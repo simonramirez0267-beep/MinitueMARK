@@ -1,0 +1,1811 @@
+<title>Oficina MinuteMark</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+<style>
+/* Oficina MinuteMark · herramienta interna de los socios (no es la landing).
+   Colores, tipografía y reglas: Design System de MinuteMark. La marca se ve siempre en modo claro.
+   Layout: las salas viven en una barra lateral en tinta (como el pie del landing); cada sala va sobre fondo;
+   las bandas azules con Mark quedan solo para la llegada (Recepción) y la Reunión de las 6. */
+:root{
+  --azul-profundo:#0051B9;
+  --azul-brillante:#008CFF;
+  --azul-hover:#0067D6;
+  --azul-tenue:#E8F1FF;
+  --fondo:#F6F8FB;
+  --superficie:#FFFFFF;
+  --blanco:#FFFFFF;
+  --carril:#EDF1F6;
+  --gris:#EEEEEE;
+  --gris-2:#E3E8EF;
+  --linea:#DCE3EC;
+  --tinta:#0A1B33;
+  --tinta-suave:#54657F;
+  --tinta-tenue:#7A8AA0;
+  --sobre-azul:#FFFFFF;
+  --sobre-azul-suave:#DCEBFF;
+  --sobre-azul-acento:#BFE0FF;
+  --sobre-azul-etiqueta:#9FCBFF;
+  --borde-claro:rgba(255,255,255,.45);
+  --lado-texto:#C6D8EE;
+  --lado-tenue:#7FA6D4;
+  --lado-hover:rgba(255,255,255,.06);
+  --lado-activo:rgba(255,255,255,.12);
+  --verde-abierto:#1FBF6A;
+  --alerta:#B42318;
+  --alerta-tenue:#FDEDEB;
+  --velo:rgba(10,27,51,.45);
+  --degradado:linear-gradient(118deg,#0051B9 0%,#0062D2 46%,#008CFF 100%);
+  --sombra:0 1px 2px rgba(10,27,51,.05),0 12px 30px -18px rgba(10,27,51,.28);
+  --sombra-modal:0 30px 80px -30px rgba(10,27,51,.55);
+  --anillo:0 0 0 4px rgba(0,140,255,.14);
+  --r-s:12px;
+  --r-m:18px;
+  --r-l:26px;
+  --f:"Outfit","Poppins","Myriad Pro",Arial,sans-serif;
+  color-scheme:light;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--fondo);color:var(--tinta);font-family:var(--f);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.025em;line-height:1.08;text-wrap:balance}
+p{margin:0}
+ul,ol{margin:0;padding:0;list-style:none}
+button,input,select,textarea{font:inherit;color:inherit}
+img{max-width:100%}
+:focus-visible{outline:3px solid var(--azul-brillante);outline-offset:2px;border-radius:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+svg{display:block}
+
+.etiqueta{display:block;font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--azul-profundo)}
+.etiqueta-azul{color:var(--sobre-azul-etiqueta)}
+.lead{color:var(--tinta-suave);font-size:17px;font-weight:300;max-width:62ch}
+.vacio{color:var(--tinta-suave);font-weight:300;font-size:14px}
+.panel-ayuda{color:var(--tinta-suave);font-weight:300;font-size:14px;max-width:60ch}
+
+/* ---------- estructura ---------- */
+.app{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100%}
+.lado{
+  position:sticky;top:0;height:100vh;height:100dvh;overflow-y:auto;z-index:20;
+  background:var(--tinta);color:var(--lado-texto);
+  display:flex;flex-direction:column;gap:24px;
+  padding-block:24px;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:18px;
+}
+.lado-marca{display:flex;flex-direction:column;gap:6px;padding-left:10px}
+.lado-logo{display:block;width:150px}
+.lado-logo img{display:block;width:100%;height:auto}
+.lado-sub{font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--lado-tenue)}
+.lado-nav{display:flex;flex-direction:column;gap:2px}
+.sala-link{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;color:var(--lado-texto);text-decoration:none;font-size:15px;white-space:nowrap}
+.sala-link svg{width:20px;height:20px;flex:none}
+.sala-link:hover{background:var(--lado-hover)}
+.sala-link.on{background:var(--lado-activo);color:var(--blanco);font-weight:500}
+.cuenta{margin-left:auto;font-size:12px;font-weight:600;background:var(--lado-activo);color:var(--blanco);border-radius:999px;padding:1px 8px;font-variant-numeric:tabular-nums}
+.vivo-dot{margin-left:auto}
+.lado-pie{margin-top:auto;display:flex;flex-direction:column;gap:14px}
+.lado-etq{display:block;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--lado-tenue);margin-bottom:8px}
+.presentes ul{display:flex;flex-direction:column;gap:8px}
+.presentes li{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--blanco)}
+.presentes small{display:block;font-size:12px;color:var(--lado-tenue)}
+.presentes .av-wrap{position:relative}
+.presentes .av-wrap::after{content:"";position:absolute;right:-2px;bottom:-2px;width:10px;height:10px;border-radius:50%;background:var(--verde-abierto);border:2px solid var(--tinta)}
+.quien{display:flex;align-items:center;gap:10px;background:none;border:0;padding:8px;border-radius:12px;cursor:pointer;color:var(--blanco);text-align:left}
+.quien:hover{background:var(--lado-hover)}
+.quien small{display:block;font-size:12px;color:var(--lado-tenue)}
+.btn-parquear{width:100%;justify-content:flex-start;background:var(--lado-activo);color:var(--blanco)}
+.btn-parquear:hover{background:var(--lado-hover)}
+
+.sala{min-width:0;padding-block:28px 72px;padding-left:clamp(16px,3vw,40px);padding-right:max(clamp(16px,3vw,40px),env(safe-area-inset-right,0px));outline:none}
+.sala-in{max-width:1200px;margin-inline:auto;display:flex;flex-direction:column;gap:22px}
+
+@media(max-width:900px){
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:31;background:var(--tinta)}
+  .app{display:block}
+  .lado{
+    position:sticky;top:env(safe-area-inset-top,0px);height:auto;overflow:visible;z-index:30;
+    display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px 12px;
+    padding-block:12px 8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  }
+  .lado-marca{padding-left:0}
+  .lado-logo{width:118px}
+  .lado-sub{display:none}
+  .lado-pie{grid-column:2;grid-row:1;margin-top:0;flex-direction:row;justify-content:flex-end;align-items:center;gap:6px}
+  .presentes,.quien small,.quien .quien-nombre,.btn-parquear span{display:none}
+  .btn-parquear{width:auto;padding:8px 10px}
+  .quien{padding:4px}
+  .lado-nav{grid-column:1/-1;flex-direction:row;overflow-x:auto;scrollbar-width:none;gap:4px;margin-inline:-4px;padding-bottom:2px}
+  .lado-nav::-webkit-scrollbar{display:none}
+  .sala-link{flex:none;padding:8px 12px;font-size:14px;gap:8px}
+  .sala-link svg{width:18px;height:18px}
+  .cuenta{margin-left:4px}
+  .sala{padding-top:20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+}
+
+/* ---------- cabeceras de sala ---------- */
+.sala-cab{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 24px}
+.sala-cab > div{display:flex;flex-direction:column;gap:10px;min-width:0}
+.sala-cab h1{font-size:clamp(28px,3.6vw,42px);letter-spacing:-.03em}
+
+/* ---------- bandas azules (Recepción y Reunión) ---------- */
+.banda{
+  position:relative;overflow:hidden;isolation:isolate;
+  background:var(--degradado);color:var(--sobre-azul);border-radius:var(--r-l);
+  padding:clamp(24px,3.4vw,40px);
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 28px;align-items:end;
+}
+.banda::before{
+  content:"";position:absolute;right:-70px;bottom:-90px;width:420px;height:420px;z-index:-1;
+  background:url("img/mm-isotipo.png") no-repeat center/contain;
+  opacity:.06;filter:brightness(0) invert(1);transform:rotate(-8deg);pointer-events:none;
+}
+.banda-txt{display:flex;flex-direction:column;gap:16px;min-width:0}
+.banda-titulo{font-size:clamp(30px,4.3vw,52px);letter-spacing:-.035em;line-height:1}
+.banda-titulo em{display:block;font-style:normal;color:var(--sobre-azul-acento)}
+.banda-nota{color:var(--sobre-azul-suave);font-weight:300;font-size:16px;max-width:56ch}
+.banda-acciones{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.mark{display:block;height:auto;pointer-events:none;user-select:none}
+.mark-recepcion{width:clamp(120px,13vw,176px);margin-bottom:-8px}
+.mark-reunion{width:clamp(150px,15vw,210px);margin-bottom:-10px}
+@media(max-width:700px){.banda{grid-template-columns:1fr}.mark{display:none}}
+@media(prefers-reduced-motion:no-preference){.mark-recepcion{animation:brinco 3.4s ease-in-out infinite}}
+@keyframes brinco{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+.reloj{display:inline-flex;align-items:center;gap:9px;background:var(--blanco);color:var(--tinta);border-radius:999px;padding:8px 15px 8px 12px;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;box-shadow:0 14px 34px -14px rgba(0,22,70,.55)}
+.reloj svg{width:17px;height:17px;color:var(--azul-profundo)}
+.punto{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--verde-abierto);flex:none;animation:latido 2.4s infinite}
+@keyframes latido{0%{box-shadow:0 0 0 0 rgba(31,191,106,.5)}70%{box-shadow:0 0 0 9px rgba(31,191,106,0)}100%{box-shadow:0 0 0 0 rgba(31,191,106,0)}}
+.quien-llego{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding-top:16px;border-top:1px solid var(--borde-claro)}
+.quien-llego p{font-size:16px;font-weight:500}
+
+/* ---------- botones ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:999px;border:1px solid transparent;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;transition:background .15s ease,border-color .15s ease,box-shadow .15s ease,transform .15s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn svg{width:18px;height:18px;flex:none}
+.btn-sm{padding:8px 14px;font-size:14px}
+.btn-primario{background:var(--azul-profundo);color:var(--blanco)}
+.btn-primario:hover{background:var(--azul-hover);box-shadow:0 8px 24px -8px rgba(0,140,255,.45)}
+.btn-blanco{background:var(--blanco);color:var(--azul-profundo)}
+.btn-linea{background:var(--superficie);border-color:var(--linea);color:var(--tinta)}
+.btn-linea:hover{border-color:var(--azul-brillante);color:var(--azul-profundo)}
+.btn-linea-clara{background:transparent;border-color:var(--borde-claro);color:var(--sobre-azul)}
+.btn-linea-clara:hover{background:var(--lado-activo)}
+.btn-borrar{background:transparent;color:var(--alerta);border-color:transparent;padding-inline:10px}
+.btn-borrar:hover{border-color:var(--alerta-tenue);background:var(--alerta-tenue)}
+.armado,.armado:hover{background:var(--alerta);color:var(--blanco);border-color:var(--alerta)}
+.icono-btn{width:38px;height:38px;flex:none;border-radius:50%;border:1px solid var(--linea);background:var(--superficie);display:grid;place-items:center;cursor:pointer;color:var(--tinta)}
+.icono-btn:hover{border-color:var(--azul-brillante);color:var(--azul-profundo)}
+.icono-btn svg{width:18px;height:18px}
+.enlace{background:none;border:0;padding:0;color:var(--azul-profundo);font-weight:500;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-size:14px;text-align:left}
+.enlace-suave{color:var(--tinta-suave)}
+.mini-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--linea);background:var(--superficie);cursor:pointer;font-size:16px;line-height:1;display:grid;place-items:center}
+.mini-btn:hover{border-color:var(--azul-brillante)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.btn:hover{transform:none}}
+
+/* ---------- controles segmentados ---------- */
+.seg{display:inline-flex;flex-wrap:wrap;background:var(--carril);border-radius:999px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:500;color:var(--tinta-suave);cursor:pointer;white-space:nowrap}
+.seg button:hover{color:var(--tinta)}
+.seg button[aria-pressed="true"]{background:var(--superficie);color:var(--tinta);box-shadow:0 1px 2px rgba(10,27,51,.14)}
+.pestanas{align-self:flex-start}
+.pestanas button{padding:9px 16px;font-size:14px}
+.estado-seg button[aria-pressed="true"]{background:var(--azul-profundo);color:var(--blanco)}
+
+/* ---------- chips y avatares ---------- */
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500;line-height:1.45;white-space:nowrap}
+.chip-etapa{background:var(--azul-tenue);color:var(--azul-profundo)}
+.chip-neutro{background:var(--gris);color:var(--tinta-suave)}
+.chip-alerta{background:var(--alerta-tenue);color:var(--alerta)}
+.chip-curso,.chip-hoy{background:var(--azul-profundo);color:var(--blanco)}
+.chip-vivo{background:var(--superficie);color:var(--tinta);border:1px solid var(--linea)}
+.chip-blanco{background:var(--blanco);color:var(--azul-profundo)}
+.avatar{width:28px;height:28px;border-radius:50%;display:inline-grid;place-items:center;flex:none;font-size:11px;font-weight:600;letter-spacing:.02em}
+.av-simon{background:var(--azul-profundo);color:var(--blanco)}
+.av-sebastian{background:var(--azul-tenue);color:var(--azul-profundo);box-shadow:inset 0 0 0 1px #C7DCF7}
+.av-ambos{background:var(--gris-2);color:var(--tinta);font-size:10px}
+.av-sin{background:var(--alerta-tenue);color:var(--alerta)}
+.av-marca{background:var(--superficie);box-shadow:inset 0 0 0 1px var(--linea)}
+.av-marca img{width:17px;height:auto}
+.avatar-l{width:36px;height:36px;font-size:13px}
+
+/* ---------- paneles ---------- */
+.panel{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-m);padding:22px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel-cab{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px}
+.panel-cab > div:first-child{display:flex;flex-direction:column;gap:8px;min-width:0}
+.panel-cab h2{font-size:22px}
+.panel-herr{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+
+.rejilla{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;align-items:start}
+.p-hoy{grid-column:span 7}
+.p-norte{grid-column:span 5}
+.p-ruta,.p-actividad,.p-parq{grid-column:span 4}
+.p-reglas{grid-column:1/-1}
+@media(max-width:1180px){.p-hoy,.p-norte{grid-column:1/-1}.p-ruta,.p-actividad{grid-column:span 6}.p-parq{grid-column:1/-1}}
+@media(max-width:720px){.rejilla > *{grid-column:1/-1!important}}
+
+/* listas de tareas */
+.lista-tareas{display:flex;flex-direction:column}
+.fila{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid var(--linea)}
+.fila:first-child{border-top:0;padding-top:2px}
+.fila-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.fila-titulo,.mini-titulo,.tarea-titulo,.obj-titulo,.rv-titulo{background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--tinta);font-weight:500;font-size:15px;line-height:1.35}
+.fila-titulo:hover,.mini-titulo:hover,.tarea-titulo:hover,.obj-titulo:hover,.rv-titulo:hover{color:var(--azul-profundo);text-decoration:underline;text-underline-offset:3px}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.es-hecha .fila-titulo,.es-hecha .mini-titulo,.es-hecha .tarea-titulo{color:var(--tinta-suave)}
+.resultado{font-size:13px;color:var(--tinta-suave);font-weight:300;line-height:1.45}
+.resultado b{font-weight:500;color:var(--tinta)}
+.check{width:26px;height:26px;flex:none;border-radius:50%;border:2px solid var(--linea);background:var(--superficie);cursor:pointer;display:grid;place-items:center;color:transparent;padding:0;margin-top:-1px}
+.check svg{width:15px;height:15px}
+.check:hover{border-color:var(--azul-brillante);color:var(--azul-brillante)}
+.check.on{background:var(--azul-profundo);border-color:var(--azul-profundo);color:var(--blanco)}
+.mostrar-mas{align-self:flex-start}
+
+/* norte y objetivos */
+.norte{font-size:26px;letter-spacing:-.03em}
+.objetivos{display:flex;flex-direction:column;gap:16px}
+.objetivo{display:flex;flex-direction:column;gap:7px}
+.obj-fila{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.obj-num{font-size:24px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.obj-num small{font-size:14px;font-weight:400;color:var(--tinta-suave);letter-spacing:0}
+.obj-auto{font-size:12px;color:var(--tinta-suave)}
+.obj-ctrl{display:flex;gap:6px}
+.barra{height:8px;border-radius:99px;background:var(--gris-2);overflow:hidden}
+.barra i{display:block;height:100%;border-radius:99px;background:var(--azul-brillante);transition:width .4s ease}
+
+/* ruta vertical (Recepción) */
+.ruta-v{display:flex;flex-direction:column;gap:0}
+.rv{display:flex;gap:14px;position:relative;padding-bottom:16px}
+.rv::before{content:"";position:absolute;left:14px;top:30px;bottom:0;width:2px;background:var(--gris-2)}
+.rv:last-child{padding-bottom:0}
+.rv:last-child::before{display:none}
+.rv > div{display:flex;flex-direction:column;gap:2px;padding-top:4px;min-width:0}
+.rv-meta{font-size:13px;color:var(--tinta-suave)}
+.paso-num{width:30px;height:30px;border-radius:50%;background:var(--azul-brillante);color:var(--blanco);display:grid;place-items:center;font-weight:600;font-size:14px;flex:none;position:relative;z-index:1}
+.paso-num svg{width:16px;height:16px}
+.pendiente .paso-num{background:var(--gris-2);color:var(--tinta-suave)}
+.cumplida .paso-num{background:var(--azul-profundo)}
+.rv-final .paso-num{background:var(--tinta)}
+
+/* actividad */
+.actividad{display:flex;flex-direction:column;gap:12px}
+.actividad li{display:flex;gap:10px;align-items:flex-start}
+.actividad p{font-size:14px;line-height:1.4;min-width:0;overflow-wrap:anywhere}
+.actividad b{font-weight:600}
+.actividad time{display:block;font-size:12px;color:var(--tinta-suave);margin-top:2px}
+
+/* parqueadero */
+.form-linea{display:flex;gap:8px}
+.form-linea input{flex:1;min-width:0}
+.ideas{display:flex;flex-direction:column;gap:10px}
+.idea{background:var(--fondo);border:1px solid var(--linea);border-radius:var(--r-s);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.idea p{font-size:15px;overflow-wrap:anywhere}
+.idea-pie{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;font-size:12px;color:var(--tinta-suave)}
+.idea-acc{display:flex;gap:14px}
+.idea-acc .enlace{font-size:13px}
+
+/* reglas */
+.reglas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.reglas li{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--tinta-suave);font-weight:300}
+.reglas b{color:var(--tinta);font-weight:600;font-size:15px}
+@media(max-width:900px){.reglas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.reglas{grid-template-columns:1fr}}
+
+/* ---------- campos ---------- */
+.campo-input,.campo input,.campo select,.campo textarea,.form-linea input,.form-linea select,.filtro select,.select-suelto{
+  width:100%;padding:10px 13px;border:1px solid var(--linea);border-radius:var(--r-s);background:var(--fondo);color:var(--tinta);font-size:15px;
+}
+.campo textarea{min-height:88px;resize:vertical;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azul-brillante);box-shadow:var(--anillo)}
+::placeholder{color:var(--tinta-tenue)}
+
+/* ---------- tablero ---------- */
+.ruta-h{display:grid;grid-template-columns:repeat(var(--n,5),minmax(150px,1fr)) minmax(120px,.6fr);gap:10px;overflow-x:auto;padding-bottom:4px}
+.rh{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-m);padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.rh.sel{border-color:var(--azul-brillante);box-shadow:var(--anillo)}
+.rh-btn{display:flex;gap:10px;align-items:flex-start;background:none;border:0;padding:0;text-align:left;cursor:pointer}
+.rh-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rh-txt b{font-weight:600;font-size:15px;line-height:1.2}
+.rh-txt small{font-size:12px;color:var(--tinta-suave)}
+.rh-final{background:var(--tinta);border-color:var(--tinta);color:var(--blanco);justify-content:center;align-items:flex-start}
+.rh-final .paso-num{background:var(--azul-brillante)}
+.rh-final b{font-size:15px}
+.rh .enlace{font-size:13px}
+.aviso-linea{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:14px;color:var(--tinta-suave)}
+.filtros{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:center}
+.filtro{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.filtro-label{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave)}
+.filtro select{width:auto;padding:7px 12px;font-size:14px;background:var(--superficie)}
+.kanban{display:grid;grid-template-columns:repeat(3,minmax(270px,1fr));gap:14px;overflow-x:auto;padding-bottom:6px;align-items:start}
+.columna{background:var(--carril);border-radius:var(--r-m);padding:12px;display:flex;flex-direction:column;gap:10px;min-height:220px;min-width:0}
+.columna.sobre{outline:2px dashed var(--azul-brillante);outline-offset:-2px}
+.col-cab{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 2px}
+.col-cab h2{font-size:16px;letter-spacing:-.01em}
+.cuenta-col{font-size:13px;font-weight:600;color:var(--tinta-suave);font-variant-numeric:tabular-nums}
+.col-lista{display:flex;flex-direction:column;gap:10px}
+.vacio-col{padding:12px 6px}
+.col-mas{display:flex;align-items:center;gap:6px;background:none;border:1px dashed var(--linea);border-radius:var(--r-s);padding:9px 12px;color:var(--tinta-suave);cursor:pointer;font-size:14px;font-weight:500}
+.col-mas:hover{border-color:var(--azul-brillante);color:var(--azul-profundo)}
+.col-mas svg{width:16px;height:16px}
+.tarea{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-s);padding:12px;display:flex;flex-direction:column;gap:9px}
+.tarea[draggable="true"]{cursor:grab}
+.tarea.arrastrando{opacity:.5}
+.tarea-fila{display:flex;gap:10px;align-items:flex-start}
+.tarea-pie{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tarea-pie .enlace{font-size:13px}
+@media(max-width:900px){.kanban{grid-template-columns:repeat(3,minmax(260px,82%));scroll-snap-type:x mandatory}.columna{scroll-snap-align:start}}
+
+/* ---------- semana ---------- */
+.nav-semana{display:flex;align-items:center;gap:8px}
+.semana{display:grid;grid-template-columns:repeat(7,minmax(148px,1fr));gap:10px;overflow-x:auto;padding-bottom:6px;align-items:stretch}
+.dia{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-m);padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.dia.es-hoy{border-color:var(--azul-brillante);box-shadow:var(--anillo)}
+.dia.es-pasado{background:var(--fondo)}
+.dia-cab{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.dia-nombre{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave)}
+.dia-num{font-size:24px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.foco{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;background:var(--azul-tenue);border:1px solid transparent;border-radius:var(--r-s);padding:10px 11px;cursor:pointer;color:var(--azul-profundo)}
+.foco b{font-weight:600;font-size:14px;line-height:1.25;color:var(--tinta)}
+.foco:hover{border-color:var(--azul-brillante)}
+.foco-et{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.foco-vacio{background:var(--superficie);border:1px dashed var(--alerta);color:var(--alerta)}
+.foco-vacio b{color:var(--alerta);font-weight:500}
+.dia-tareas{display:flex;flex-direction:column;gap:8px;flex:1}
+.mini{display:flex;align-items:flex-start;gap:8px}
+.mini .check{width:22px;height:22px}
+.mini .check svg{width:13px;height:13px}
+.mini-titulo{flex:1;min-width:0;font-size:13px;font-weight:400;overflow-wrap:anywhere}
+.mini .avatar{width:22px;height:22px;font-size:9px}
+.dia-pie{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.dia-pie .enlace{display:inline-flex;align-items:center;gap:4px;font-size:13px}
+.dia-pie svg{width:14px;height:14px}
+.programar{display:flex;align-items:center;gap:10px}
+.programar select{width:auto;padding:6px 10px;font-size:13px;background:var(--superficie)}
+@media(max-width:760px){.semana{grid-template-columns:1fr;overflow:visible}}
+
+/* ---------- reunión ---------- */
+.select-azul{width:auto;background:transparent;border:1px solid var(--borde-claro);border-radius:999px;color:var(--sobre-azul);padding:8px 14px;font-size:14px;font-weight:500}
+.select-azul option{color:var(--tinta)}
+.reunion{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start}
+.reunion-agenda{display:flex;flex-direction:column;gap:14px;min-width:0}
+.reunion-lado{display:flex;flex-direction:column;gap:16px;position:sticky;top:20px}
+@media(max-width:1060px){.reunion{grid-template-columns:1fr}.reunion-lado{position:static}}
+.bloque{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-m);padding:20px;display:flex;flex-direction:column;gap:16px}
+.bloque.activo{border-color:var(--azul-brillante);box-shadow:var(--anillo)}
+.bloque.pasado{background:var(--fondo)}
+.bloque-cab{display:flex;gap:14px;align-items:flex-start}
+.bloque-cab > div{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.bloque-cab h2{font-size:20px}
+.bloque-cab p{font-size:14px;color:var(--tinta-suave);font-weight:300}
+.bloque-cab .hora{font-weight:600;color:var(--azul-profundo);letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.sub{display:flex;flex-direction:column;gap:6px}
+.sub h3{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-suave)}
+.foco-hoy{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;background:var(--azul-tenue);border-radius:var(--r-s);padding:14px 16px}
+.foco-hoy b{font-size:18px;font-weight:600;letter-spacing:-.01em}
+.foco-hoy p{flex-basis:100%;font-size:14px;color:var(--tinta-suave)}
+.decisiones{display:flex;flex-direction:column;gap:8px;counter-reset:dec}
+.decision{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;background:var(--fondo);border-radius:var(--r-s)}
+.decision p{flex:1;min-width:0;font-size:15px;overflow-wrap:anywhere}
+.decision small{display:block;font-size:12px;color:var(--tinta-suave);margin-top:2px}
+.form-compromiso{display:grid;grid-template-columns:minmax(0,1fr) 150px 150px auto;gap:8px}
+@media(max-width:760px){.form-compromiso{grid-template-columns:1fr 1fr}.form-compromiso input[name="titulo"],.form-compromiso button{grid-column:1/-1}}
+.notas-reunion{width:100%;min-height:130px;resize:vertical;padding:12px 14px;border:1px solid var(--linea);border-radius:var(--r-s);background:var(--fondo);line-height:1.5}
+.actas{display:flex;flex-direction:column}
+.acta{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--linea);font-size:14px}
+.acta:first-child{border-top:0}
+.acta span{color:var(--tinta-suave)}
+
+/* ---------- proveedores y precios ---------- */
+.resumen{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.dato{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-m);padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.dato b{font-size:28px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.dato b small{font-size:15px;font-weight:400;color:var(--tinta-suave);letter-spacing:0}
+.dato span{font-size:13px;color:var(--tinta-suave)}
+.tarjetas{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.prov{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-m);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.prov-cab{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.prov-cab h3{font-size:17px}
+.prov-cab span{font-size:12px;color:var(--tinta-suave)}
+.prov p{font-size:14px;color:var(--tinta-suave);overflow-wrap:anywhere}
+.prov .seg{align-self:flex-start}
+.prov-pie{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.tabla-caja{overflow-x:auto;border:1px solid var(--linea);border-radius:var(--r-m);background:var(--superficie)}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:14px}
+th{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave);text-align:left;padding:12px 14px;white-space:nowrap}
+td{padding:12px 14px;border-top:1px solid var(--linea);vertical-align:top}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td .enlace{font-size:14px}
+tr.destacada td{background:var(--azul-tenue)}
+.ahorro{color:var(--azul-profundo);font-weight:600}
+.nota-tabla{font-size:13px;color:var(--tinta-suave);font-weight:300;max-width:80ch}
+
+/* ---------- comercial ---------- */
+.embudo{display:grid;grid-template-columns:repeat(6,minmax(110px,1fr));gap:8px;overflow-x:auto;padding-bottom:4px}
+.embudo-paso{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-s);padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.embudo-paso b{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}
+.embudo-paso span{font-size:12px;color:var(--tinta-suave)}
+.embudo-paso.final{background:var(--azul-profundo);border-color:var(--azul-profundo);color:var(--blanco)}
+.embudo-paso.final span{color:var(--sobre-azul-suave)}
+.pipeline{display:grid;grid-template-columns:repeat(6,minmax(232px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px;align-items:start}
+.prospecto{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-s);padding:12px;display:flex;flex-direction:column;gap:8px}
+.prospecto[draggable="true"]{cursor:grab}
+.prospecto h3{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.prospecto p{font-size:13px;color:var(--tinta-suave)}
+.prospecto .proximo{color:var(--tinta)}
+.prospecto-acc{display:flex;flex-wrap:wrap;gap:12px}
+.prospecto-acc .enlace{font-size:13px}
+
+/* ---------- libreta ---------- */
+.libreta{display:grid;grid-template-columns:280px minmax(0,1fr);gap:18px;align-items:start}
+@media(max-width:860px){.libreta{grid-template-columns:1fr}}
+.notas-lista{display:flex;flex-direction:column;gap:6px}
+.nota-item{display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-s);padding:12px 14px;cursor:pointer}
+.nota-item b{font-weight:600;font-size:15px;line-height:1.3}
+.nota-item span{font-size:12px;color:var(--tinta-suave)}
+.nota-item:hover{border-color:var(--azul-brillante)}
+.nota-item[aria-current="true"]{border-color:var(--azul-profundo);box-shadow:var(--anillo)}
+.editor{display:flex;flex-direction:column;gap:12px}
+.editor-titulo{font-size:24px;font-weight:600;letter-spacing:-.02em;border:1px solid transparent;border-radius:var(--r-s);padding:6px 10px;background:transparent;width:100%}
+.editor-titulo:hover{border-color:var(--linea)}
+.editor-texto{width:100%;min-height:62vh;resize:vertical;padding:16px 18px;border:1px solid var(--linea);border-radius:var(--r-s);background:var(--fondo);font-size:15px;line-height:1.65}
+.editor-pie{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;font-size:13px;color:var(--tinta-suave)}
+
+/* ---------- modal ---------- */
+dialog#modal{width:min(660px,calc(100% - 24px));max-height:calc(100dvh - 32px);border:0;border-radius:var(--r-l);padding:0;background:var(--superficie);color:var(--tinta);box-shadow:var(--sombra-modal);overflow:auto}
+dialog#modal::backdrop{background:var(--velo)}
+.modal-caja{display:flex;flex-direction:column}
+.modal-cab{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 24px 16px}
+.modal-cab > div{display:flex;flex-direction:column;gap:8px;min-width:0}
+.modal-cab h2{font-size:22px;overflow-wrap:anywhere}
+.modal-cuerpo{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:4px 24px 8px}
+.campo{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;min-width:0;border:0;margin:0;padding:0}
+.campo.medio{grid-column:span 1}
+@media(max-width:520px){.campo.medio{grid-column:1/-1}}
+.campo > label,.campo > legend{font-size:14px;font-weight:500;padding:0}
+.campo .ayuda{font-size:12px;color:var(--tinta-suave);font-weight:300}
+.campo.con-error input,.campo.con-error textarea,.campo.con-error select{border-color:var(--alerta)}
+.error{font-size:13px;color:var(--alerta);font-weight:500}
+.segmento{display:flex;flex-wrap:wrap;gap:6px}
+.segmento label{position:relative;cursor:pointer}
+.segmento input{position:absolute;opacity:0;width:1px;height:1px}
+.segmento span{display:inline-block;padding:7px 14px;border-radius:999px;border:1px solid var(--linea);font-size:14px;font-weight:500;background:var(--superficie)}
+.segmento input:checked + span{background:var(--azul-profundo);border-color:var(--azul-profundo);color:var(--blanco)}
+.segmento input:focus-visible + span{outline:3px solid var(--azul-brillante);outline-offset:2px}
+.pasos-lista{display:flex;flex-direction:column;gap:6px}
+.paso-item{display:flex;align-items:center;gap:8px}
+.paso-item input[type="checkbox"]{width:18px;height:18px;flex:none;accent-color:var(--azul-profundo)}
+.paso-item input[type="text"]{flex:1;min-width:0;padding:8px 10px;font-size:14px}
+.paso-nuevo{display:flex;gap:8px}
+.paso-nuevo input{flex:1;min-width:0}
+.info-modal{grid-column:1/-1;font-size:13px;color:var(--tinta-suave);background:var(--fondo);border-radius:var(--r-s);padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.info-modal b{color:var(--tinta);font-weight:500}
+.modal-acciones{position:sticky;bottom:0;display:flex;align-items:center;gap:10px;padding:16px 24px 20px;background:var(--superficie);border-top:1px solid var(--linea);margin-top:10px}
+.modal-acciones .espacio{flex:1}
+@media(max-width:520px){.modal-acciones{flex-wrap:wrap}.modal-acciones .espacio{display:none}}
+
+/* ---------- avisos ---------- */
+.aviso{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;max-width:calc(100% - 32px);width:max-content;background:var(--tinta);color:var(--blanco);border-radius:16px;padding:12px 18px;font-size:14px;font-weight:500;box-shadow:var(--sombra-modal);display:flex;align-items:center;gap:12px}
+.aviso.alerta{background:var(--alerta)}
+.aviso.logro{background:var(--azul-profundo);padding:8px 20px 8px 10px}
+.aviso.logro img{width:58px;height:auto;margin-block:-14px -4px}
+.franja{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;border-radius:var(--r-m);padding:12px 16px;font-size:14px;background:var(--azul-tenue);color:var(--tinta)}
+.franja.alerta{background:var(--alerta-tenue);color:var(--alerta)}
+.cargando{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:60px 0;color:var(--tinta-suave)}
+.cargando img{width:180px;height:auto}
+</style>
+
+<div class="app">
+  <aside class="lado" id="lado">
+    <div class="lado-marca">
+      <a class="lado-logo" href="#recepcion" data-accion="ir" data-sala="recepcion" aria-label="MinuteMark, ir a la recepción"><img src="img/mm-logo-white.png" alt="MinuteMark" width="720" height="188"></a>
+      <span class="lado-sub">Oficina de socios</span>
+    </div>
+    <nav class="lado-nav" id="lado-nav" aria-label="Salas de la oficina"></nav>
+    <div class="lado-pie" id="lado-pie"></div>
+  </aside>
+  <main class="sala" id="sala" tabindex="-1"></main>
+</div>
+<dialog id="modal" aria-labelledby="modal-titulo"></dialog>
+<div class="aviso" id="aviso" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+'use strict';
+
+// Link de la oficina compartida en claude.ai. La copia local (abierta desde el repositorio) lo muestra en su aviso.
+var OFICINA_URL = 'https://claude.ai/artifact/7JRogiZ5KaNFzfb7QSRP59';
+
+var SOCIOS = {
+  simon:{nombre:'Simón', completo:'Simón Ramírez', ini:'SR', rol:'Dirección comercial'},
+  sebastian:{nombre:'Sebastián', completo:'Sebastián Ortiz', ini:'SO', rol:'Socio fundador'}
+};
+var SALAS = [
+  ['recepcion','Recepción'],
+  ['tablero','Tablero'],
+  ['semana','Semana'],
+  ['reunion','Reunión de las 6'],
+  ['proveedores','Proveedores y precios'],
+  ['comercial','Comercial'],
+  ['libreta','Libreta']
+];
+var SALA_IDS = SALAS.map(function(s){ return s[0]; });
+var ESTADOS = [['pendiente','Por hacer'],['en_curso','En curso'],['hecho','Hecho']];
+var RESPONSABLES = [['simon','Simón'],['sebastian','Sebastián'],['ambos','Ambos'],['','Sin asignar']];
+var ETAPAS_COM = [['por_contactar','Por contactar'],['contactado','Contactado'],['reunion','Reunión agendada'],['presentacion','Presentación hecha'],['consejo','En consejo'],['firmado','Firmado']];
+var CANALES = ['Llamada','WhatsApp','LinkedIn','Facebook','Correo','Referido','Visita'];
+var ZONAS = ['El Poblado','Envigado','Laureles / Estadio','Sabaneta','Belén','Otra zona de Medellín','Fuera de Medellín'];
+var APTOS = ['Más de 300','Entre 150 y 300','Entre 100 y 150','Menos de 100'];
+var CATEGORIAS = ['Mecato','Bebidas frías','Panadería básica','Mascotas','Aseo personal','Dulces','Helados','Hogar'];
+var TIPOS_PROV = ['Distribuidor','Estanterías','Equipos','Servicios','Otro'];
+var LISTA = [['por_pedir','Por pedir'],['pedida','Pedida'],['recibida','Recibida']];
+var COTI = [['actual','Proveedor actual'],['pedida','Pedida'],['recibida','Recibida'],['elegida','Elegida'],['descartada','Descartada']];
+var IVAS = [['19','19%'],['5','5%'],['0','0% (exento)'],['excluido','Excluido']];
+var BLOQUES = [
+  {n:1, min:0,  dur:10, titulo:'Lo cumplido', ayuda:'Qué se hizo desde la última reunión y qué quedó abierto.'},
+  {n:2, min:10, dur:30, titulo:'Foco de hoy', ayuda:'Solo el tema del día. Lo que no sea del foco, al parqueadero.'},
+  {n:3, min:40, dur:10, titulo:'Decisiones', ayuda:'Lo que se decide queda escrito.'},
+  {n:4, min:50, dur:10, titulo:'Compromisos para mañana', ayuda:'Cada uno con responsable y día. Y el foco de mañana, definido.'}
+];
+var REGLAS = [
+  ['Un foco por día.','Lo que no es del foco va al parqueadero.'],
+  ['Nada sale de la reunión sin responsable y día.','Si no tiene dueño, no es un compromiso.'],
+  ['Lo cumplido se causa.','Una línea sobre cómo se cumplió, con datos.'],
+  ['Lo decidido no se reabre','sin un dato nuevo.']
+];
+var COLS = ['config','etapas','tareas','semana','reuniones','decisiones','parqueadero','objetivos','proveedores','cotizaciones','productos','prospectos','libreta'];
+
+function svg(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
+var ICON = {
+  recepcion: svg('<path d="M4 21h16"/><path d="M6 21V4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21"/><circle cx="14.5" cy="12.5" r="1" fill="currentColor"/>'),
+  tablero: svg('<rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M9 4v16M15 4v16"/>'),
+  semana: svg('<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/>'),
+  reunion: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>'),
+  proveedores: svg('<path d="m3 7.5 9-4.5 9 4.5-9 4.5z"/><path d="M3 7.5v9l9 4.5 9-4.5v-9"/><path d="M12 12v9"/>'),
+  comercial: svg('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>'),
+  libreta: svg('<path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M6 3v18M10 8h5M10 12h5"/>'),
+  parquear: svg('<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M10 16V8h3a2.5 2.5 0 0 1 0 5h-3"/>'),
+  check: svg('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
+  mas: svg('<path d="M12 5v14M5 12h14"/>'),
+  x: svg('<path d="M6 6l12 12M18 6 6 18"/>'),
+  izq: svg('<path d="m15 6-6 6 6 6"/>'),
+  der: svg('<path d="m9 6 6 6-6 6"/>'),
+  lapiz: svg('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
+  bandera: svg('<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>')
+};
+
+// ---------- utilidades ----------
+function $(s, el){ return (el || document).querySelector(s); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function pad(n){ return String(n).padStart(2, '0'); }
+var LS = {
+  get: function(k, def){ try { var v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); } catch(e){ return def; } },
+  set: function(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+function opciones(lista, sel){
+  return lista.map(function(o){ return '<option value="' + esc(o[0]) + '"' + (String(o[0]) === String(sel == null ? '' : sel) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('');
+}
+function ahora(){ return new Date().toISOString(); }
+function nuevoId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function pesos(n){
+  if (n === null || n === undefined || n === '' || isNaN(Number(n))) return '—';
+  var v = Math.round(Number(n)), s = String(Math.abs(v)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return (v < 0 ? '−' : '') + '$' + s;
+}
+function leerPesos(s){ var d = String(s || '').replace(/[^\d]/g, ''); return d ? Number(d) : null; }
+function porc(x){ return (x == null || !isFinite(x)) ? '—' : Math.round(x * 100) + '%'; }
+
+// fechas (hora local de Medellín)
+var MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+var MESES_C = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+var DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+var DIAS_C = ['dom','lun','mar','mié','jue','vie','sáb'];
+function fechaISO(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function desdeISO(s){ var p = String(s).split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+function hoy(){ return fechaISO(new Date()); }
+function sumarDias(s, n){ var d = desdeISO(s); d.setDate(d.getDate() + n); return fechaISO(d); }
+function lunesDe(s){ var d = desdeISO(s); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return fechaISO(d); }
+function fechaLarga(s){ var d = desdeISO(s); return DIAS[d.getDay()] + ' ' + d.getDate() + ' de ' + MESES[d.getMonth()]; }
+function fechaCorta(s){ var d = desdeISO(s); return DIAS_C[d.getDay()] + ' ' + d.getDate() + ' ' + MESES_C[d.getMonth()]; }
+function horaTexto(min){ var h = Math.floor(min / 60) % 24, m = min % 60; return (h % 12 === 0 ? 12 : h % 12) + ':' + pad(m) + (h < 12 ? ' a.m.' : ' p.m.'); }
+function haceCuanto(iso){
+  var t = Date.parse(iso); if (!t) return '';
+  var min = Math.round((Date.now() - t) / 60000);
+  if (min < 1) return 'ahora';
+  if (min < 60) return 'hace ' + min + ' min';
+  var d = new Date(t), hh = horaTexto(d.getHours() * 60 + d.getMinutes()), f = fechaISO(d);
+  if (f === hoy()) return 'hoy, ' + hh;
+  if (f === sumarDias(hoy(), -1)) return 'ayer, ' + hh;
+  return fechaCorta(f) + ', ' + hh;
+}
+function saludoHora(){ var h = new Date().getHours(); return h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches'; }
+
+// ---------- estado ----------
+var S = {
+  modo:'cargando', error:'', recibidas:{},
+  d:{}, actividad:[],
+  yo: LS.get('mm-oficina-yo', null),
+  sala: salaInicial(),
+  filtro: LS.get('mm-oficina-filtro', {resp:'todos', etapa:'todas'}),
+  hoyMias: LS.get('mm-oficina-mias', false),
+  provTab: LS.get('mm-oficina-prov', 'proveedores'),
+  comResp: 'todos', comCanal: '',
+  notaSel: LS.get('mm-oficina-nota', null),
+  semana: null, reunionFecha: null,
+  verHechas:false, verHechasHoy:false, verPerdidos:false,
+  presentes: [], tickClave:''
+};
+COLS.forEach(function(c){ S.d[c] = []; });
+if (S.yo && !SOCIOS[S.yo]) S.yo = null;
+function salaInicial(){ var h = (location.hash || '').slice(1); return SALA_IDS.indexOf(h) >= 0 ? h : 'recepcion'; }
+function listo(){ return S.modo === 'local' || (S.modo === 'vivo' && COLS.every(function(c){ return S.recibidas[c]; })); }
+
+// ---------- datos: base compartida (claude.ai) o copia local ----------
+var B = { db:null, room:null, local:{} };
+
+function iniciar(){
+  render();
+  var usar = window.claude && typeof window.claude.use === 'function';
+  var p = usar ? window.claude.use('db').catch(function(){ return null; }) : Promise.resolve(null);
+  p.then(function(db){
+    if (db) { B.db = db; S.modo = 'vivo'; conectarVivo(db); }
+    else { S.modo = 'local'; conectarLocal(); }
+    render();
+  });
+  if (usar) conectarSala();
+}
+
+function conectarVivo(db){
+  COLS.forEach(function(c){
+    db.collection(c).onSnapshot(function(snap){
+      S.d[c] = snap.docs.map(function(doc){ return Object.assign({id:doc.id}, doc.data()); });
+      S.recibidas[c] = true;
+      pedirRender();
+    }, caida);
+  });
+  db.collection('actividad').orderBy('fecha', 'desc').limit(40).onSnapshot(function(snap){
+    S.actividad = snap.docs.map(function(doc){ return Object.assign({id:doc.id}, doc.data()); });
+    pedirRender();
+  }, caida);
+  // la actividad se guarda 60 días; lo más viejo se borra para no llenar la base
+  var limite = new Date(Date.now() - 60 * 864e5).toISOString();
+  db.collection('actividad').where('fecha', '<', limite).limit(100).get().then(function(snap){
+    snap.docs.forEach(function(doc){ db.collection('actividad').doc(doc.id).delete().catch(function(){}); });
+  }).catch(function(){});
+}
+function caida(err){
+  S.error = err && err.code === 'revoked'
+    ? 'Esta vista perdió el acceso a la oficina. Recarga la página.'
+    : 'Se perdió la conexión con la oficina. Recarga la página para volver a ver los cambios en vivo.';
+  pedirRender();
+}
+function conectarLocal(){
+  COLS.concat('actividad').forEach(function(c){ B.local[c] = LS.get('mm-oficina-db:' + c, {}); });
+  refrescarLocal();
+}
+function refrescarLocal(){
+  function lista(c){ return Object.keys(B.local[c] || {}).map(function(id){ return Object.assign({id:id}, B.local[c][id]); }); }
+  COLS.forEach(function(c){ S.d[c] = lista(c); });
+  S.actividad = lista('actividad').sort(function(a, b){ return (b.fecha || '').localeCompare(a.fecha || ''); }).slice(0, 40);
+  pedirRender();
+}
+
+function escribir(op, c, id, data){
+  if (B.db) {
+    var ref = B.db.collection(c).doc(id);
+    var p = op === 'set' ? ref.set(data) : op === 'update' ? ref.update(data) : ref.delete();
+    return p.then(function(){ return true; }, function(e){ avisar(mensajeError(e), 'alerta'); return false; });
+  }
+  if (S.modo !== 'local') { avisar('La oficina aún se está abriendo. Intenta de nuevo en un momento.', 'alerta'); return Promise.resolve(false); }
+  var col = B.local[c] || (B.local[c] = {});
+  if (op === 'set') col[id] = data;
+  else if (op === 'update') col[id] = Object.assign({}, col[id] || {}, data);
+  else delete col[id];
+  LS.set('mm-oficina-db:' + c, col);
+  refrescarLocal();
+  return Promise.resolve(true);
+}
+function crear(c, data){ var id = nuevoId(); escribir('set', c, id, data); return id; }
+function cambiar(c, id, patch){ return escribir('update', c, id, patch); }
+function borrar(c, id){ return escribir('delete', c, id); }
+function buscar(c, id){ return S.d[c].find(function(x){ return x.id === id; }); }
+function guardarDoc(c, id, patch){ return buscar(c, id) ? cambiar(c, id, patch) : escribir('set', c, id, patch); }
+function mensajeError(e){
+  var c = e && e.code;
+  if (c === 'quota_exceeded') return 'La oficina llegó a su límite de registros. Borren cosas que ya no sirvan para seguir creando.';
+  if (c === 'resource_exhausted') return 'Muchos cambios seguidos. Espera unos segundos y vuelve a intentar.';
+  if (c === 'revoked' || c === 'not_granted') return 'Esta vista ya no puede guardar en la oficina. Recarga la página.';
+  return 'No se pudo guardar. Revisa la conexión y vuelve a intentar.';
+}
+function registrar(texto){ crear('actividad', {texto:texto, por:S.yo || '', fecha:ahora()}); }
+
+// quién está en la oficina ahora mismo
+function conectarSala(){
+  window.claude.use('room').then(function(room){
+    if (!room) return;
+    B.room = room;
+    anunciar();
+    room.onPeers(function(ch){ S.presentes = ch.peers; renderLado(); }, function(){});
+  }).catch(function(){});
+}
+function anunciar(){
+  if (!B.room) return;
+  B.room.presence({quien:S.yo || '', sala:S.sala, nota:S.sala === 'libreta' ? (S.notaSel || '') : ''}).catch(function(){});
+}
+
+// ---------- derivados ----------
+function config(){ return buscar('config', 'oficina') || {}; }
+function horaReunion(){ var h = config().horaReunion; return /^\d{1,2}:\d{2}$/.test(h || '') ? h : '18:00'; }
+function minutosReunion(){ var p = horaReunion().split(':').map(Number); return p[0] * 60 + p[1]; }
+function nombreReunion(){ var m = minutosReunion(), h = Math.floor(m / 60) % 12 || 12, mm = m % 60; return (h === 1 ? 'la 1' : 'las ' + h) + (mm ? ':' + pad(mm) : ''); }
+function etapas(){ return S.d.etapas.slice().sort(function(a, b){ return (a.n || 0) - (b.n || 0); }); }
+function etapa(id){ return id ? buscar('etapas', id) : null; }
+function focoDe(f){ return buscar('semana', f); }
+function textoFoco(fo){ if (!fo) return ''; var e = etapa(fo.etapa); return fo.foco || (e ? e.titulo : ''); }
+function ordenTareas(a, b){ return (a.dia || '9999').localeCompare(b.dia || '9999') || (a.orden || 0) - (b.orden || 0); }
+function tareasTxt(p){ return p.hechas + ' de ' + p.total + (p.total === 1 ? ' tarea' : ' tareas'); }
+function progresoEtapa(id){
+  var ts = S.d.tareas.filter(function(t){ return t.etapa === id; });
+  return {total:ts.length, hechas:ts.filter(function(t){ return t.estado === 'hecho'; }).length, curso:ts.filter(function(t){ return t.estado === 'en_curso'; }).length};
+}
+function estadoEtapa(e, p){ if (e.cumplida) return 'cumplida'; if (p.hechas || p.curso) return 'en-curso'; return 'pendiente'; }
+function estadoReunion(){
+  var r = buscar('reuniones', hoy());
+  var n = new Date(), min = n.getHours() * 60 + n.getMinutes(), ini = minutosReunion();
+  if (r && r.fin) return {fase:'cerrada', r:r};
+  if (r && r.inicio) return {fase:'curso', trans:Math.max(0, Math.floor((Date.now() - Date.parse(r.inicio)) / 60000)), r:r};
+  if (min < ini) return {fase:'antes', faltan:ini - min};
+  if (min < ini + 60) return {fase:'hora', trans:min - ini};
+  return {fase:'paso'};
+}
+function bloqueActual(trans){ return BLOQUES.find(function(b){ return trans >= b.min && trans < b.min + b.dur; }) || null; }
+function textoFaltan(m){ var h = Math.floor(m / 60), r = m % 60; return h ? h + ' h ' + r + ' min' : r + ' min'; }
+function textoReloj(){
+  var e = estadoReunion(), h = horaTexto(minutosReunion()), b;
+  if (e.fase === 'antes') return ICON.reunion + 'Reunión de socios · ' + h + ' · faltan ' + textoFaltan(e.faltan);
+  if (e.fase === 'hora') return '<i class="punto"></i>Es hora de la reunión · ' + h;
+  if (e.fase === 'curso') { b = bloqueActual(e.trans); return '<i class="punto"></i>Reunión en curso · ' + (b ? b.titulo : 'tiempo extra'); }
+  if (e.fase === 'cerrada') return ICON.check + 'Reunión de hoy cerrada · mañana ' + h;
+  return ICON.reunion + 'Hoy no quedó acta de la reunión';
+}
+function claveReloj(){ var e = estadoReunion(), b = (e.fase === 'curso' || e.fase === 'hora') ? bloqueActual(e.trans) : null; return hoy() + '|' + e.fase + '|' + (b ? b.n : ''); }
+function valorObjetivo(o){
+  var actual = Number(o.actual) || 0, meta = (o.meta === null || o.meta === undefined || o.meta === '') ? null : Number(o.meta), dist;
+  if (o.auto === 'firmados') actual = S.d.prospectos.filter(function(p){ return p.etapa === 'firmado'; }).length;
+  if (o.auto === 'contactados') actual = S.d.prospectos.filter(function(p){ return p.etapa && p.etapa !== 'por_contactar'; }).length;
+  if (o.auto === 'listas') { dist = S.d.proveedores.filter(function(p){ return p.tipo === 'Distribuidor'; }); actual = dist.filter(function(p){ return p.lista === 'recibida'; }).length; if (meta === null) meta = dist.length; }
+  if (o.auto === 'ruta') { actual = S.d.etapas.filter(function(e){ return e.cumplida; }).length; if (meta === null) meta = S.d.etapas.length; }
+  return {actual:actual, meta:meta};
+}
+var AUTO_TXT = {
+  firmados:'Se cuenta solo: prospectos en «Firmado» (sala Comercial).',
+  contactados:'Se cuenta solo: prospectos que ya pasaron de «Por contactar» (sala Comercial).',
+  listas:'Se cuenta solo: distribuidores con la lista 2026 «Recibida» (sala Proveedores).',
+  ruta:'Se cuenta solo: etapas de la ruta marcadas como cumplidas (Tablero).'
+};
+
+// ---------- piezas comunes ----------
+function avatar(r, mini){
+  if (!r) return mini ? '<span class="avatar av-sin" title="Sin responsable">?</span>' : '<span class="chip chip-alerta">Sin responsable</span>';
+  if (r === 'ambos') return '<span class="avatar av-ambos" title="Ambos socios">S+S</span>';
+  var s = SOCIOS[r];
+  return s ? '<span class="avatar av-' + r + '" title="' + esc(s.completo) + '">' + s.ini + '</span>' : '';
+}
+function avatarPor(por){ return SOCIOS[por] ? avatar(por) : '<span class="avatar av-marca" title="MinuteMark"><img src="img/mm-isotipo.png" alt=""></span>'; }
+function chipEtapa(e){ return '<span class="chip chip-etapa">' + e.n + ' · ' + esc(e.titulo) + '</span>'; }
+function botonCheck(t){
+  var h = t.estado === 'hecho';
+  return '<button class="check' + (h ? ' on' : '') + '" data-accion="' + (h ? 'reabrir' : 'completar') + '" data-id="' + esc(t.id) + '" title="' + (h ? 'Reabrir' : 'Marcar como hecha') + '" aria-label="' + (h ? 'Reabrir' : 'Marcar como hecha') + ': ' + esc(t.titulo) + '">' + ICON.check + '</button>';
+}
+function seg(grupo, lista, sel, clase){
+  return '<div class="seg ' + (clase || '') + '" role="group">' + lista.map(function(o){
+    return '<button type="button" data-accion="seg" data-grupo="' + esc(grupo) + '" data-valor="' + esc(o[0]) + '" aria-pressed="' + (String(o[0]) === String(sel)) + '">' + esc(o[1]) + '</button>';
+  }).join('') + '</div>';
+}
+function cabecera(etq, titulo, lead, derecha){
+  return '<header class="sala-cab"><div><span class="etiqueta">' + etq + '</span><h1>' + titulo + '</h1>' + (lead ? '<p class="lead">' + lead + '</p>' : '') + '</div>' + (derecha || '') + '</header>';
+}
+function filaTarea(t, extra){
+  var e = etapa(t.etapa), hecha = t.estado === 'hecho', venc = !hecha && t.dia && t.dia < hoy();
+  var pasos = t.pasos || [], ok = pasos.filter(function(p){ return p.ok; }).length;
+  return '<li class="fila' + (hecha ? ' es-hecha' : '') + '">' + botonCheck(t) +
+    '<div class="fila-txt"><button class="fila-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button>' +
+    '<div class="meta">' + (e ? chipEtapa(e) : '') +
+      (venc ? '<span class="chip chip-alerta">Vencida · ' + fechaCorta(t.dia) + '</span>' : '') +
+      (t.estado === 'en_curso' ? '<span class="chip chip-curso">En curso</span>' : '') +
+      (pasos.length ? '<span class="chip chip-neutro">' + ok + '/' + pasos.length + ' pasos</span>' : '') + (extra || '') + '</div>' +
+    (hecha && t.resultado ? '<p class="resultado"><b>Cómo se cumplió:</b> ' + esc(t.resultado) + '</p>' : '') +
+    '</div>' + avatar(t.responsable, true) + '</li>';
+}
+function filaIdea(i){
+  return '<li class="idea"><p>' + esc(i.texto) + '</p><div class="idea-pie"><span>' + (SOCIOS[i.por] ? SOCIOS[i.por].nombre + ' · ' : '') + haceCuanto(i.creada) + '</span>' +
+    '<span class="idea-acc"><button class="enlace" data-accion="idea-a-ruta" data-id="' + esc(i.id) + '">Llevar a la ruta</button><button class="enlace enlace-suave" data-accion="idea-descartar" data-id="' + esc(i.id) + '">Descartar</button></span></div></li>';
+}
+function formParquear(id){
+  return '<form class="form-linea" data-form="parquear"><label class="sr" for="' + id + '">Idea para el parqueadero</label><input id="' + id + '" name="texto" placeholder="Ej.: vender también café en grano" autocomplete="off" maxlength="300"><button class="btn btn-linea btn-sm" type="submit">Parquear</button></form>';
+}
+function ideasParqueadas(){ return S.d.parqueadero.filter(function(i){ return (i.estado || 'parqueada') === 'parqueada'; }).sort(function(a, b){ return (b.creada || '').localeCompare(a.creada || ''); }); }
+
+// ---------- render ----------
+var renderPendiente = false;
+function pedirRender(){ if (renderPendiente) return; renderPendiente = true; requestAnimationFrame(function(){ renderPendiente = false; render(); }); }
+
+function render(){
+  renderLado();
+  var sala = $('#sala'), g = capturar(sala);
+  sala.innerHTML = '<div class="sala-in">' + franjas() + vistaSala() + '</div>';
+  restaurar(sala, g);
+}
+function franjas(){
+  var h = '';
+  if (S.error) h += '<p class="franja alerta" role="alert">' + esc(S.error) + '</p>';
+  if (S.modo === 'local') h += '<p class="franja">Copia local: lo que anotes aquí queda solo en este navegador.' + (OFICINA_URL ? ' <a class="enlace" href="' + esc(OFICINA_URL) + '" target="_blank" rel="noopener">Abrir la oficina compartida</a>' : '') + '</p>';
+  return h;
+}
+function vistaSala(){
+  if (!listo()) return '<div class="cargando"><img src="img/mm-logo-color.png" alt="MinuteMark" width="720" height="188"><p>Abriendo la oficina…</p></div>';
+  switch (S.sala) {
+    case 'tablero': return vistaTablero();
+    case 'semana': return vistaSemana();
+    case 'reunion': return vistaReunion();
+    case 'proveedores': return vistaProveedores();
+    case 'comercial': return vistaComercial();
+    case 'libreta': return vistaLibreta();
+    default: return vistaRecepcion();
+  }
+}
+// los campos que se están escribiendo sobreviven a los cambios que llegan en vivo
+function capturar(root){
+  var a = document.activeElement, g = {foco:null, sel:null, valores:{}, scroll:{}};
+  if (a && root.contains(a) && a.id) { g.foco = a.id; try { g.sel = [a.selectionStart, a.selectionEnd]; } catch(e){} }
+  root.querySelectorAll('input[id],textarea[id],select[id]').forEach(function(el){
+    if (el.type === 'checkbox' || el.type === 'radio') return;
+    if (el.hasAttribute('data-vivo') && el.id !== g.foco) return;
+    g.valores[el.id] = el.value;
+  });
+  root.querySelectorAll('[data-scroll][id]').forEach(function(el){ g.scroll[el.id] = [el.scrollLeft, el.scrollTop]; });
+  return g;
+}
+function restaurar(root, g){
+  Object.keys(g.valores).forEach(function(id){ var el = document.getElementById(id); if (el && root.contains(el) && el.value !== g.valores[id]) el.value = g.valores[id]; });
+  Object.keys(g.scroll).forEach(function(id){ var el = document.getElementById(id); if (el) { el.scrollLeft = g.scroll[id][0]; el.scrollTop = g.scroll[id][1]; } });
+  if (g.foco) { var f = document.getElementById(g.foco); if (f && root.contains(f)) { f.focus({preventScroll:true}); if (g.sel && g.sel[0] != null) try { f.setSelectionRange(g.sel[0], g.sel[1]); } catch(e){} } }
+}
+
+function renderLado(){
+  var nav = $('#lado-nav'), x = nav.scrollLeft;
+  var abiertas = S.d.tareas.filter(function(t){ return t.estado !== 'hecho'; }).length;
+  var er = listo() ? estadoReunion().fase : '';
+  nav.innerHTML = SALAS.map(function(s){
+    var extra = '';
+    if (s[0] === 'tablero' && abiertas) extra = '<b class="cuenta">' + abiertas + '</b>';
+    if (s[0] === 'reunion' && (er === 'curso' || er === 'hora')) extra = '<i class="punto vivo-dot" title="Es hora de la reunión"></i>';
+    return '<a href="#' + s[0] + '" class="sala-link' + (S.sala === s[0] ? ' on' : '') + '" data-accion="ir" data-sala="' + s[0] + '"' + (S.sala === s[0] ? ' aria-current="page"' : '') + '>' + ICON[s[0]] + '<span>' + s[1] + '</span>' + extra + '</a>';
+  }).join('');
+  nav.scrollLeft = x;
+  var yo = SOCIOS[S.yo];
+  $('#lado-pie').innerHTML = presentesHTML() +
+    '<button class="quien" data-accion="cambiar-quien">' + (yo ? avatar(S.yo) : '<span class="avatar av-ambos">?</span>') + '<span><span class="quien-nombre">' + (yo ? esc(yo.nombre) : '¿Quién eres?') + '</span><small>' + (yo ? 'Cambiar de socio' : 'Elige tu nombre') + '</small></span></button>' +
+    '<button class="btn btn-sm btn-parquear" data-accion="parquear" title="Parquear una idea">' + ICON.parquear.replace('<svg', '<svg style="width:18px;height:18px"') + '<span>Parquear una idea</span></button>';
+}
+function presentesHTML(){
+  if (!B.room || !S.presentes.length) return '';
+  var vistos = {}, orden = [];
+  S.presentes.forEach(function(p){
+    if (p.kind !== 'viewer') return;
+    var q = p.presence && SOCIOS[p.presence.quien] ? p.presence.quien : '';
+    var k = q || p.peer;
+    if (!vistos[k]) { vistos[k] = {q:q, yo:p.isMe, sala:p.presence && p.presence.sala}; orden.push(k); }
+    else if (p.isMe) vistos[k].yo = true;
+  });
+  if (!orden.length) return '';
+  return '<div class="presentes"><span class="lado-etq">En la oficina ahora</span><ul>' + orden.map(function(k){
+    var v = vistos[k], sala = SALAS.find(function(s){ return s[0] === v.sala; });
+    return '<li><span class="av-wrap">' + (v.q ? avatar(v.q) : '<span class="avatar av-ambos">?</span>') + '</span><span>' + (v.q ? SOCIOS[v.q].nombre : 'Alguien') + (v.yo ? ' (tú)' : '') + (sala ? '<small>' + sala[1] + '</small>' : '') + '</span></li>';
+  }).join('') + '</ul></div>';
+}
+
+// ---------- sala: recepción ----------
+function vistaRecepcion(){
+  var f = hoy(), fo = focoDe(f), tf = textoFoco(fo), yo = SOCIOS[S.yo];
+  return '<section class="banda">' +
+    '<div class="banda-txt">' +
+      '<span class="etiqueta etiqueta-azul">Oficina MinuteMark · ' + fechaLarga(f) + '</span>' +
+      '<h1 class="banda-titulo">' + saludoHora() + (yo ? ', ' + esc(yo.nombre) : '') + '.<em>' + (tf ? 'Hoy el foco es ' + esc(tf) + '.' : 'Falta definir el foco de hoy.') + '</em></h1>' +
+      (fo && fo.nota ? '<p class="banda-nota">' + esc(fo.nota) + '</p>' : '') +
+      '<div class="banda-acciones"><span class="reloj" data-reloj>' + textoReloj() + '</span>' +
+        '<button class="btn btn-blanco btn-sm" data-accion="editar-foco" data-fecha="' + f + '">' + (tf ? 'Cambiar el foco' : 'Definir el foco') + '</button>' +
+        '<button class="btn btn-linea-clara btn-sm" data-accion="ir" data-sala="reunion">Ir a la reunión</button></div>' +
+      (yo ? '' : '<div class="quien-llego"><p>¿Quién llegó a la oficina?</p><button class="btn btn-blanco btn-sm" data-accion="soy" data-quien="simon">Soy Simón</button><button class="btn btn-blanco btn-sm" data-accion="soy" data-quien="sebastian">Soy Sebastián</button></div>') +
+    '</div>' +
+    '<img class="mark mark-recepcion" src="img/mark-02-saludo.webp" alt="" width="280" height="239">' +
+  '</section>' +
+  '<div class="rejilla">' + panelHoy() + panelNorte() + panelRuta() + panelActividad() + panelParqueadero() + panelReglas() + '</div>';
+}
+function panelHoy(){
+  var f = hoy();
+  var lista = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.dia && t.dia <= f; });
+  if (S.hoyMias && S.yo) lista = lista.filter(function(t){ return t.responsable === S.yo || t.responsable === 'ambos'; });
+  lista.sort(ordenTareas);
+  var hechas = S.d.tareas.filter(function(t){ return t.estado === 'hecho' && t.hechaEn && fechaISO(new Date(t.hechaEn)) === f; });
+  return '<section class="panel p-hoy"><header class="panel-cab"><div><span class="etiqueta">Lo de hoy</span><h2>' + (lista.length ? lista.length + (lista.length === 1 ? ' pendiente' : ' pendientes') : 'Al día') + '</h2></div>' +
+    '<div class="panel-herr">' + (S.yo ? seg('hoy-mias', [['0','Todas'],['1','Mías']], S.hoyMias ? '1' : '0') : '') +
+    '<button class="btn btn-primario btn-sm" data-accion="nueva-tarea" data-dia="' + f + '">' + ICON.mas + 'Tarea para hoy</button></div></header>' +
+    (lista.length ? '<ul class="lista-tareas">' + lista.map(filaTarea).join('') + '</ul>' : '<p class="vacio">Nada pendiente para hoy. Revisa la semana o adelanta el foco de mañana.</p>') +
+    (hechas.length ? (S.verHechasHoy ? '<ul class="lista-tareas">' + hechas.map(filaTarea).join('') + '</ul>' : '') +
+      '<button class="enlace mostrar-mas" data-accion="ver-hechas-hoy">' + (S.verHechasHoy ? 'Ocultar las cumplidas hoy' : 'Ver las cumplidas hoy (' + hechas.length + ')') + '</button>' : '') +
+  '</section>';
+}
+function panelNorte(){
+  var c = config(), objs = S.d.objetivos.slice().sort(function(a, b){ return (a.orden || 0) - (b.orden || 0); });
+  return '<section class="panel p-norte"><header class="panel-cab"><div><span class="etiqueta">El norte</span><h2 class="norte">' + esc(c.norte || 'Definan el norte') + '</h2></div>' +
+    '<button class="icono-btn" data-accion="ajustes" aria-label="Editar el norte y la hora de la reunión">' + ICON.lapiz + '</button></header>' +
+    (objs.length ? '<ul class="objetivos">' + objs.map(filaObjetivo).join('') + '</ul>' : '<p class="vacio">Sin metas todavía. Agreguen la primera con un número que se pueda medir.</p>') +
+    '<button class="btn btn-linea btn-sm mostrar-mas" data-accion="nuevo-objetivo">' + ICON.mas + 'Meta</button></section>';
+}
+function filaObjetivo(o){
+  var v = valorObjetivo(o), pct = v.meta ? Math.min(1, v.actual / v.meta) : 0;
+  return '<li class="objetivo"><button class="obj-titulo" data-accion="editar-objetivo" data-id="' + esc(o.id) + '">' + esc(o.titulo) + '</button>' +
+    '<div class="obj-fila"><span class="obj-num">' + v.actual + (v.meta !== null ? ' <small>de ' + v.meta + (o.unidad ? ' ' + esc(o.unidad) : '') + '</small>' : (o.unidad ? ' <small>' + esc(o.unidad) + '</small>' : '')) + '</span>' +
+    (o.auto ? '<span class="obj-auto">Se cuenta solo</span>' : '<span class="obj-ctrl"><button class="mini-btn" data-accion="obj-sumar" data-n="-1" data-id="' + esc(o.id) + '" aria-label="Restar uno">−</button><button class="mini-btn" data-accion="obj-sumar" data-n="1" data-id="' + esc(o.id) + '" aria-label="Sumar uno">+</button></span>') + '</div>' +
+    (v.meta !== null ? '<div class="barra" role="progressbar" aria-label="' + esc(o.titulo) + '" aria-valuenow="' + v.actual + '" aria-valuemin="0" aria-valuemax="' + v.meta + '"><i style="width:' + (pct * 100).toFixed(1) + '%"></i></div>' : '<button class="enlace" data-accion="editar-objetivo" data-id="' + esc(o.id) + '">Definir la meta</button>') +
+  '</li>';
+}
+function panelRuta(){
+  var es = etapas(), cumplidas = es.filter(function(e){ return e.cumplida; }).length;
+  return '<section class="panel p-ruta"><header class="panel-cab"><div><span class="etiqueta">Ruta a la primera venta</span><h2>' + cumplidas + ' de ' + es.length + ' etapas</h2></div></header>' +
+    (es.length ? '<ol class="ruta-v">' + es.map(function(e){
+      var p = progresoEtapa(e.id), st = estadoEtapa(e, p);
+      return '<li class="rv ' + st + '"><span class="paso-num">' + (e.cumplida ? ICON.check : e.n) + '</span><div><button class="rv-titulo" data-accion="ver-etapa" data-id="' + esc(e.id) + '">' + esc(e.titulo) + '</button><span class="rv-meta">' + (p.total ? tareasTxt(p) : 'Sin tareas') + (st === 'en-curso' ? ' · en curso' : st === 'cumplida' ? ' · cumplida' : '') + '</span></div></li>';
+    }).join('') + '<li class="rv rv-final"><span class="paso-num">' + ICON.bandera + '</span><div><b>Primera venta</b><span class="rv-meta">El contrato firmado con la primera unidad.</span></div></li></ol>'
+    : '<p class="vacio">La ruta aún no tiene etapas. Créenlas en el Tablero.</p>') + '</section>';
+}
+function panelActividad(){
+  var a = S.actividad.slice(0, 10);
+  return '<section class="panel p-actividad"><header class="panel-cab"><div><span class="etiqueta">Lo último en la oficina</span><h2>Movimientos</h2></div></header>' +
+    (a.length ? '<ul class="actividad">' + a.map(function(x){
+      return '<li>' + avatarPor(x.por) + '<p>' + (SOCIOS[x.por] ? '<b>' + SOCIOS[x.por].nombre + '</b> ' : '') + esc(x.texto) + '<time datetime="' + esc(x.fecha) + '">' + haceCuanto(x.fecha) + '</time></p></li>';
+    }).join('') + '</ul>' : '<p class="vacio">Aquí va quedando lo que cada socio hace: tareas cumplidas, decisiones y cambios.</p>') + '</section>';
+}
+function panelParqueadero(){
+  var ideas = ideasParqueadas();
+  return '<section class="panel p-parq"><header class="panel-cab"><div><span class="etiqueta">Parqueadero</span><h2>' + ideas.length + (ideas.length === 1 ? ' idea parqueada' : ' ideas parqueadas') + '</h2></div></header>' +
+    '<p class="panel-ayuda">Lo que no es del foco de hoy se anota aquí y se revisa en la revisión semanal. Así no se abren caminos nuevos a mitad de semana.</p>' +
+    formParquear('parq-recepcion') +
+    (ideas.length ? '<ul class="ideas">' + ideas.slice(0, 3).map(filaIdea).join('') + '</ul>' : '') +
+    (ideas.length > 3 ? '<button class="enlace mostrar-mas" data-accion="ir" data-sala="reunion">Ver las ' + ideas.length + ' en la sala de juntas</button>' : '') + '</section>';
+}
+function panelReglas(){
+  return '<section class="panel p-reglas"><span class="etiqueta">Reglas de la oficina</span><ul class="reglas">' + REGLAS.map(function(r){ return '<li><b>' + r[0] + '</b>' + r[1] + '</li>'; }).join('') + '</ul></section>';
+}
+
+// ---------- sala: tablero ----------
+function vistaTablero(){
+  var es = etapas(), F = S.filtro, ts = S.d.tareas.slice();
+  if (F.etapa !== 'todas') ts = ts.filter(function(t){ return (t.etapa || '') === (F.etapa === 'sin' ? '' : F.etapa); });
+  if (F.resp !== 'todos') ts = ts.filter(function(t){ return (t.responsable || '') === (F.resp === 'sin' ? '' : F.resp); });
+  function col(e){ return ts.filter(function(t){ return (t.estado || 'pendiente') === e; }); }
+  var hechas = col('hecho').sort(function(a, b){ return (b.hechaEn || '').localeCompare(a.hechaEn || ''); });
+  var sinResp = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && !t.responsable; }).length;
+  return cabecera('Tablero', 'La ruta y las tareas', 'Una etapa lleva a la siguiente. Cada tarea con responsable y día; cuando se cumple, cómo se cumplió.',
+      '<button class="btn btn-primario" data-accion="nueva-tarea">' + ICON.mas + 'Nueva tarea</button>') +
+    '<ol class="ruta-h" style="--n:' + Math.max(es.length, 1) + '" aria-label="Ruta a la primera venta">' + es.map(pasoRuta).join('') +
+      '<li class="rh rh-final"><span class="paso-num">' + ICON.bandera + '</span><b>Primera venta</b><button class="enlace" style="color:var(--sobre-azul-acento)" data-accion="nueva-etapa">Agregar etapa</button></li></ol>' +
+    (sinResp ? '<p class="aviso-linea"><span class="chip chip-alerta">' + sinResp + ' sin responsable</span>Asígnenlas en la próxima reunión: si no tiene dueño, no es un compromiso.</p>' : '') +
+    '<div class="filtros"><div class="filtro"><span class="filtro-label">Responsable</span>' + seg('filtro-resp', [['todos','Todos'],['simon','Simón'],['sebastian','Sebastián'],['ambos','Ambos'],['sin','Sin responsable']], F.resp) + '</div>' +
+    '<div class="filtro"><label class="filtro-label" for="filtro-etapa">Etapa</label><select id="filtro-etapa" data-cambio="filtro-etapa" data-vivo>' + opciones([['todas','Todas']].concat(es.map(function(e){ return [e.id, e.n + ' · ' + e.titulo]; }), [['sin','Sin etapa']]), F.etapa) + '</select></div></div>' +
+    '<div class="kanban" id="kanban" data-scroll>' +
+      columna('pendiente', 'Por hacer', col('pendiente').sort(ordenTareas)) +
+      columna('en_curso', 'En curso', col('en_curso').sort(ordenTareas)) +
+      columna('hecho', 'Hecho', hechas) +
+    '</div>';
+}
+function pasoRuta(e){
+  var p = progresoEtapa(e.id), st = estadoEtapa(e, p), sel = S.filtro.etapa === e.id;
+  return '<li class="rh ' + st + (sel ? ' sel' : '') + '"><button class="rh-btn" data-accion="filtrar-etapa" data-id="' + esc(e.id) + '" aria-pressed="' + sel + '" title="Ver solo las tareas de esta etapa">' +
+    '<span class="paso-num">' + (e.cumplida ? ICON.check : e.n) + '</span><span class="rh-txt"><b>' + esc(e.titulo) + '</b><small>' + (e.cumplida ? 'Cumplida' : p.total ? tareasTxt(p) : 'Sin tareas') + '</small></span></button>' +
+    '<div class="barra"><i style="width:' + (e.cumplida ? 100 : p.total ? Math.round(p.hechas / p.total * 100) : 0) + '%"></i></div>' +
+    '<button class="enlace" data-accion="editar-etapa" data-id="' + esc(e.id) + '">Ver la etapa</button></li>';
+}
+function columna(estado, titulo, lista){
+  var max = estado === 'hecho' && !S.verHechas ? 12 : Infinity;
+  var vacio = estado === 'hecho' ? 'Lo que se cumpla aparece aquí, con cómo se cumplió.' : estado === 'en_curso' ? 'Lo que alguien está haciendo ahora.' : 'Sin tareas por hacer.';
+  return '<section class="columna" data-columna="t:' + estado + '" aria-label="' + titulo + '"><header class="col-cab"><h2>' + titulo + '</h2><span class="cuenta-col">' + lista.length + '</span></header>' +
+    '<div class="col-lista">' + (lista.slice(0, max).map(tarjetaTarea).join('') || '<p class="vacio vacio-col">' + vacio + '</p>') +
+    (lista.length > max ? '<button class="enlace mostrar-mas" data-accion="ver-hechas">Ver las ' + lista.length + '</button>' : '') + '</div>' +
+    (estado !== 'hecho' ? '<button class="col-mas" data-accion="nueva-tarea" data-estado="' + estado + '">' + ICON.mas + 'Agregar</button>' : '') + '</section>';
+}
+function tarjetaTarea(t){
+  var e = etapa(t.etapa), hecha = t.estado === 'hecho', venc = !hecha && t.dia && t.dia < hoy();
+  var pasos = t.pasos || [], ok = pasos.filter(function(p){ return p.ok; }).length;
+  var mover = t.estado === 'pendiente' ? '<button class="enlace" data-accion="mover-tarea" data-estado="en_curso" data-id="' + esc(t.id) + '">Empezar</button>'
+    : t.estado === 'en_curso' ? '<button class="enlace enlace-suave" data-accion="mover-tarea" data-estado="pendiente" data-id="' + esc(t.id) + '">Volver a por hacer</button>' : '';
+  return '<article class="tarea' + (hecha ? ' es-hecha' : '') + '" draggable="true" data-arrastre="t:' + esc(t.id) + '">' +
+    '<div class="tarea-fila">' + botonCheck(t) + '<button class="tarea-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button></div>' +
+    '<div class="meta">' + (e ? chipEtapa(e) : '') +
+      (t.dia ? '<span class="chip ' + (venc ? 'chip-alerta' : 'chip-neutro') + '">' + (venc ? 'Vencida · ' : '') + fechaCorta(t.dia) + '</span>' : '') +
+      (pasos.length ? '<span class="chip chip-neutro">' + ok + '/' + pasos.length + ' pasos</span>' : '') + '</div>' +
+    (hecha && t.resultado ? '<p class="resultado"><b>Cómo se cumplió:</b> ' + esc(t.resultado) + '</p>' : '') +
+    '<div class="tarea-pie">' + (mover || (hecha && t.hechaEn ? '<span class="resultado">' + (SOCIOS[t.hechaPor] ? SOCIOS[t.hechaPor].nombre + ' · ' : '') + haceCuanto(t.hechaEn) + '</span>' : '<span></span>')) + avatar(t.responsable) + '</div>' +
+  '</article>';
+}
+
+// ---------- sala: semana ----------
+function vistaSemana(){
+  var lunes = S.semana || lunesDe(hoy()), dias = [], i;
+  for (i = 0; i < 7; i++) dias.push(sumarDias(lunes, i));
+  var sinDia = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && !t.dia; }).sort(ordenTareas);
+  var d0 = desdeISO(dias[0]), d6 = desdeISO(dias[6]);
+  var rango = d0.getMonth() === d6.getMonth() ? 'Del ' + d0.getDate() + ' al ' + d6.getDate() + ' de ' + MESES[d6.getMonth()] : 'Del ' + d0.getDate() + ' de ' + MESES[d0.getMonth()] + ' al ' + d6.getDate() + ' de ' + MESES[d6.getMonth()];
+  return cabecera('Semana', rango, 'Un foco por día. El foco de mañana se deja definido en la reunión.',
+      '<div class="nav-semana"><button class="icono-btn" data-accion="semana-mover" data-n="-7" aria-label="Semana anterior">' + ICON.izq + '</button><button class="btn btn-linea btn-sm" data-accion="semana-mover" data-n="0">Esta semana</button><button class="icono-btn" data-accion="semana-mover" data-n="7" aria-label="Semana siguiente">' + ICON.der + '</button></div>') +
+    '<div class="semana" id="semana-grid" data-scroll>' + dias.map(diaHTML).join('') + '</div>' +
+    '<section class="panel"><header class="panel-cab"><div><span class="etiqueta">Sin día</span><h2>' + (sinDia.length ? sinDia.length + ' por programar' : 'Todo tiene día') + '</h2></div></header>' +
+    (sinDia.length ? '<ul class="lista-tareas">' + sinDia.map(function(t){
+      return '<li class="fila">' + botonCheck(t) + '<div class="fila-txt"><button class="fila-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button><div class="meta">' + (etapa(t.etapa) ? chipEtapa(etapa(t.etapa)) : '') + '</div></div>' +
+        '<div class="programar"><label class="sr" for="prog-' + esc(t.id) + '">Programar</label><select id="prog-' + esc(t.id) + '" data-cambio="programar" data-id="' + esc(t.id) + '" data-vivo>' + opciones([['','Programar…']].concat(dias.map(function(f){ return [f, fechaCorta(f)]; })), '') + '</select>' + avatar(t.responsable, true) + '</div></li>';
+    }).join('') + '</ul>' : '<p class="vacio">Cada tarea abierta ya tiene un día en el plan.</p>') + '</section>';
+}
+function diaHTML(f){
+  var d = desdeISO(f), esHoy = f === hoy(), fo = focoDe(f), tf = textoFoco(fo), e = fo && etapa(fo.etapa);
+  var ts = S.d.tareas.filter(function(t){ return t.dia === f; }).sort(function(a, b){ return (a.estado === 'hecho') - (b.estado === 'hecho') || ordenTareas(a, b); });
+  var r = buscar('reuniones', f);
+  return '<section class="dia' + (esHoy ? ' es-hoy' : '') + (f < hoy() ? ' es-pasado' : '') + '" aria-label="' + fechaLarga(f) + '">' +
+    '<header class="dia-cab"><span class="dia-nombre">' + DIAS[d.getDay()] + '</span><span class="dia-num">' + d.getDate() + '</span>' + (esHoy ? '<span class="chip chip-hoy">Hoy</span>' : '') + '</header>' +
+    '<button class="foco' + (tf ? '' : ' foco-vacio') + '" data-accion="editar-foco" data-fecha="' + f + '"><span class="foco-et">Foco' + (e ? ' · etapa ' + e.n : '') + '</span><b>' + (tf ? esc(tf) : 'Sin definir') + '</b></button>' +
+    '<ul class="dia-tareas">' + ts.map(function(t){ return '<li class="mini' + (t.estado === 'hecho' ? ' es-hecha' : '') + '">' + botonCheck(t) + '<button class="mini-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button>' + avatar(t.responsable, true) + '</li>'; }).join('') + '</ul>' +
+    '<footer class="dia-pie"><button class="enlace" data-accion="nueva-tarea" data-dia="' + f + '">' + ICON.mas + 'Tarea</button>' + (r && r.fin ? '<button class="enlace enlace-suave" data-accion="ver-reunion" data-fecha="' + f + '">Acta</button>' : '') + '</footer></section>';
+}
+
+// ---------- sala: reunión de las 6 ----------
+function desdeUltimaReunion(f){
+  var prev = S.d.reuniones.filter(function(r){ return r.id < f && r.inicio; }).sort(function(a, b){ return b.id.localeCompare(a.id); })[0];
+  if (prev) return prev.fin || prev.inicio;
+  var d = desdeISO(sumarDias(f, -1)), m = minutosReunion(); d.setHours(Math.floor(m / 60), m % 60, 0, 0);
+  return d.toISOString();
+}
+function vistaReunion(){
+  var f = S.reunionFecha || hoy(), esHoy = f === hoy(), r = buscar('reuniones', f) || {};
+  var e = esHoy ? estadoReunion() : {fase:r.fin ? 'cerrada' : 'archivo'};
+  var actual = (e.fase === 'curso' || e.fase === 'hora') ? bloqueActual(e.trans) : null;
+  var fo = focoDe(f), tf = textoFoco(fo), man = sumarDias(f, 1), foM = focoDe(man);
+  var desde = desdeUltimaReunion(f), hasta = esHoy ? null : (r.fin || new Date(desdeISO(sumarDias(f, 1)).getTime()).toISOString());
+  var cumplidas = S.d.tareas.filter(function(t){ return t.estado === 'hecho' && t.hechaEn && t.hechaEn >= desde && (!hasta || t.hechaEn <= hasta); }).sort(function(a, b){ return (a.hechaEn || '').localeCompare(b.hechaEn || ''); });
+  var abiertas = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.dia && t.dia <= f; }).sort(ordenTareas);
+  var delFoco = fo && fo.etapa ? S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.etapa === fo.etapa && !(t.dia && t.dia <= f); }).sort(ordenTareas) : [];
+  var decisiones = S.d.decisiones.filter(function(d){ return d.reunion === f; }).sort(function(a, b){ return (a.fecha || '').localeCompare(b.fecha || ''); });
+  var compromisos = S.d.tareas.filter(function(t){ return t.origen === f; }).sort(ordenTareas);
+  var ideas = ideasParqueadas();
+  var fechas = S.d.reuniones.map(function(x){ return x.id; }).filter(function(x){ return x !== hoy(); }).sort().reverse();
+
+  var botones = '';
+  if (esHoy && !r.inicio) botones = '<button class="btn btn-blanco btn-sm" data-accion="reunion-iniciar">Iniciar reunión</button>';
+  else if (r.inicio && !r.fin) botones = '<button class="btn btn-blanco btn-sm" data-accion="reunion-cerrar" data-fecha="' + f + '">Cerrar reunión</button>';
+  else if (r.fin) botones = '<span class="chip chip-blanco">Cerrada · ' + haceCuanto(r.fin) + '</span><button class="btn btn-linea-clara btn-sm" data-accion="reunion-reabrir" data-fecha="' + f + '">Reabrir</button>';
+
+  function bloque(b, contenido){
+    var st = actual ? (actual.n === b.n ? ' activo' : actual.n > b.n ? ' pasado' : '') : (e.fase === 'curso' && !actual ? ' pasado' : '');
+    var quedan = actual && actual.n === b.n ? '<span class="chip chip-vivo"><i class="punto"></i>quedan ' + (b.min + b.dur - e.trans) + ' min</span>' : '';
+    return '<section class="bloque' + st + '"><header class="bloque-cab"><span class="paso-num">' + b.n + '</span><div><h2>' + b.titulo + '</h2><p><span class="hora">' + horaTexto(minutosReunion() + b.min) + '</span> · ' + b.dur + ' min · ' + b.ayuda + '</p></div>' + quedan + '</header>' + contenido + '</section>';
+  }
+
+  var b1 = '<div class="sub"><h3>Cumplido desde la última reunión · ' + cumplidas.length + '</h3>' +
+      (cumplidas.length ? '<ul class="lista-tareas">' + cumplidas.map(filaTarea).join('') + '</ul>' : '<p class="vacio">Nada se marcó como hecho desde la última reunión.</p>') + '</div>' +
+    '<div class="sub"><h3>Comprometido y abierto · ' + abiertas.length + '</h3>' +
+      (abiertas.length ? '<ul class="lista-tareas">' + abiertas.map(function(t){
+        return filaTarea(t, '<button class="enlace" data-accion="pasar-dia" data-id="' + esc(t.id) + '" data-dia="' + man + '">Pasar a ' + fechaCorta(man) + '</button>');
+      }).join('') + '</ul><p class="panel-ayuda">Para cada una: ¿qué pasó? Si sigue viva, pásenla a mañana; si ya no aplica, bórrenla.</p>' : '<p class="vacio">No quedó nada abierto de los días anteriores.</p>') + '</div>';
+
+  var b2 = (tf ? '<div class="foco-hoy">' + (fo.etapa && etapa(fo.etapa) ? '<span class="chip chip-etapa">Etapa ' + etapa(fo.etapa).n + '</span>' : '') + '<b>' + esc(tf) + '</b>' + (fo.nota ? '<p>' + esc(fo.nota) + '</p>' : '') + '</div>'
+      : '<p class="franja alerta">Este día no tiene foco. <button class="enlace" data-accion="editar-foco" data-fecha="' + f + '">Definirlo ahora</button></p>') +
+    (delFoco.length ? '<div class="sub"><h3>Más tareas de esta etapa</h3><ul class="lista-tareas">' + delFoco.map(filaTarea).join('') + '</ul></div>' : '') +
+    '<div class="sub"><label class="sr" for="reunion-notas">Notas del foco</label><textarea class="notas-reunion" id="reunion-notas" data-vivo data-guardar="reunion-notas" data-id="' + f + '" placeholder="Notas del foco: datos, cifras, lo que se habló. Lo que no sea del foco, al parqueadero.">' + esc(r.notas || '') + '</textarea></div>';
+
+  var b3 = (decisiones.length ? '<ul class="decisiones">' + decisiones.map(function(d){
+      return '<li class="decision">' + avatarPor(d.por) + '<p>' + esc(d.texto) + '<small>' + (SOCIOS[d.por] ? SOCIOS[d.por].nombre + ' · ' : '') + haceCuanto(d.fecha) + '</small></p><button class="enlace enlace-suave" data-accion="borrar-decision" data-id="' + esc(d.id) + '">Quitar</button></li>';
+    }).join('') + '</ul>' : '<p class="vacio">Aún no hay decisiones en esta reunión.</p>') +
+    '<form class="form-linea" data-form="decision" data-fecha="' + f + '"><label class="sr" for="decision-nueva">Nueva decisión</label><input id="decision-nueva" name="texto" placeholder="Ej.: El proveedor de estanterías se elige el jueves con 3 cotizaciones." autocomplete="off" maxlength="400"><button class="btn btn-primario btn-sm" type="submit">Decidir</button></form>';
+
+  var b4 = (compromisos.length ? '<ul class="lista-tareas">' + compromisos.map(filaTarea).join('') + '</ul>' : '<p class="vacio">Aún no hay compromisos para mañana.</p>') +
+    '<form class="form-compromiso" data-form="compromiso" data-fecha="' + f + '">' +
+      '<label class="sr" for="comp-titulo">Compromiso</label><input class="campo-input" id="comp-titulo" name="titulo" placeholder="¿Qué se hace?" autocomplete="off" maxlength="200">' +
+      '<label class="sr" for="comp-resp">Responsable</label><select class="campo-input" id="comp-resp" name="responsable">' + opciones([['','¿Quién?']].concat(RESPONSABLES.slice(0, 3)), '') + '</select>' +
+      '<label class="sr" for="comp-dia-' + f + '">Día</label><input class="campo-input" id="comp-dia-' + f + '" name="dia" type="date" value="' + man + '">' +
+      '<button class="btn btn-primario btn-sm" type="submit">Comprometer</button></form>' +
+    '<div class="sub"><h3>Foco de mañana · ' + fechaCorta(man) + '</h3>' +
+      (textoFoco(foM) ? '<div class="foco-hoy">' + (foM.etapa && etapa(foM.etapa) ? '<span class="chip chip-etapa">Etapa ' + etapa(foM.etapa).n + '</span>' : '') + '<b>' + esc(textoFoco(foM)) + '</b><button class="enlace" data-accion="editar-foco" data-fecha="' + man + '">Cambiar</button></div>'
+        : '<p class="franja alerta">Falta el foco de mañana. <button class="enlace" data-accion="editar-foco" data-fecha="' + man + '">Definirlo</button></p>') + '</div>';
+
+  var actas = fechas.length ? '<ul class="actas">' + fechas.slice(0, 12).map(function(x){
+    var nd = S.d.decisiones.filter(function(d){ return d.reunion === x; }).length, nc = S.d.tareas.filter(function(t){ return t.origen === x; }).length;
+    return '<li class="acta"><button class="enlace" data-accion="ver-reunion" data-fecha="' + x + '">' + fechaCorta(x) + '</button><span>' + nd + (nd === 1 ? ' decisión' : ' decisiones') + ' · ' + nc + (nc === 1 ? ' compromiso' : ' compromisos') + '</span></li>';
+  }).join('') + '</ul>' : '<p class="vacio">Las reuniones pasadas aparecen aquí.</p>';
+
+  return '<section class="banda">' +
+      '<div class="banda-txt"><span class="etiqueta etiqueta-azul">Sala de juntas · ' + fechaLarga(f) + (esHoy ? '' : ' · acta') + '</span>' +
+      '<h1 class="banda-titulo">Reunión de ' + nombreReunion() + '.<em>Una hora. Cuatro bloques. Un foco.</em></h1>' +
+      '<div class="banda-acciones">' + (esHoy ? '<span class="reloj" data-reloj>' + textoReloj() + '</span>' : '') + botones +
+        '<label class="sr" for="reunion-fecha">Ver otra reunión</label><select class="select-azul" id="reunion-fecha" data-cambio="reunion-fecha" data-vivo>' + opciones([[hoy(), 'Hoy, ' + fechaCorta(hoy())]].concat(fechas.map(function(x){ return [x, fechaCorta(x)]; })), f) + '</select>' +
+      '</div></div>' +
+      '<img class="mark mark-reunion" src="img/mark-08-senalando.webp" alt="" width="400" height="309">' +
+    '</section>' +
+    '<div class="reunion"><div class="reunion-agenda">' + bloque(BLOQUES[0], b1) + bloque(BLOQUES[1], b2) + bloque(BLOQUES[2], b3) + bloque(BLOQUES[3], b4) + '</div>' +
+    '<aside class="reunion-lado">' +
+      '<section class="panel"><header class="panel-cab"><div><span class="etiqueta">Parqueadero</span><h2>' + ideas.length + (ideas.length === 1 ? ' idea' : ' ideas') + '</h2></div></header>' +
+        '<p class="panel-ayuda">¿Salió algo que no es del foco? Se parquea y se sigue.</p>' + formParquear('parq-reunion') +
+        (ideas.length ? '<ul class="ideas">' + ideas.map(filaIdea).join('') + '</ul>' : '') + '</section>' +
+      '<section class="panel"><header class="panel-cab"><div><span class="etiqueta">Actas</span><h2>Reuniones pasadas</h2></div></header>' + actas +
+        '<button class="enlace mostrar-mas" data-accion="ajustes">Cambiar la hora de la reunión</button></section>' +
+    '</aside></div>';
+}
+
+// ---------- sala: proveedores y precios ----------
+function vistaProveedores(){
+  var tab = ['proveedores','estanterias','precios'].indexOf(S.provTab) >= 0 ? S.provTab : 'proveedores';
+  var t = {
+    proveedores:['Proveedores', 'Lista de precios 2026 y manejo del IVA de cada proveedor. Las preguntas para hacerles están en la Libreta.', '<button class="btn btn-primario" data-accion="nuevo-proveedor">' + ICON.mas + 'Proveedor</button>'],
+    estanterias:['Estanterías', 'Cotizaciones para comparar contra el proveedor actual. Gana la más barata que cumpla las medidas.', '<button class="btn btn-primario" data-accion="nueva-cotizacion">' + ICON.mas + 'Cotización</button>'],
+    precios:['Lista de precios', 'Costo, IVA y precio de venta de cada producto. El margen se calcula solo.', '<button class="btn btn-primario" data-accion="nuevo-producto">' + ICON.mas + 'Producto</button>']
+  }[tab];
+  return cabecera('Proveedores y precios', t[0], t[1], t[2]) +
+    seg('prov-tab', [['proveedores','Proveedores'],['estanterias','Estanterías'],['precios','Lista de precios']], tab, 'pestanas') +
+    (tab === 'estanterias' ? vistaEstanterias() : tab === 'precios' ? vistaPrecios() : vistaListaProveedores());
+}
+function vistaListaProveedores(){
+  var ps = S.d.proveedores.slice().sort(function(a, b){ return TIPOS_PROV.indexOf(a.tipo) - TIPOS_PROV.indexOf(b.tipo) || (a.nombre || '').localeCompare(b.nombre || '', 'es'); });
+  var dist = ps.filter(function(p){ return p.tipo === 'Distribuidor'; });
+  function n(fn){ return dist.filter(fn).length; }
+  return '<div class="resumen">' +
+      '<div class="dato"><b>' + n(function(p){ return p.lista === 'recibida'; }) + ' <small>de ' + dist.length + '</small></b><span>Listas 2026 recibidas</span></div>' +
+      '<div class="dato"><b>' + n(function(p){ return p.lista === 'pedida'; }) + '</b><span>Pedidas, esperando respuesta</span></div>' +
+      '<div class="dato"><b>' + n(function(p){ return !p.lista || p.lista === 'por_pedir'; }) + '</b><span>Por pedir</span></div>' +
+      '<div class="dato"><b>' + n(function(p){ return p.iva === 'aclarado'; }) + ' <small>de ' + dist.length + '</small></b><span>Con el IVA aclarado</span></div>' +
+    '</div>' +
+    (ps.length ? '<div class="tarjetas">' + ps.map(function(p){
+      var lista = p.lista || 'por_pedir';
+      return '<article class="prov"><header class="prov-cab"><div><h3>' + esc(p.nombre) + '</h3><span>' + esc(p.tipo || '') + '</span></div>' + (p.iva === 'aclarado' ? '<span class="chip chip-etapa">IVA aclarado</span>' : '<span class="chip chip-neutro">IVA sin aclarar</span>') + '</header>' +
+        '<p>' + (p.contacto || p.telefono ? esc([p.contacto, p.telefono].filter(Boolean).join(' · ')) : 'Sin contacto todavía') + '</p>' +
+        '<div><span class="filtro-label" style="display:block;margin-bottom:6px">Lista 2026</span>' + seg('prov-lista:' + p.id, LISTA, lista, 'estado-seg') + '</div>' +
+        (p.ivaNota ? '<p><b style="color:var(--tinta);font-weight:500">IVA:</b> ' + esc(p.ivaNota) + '</p>' : '') +
+        (p.notas ? '<p>' + esc(p.notas) + '</p>' : '') +
+        '<div class="prov-pie"><span class="resultado">' + (p.actualizado ? 'Actualizado ' + haceCuanto(p.actualizado) : '') + '</span><button class="enlace" data-accion="editar-proveedor" data-id="' + esc(p.id) + '">Abrir ficha</button></div></article>';
+    }).join('') + '</div>' : '<p class="vacio">Aún no hay proveedores. Agreguen el primero con su contacto.</p>');
+}
+function vistaEstanterias(){
+  var cs = S.d.cotizaciones.slice().sort(function(a, b){ return (a.estado === 'actual' ? -1 : 0) - (b.estado === 'actual' ? -1 : 0) || (a.valor || 9e15) - (b.valor || 9e15); });
+  var actual = cs.find(function(c){ return c.estado === 'actual'; });
+  var validas = cs.filter(function(c){ return c.valor > 0 && c.estado !== 'descartada' && c.estado !== 'pedida'; });
+  var barata = validas.slice().sort(function(a, b){ return a.valor - b.valor; })[0];
+  var ahorro = actual && actual.valor && barata && barata !== actual ? actual.valor - barata.valor : null;
+  return '<div class="resumen">' +
+      '<div class="dato"><b>' + pesos(actual && actual.valor) + '</b><span>Proveedor actual' + (actual ? ' · ' + esc(actual.proveedor) : '') + '</span></div>' +
+      '<div class="dato"><b>' + pesos(barata && barata.valor) + '</b><span>Más barata' + (barata ? ' · ' + esc(barata.proveedor) : '') + '</span></div>' +
+      '<div class="dato"><b>' + (ahorro !== null ? pesos(ahorro) : '—') + '</b><span>' + (ahorro !== null && actual.valor ? 'Ahorro frente al actual (' + porc(ahorro / actual.valor) + ')' : 'Ahorro frente al actual') + '</span></div>' +
+      '<div class="dato"><b>' + cs.filter(function(c){ return c.estado !== 'actual'; }).length + '</b><span>Cotizaciones nuevas</span></div>' +
+    '</div>' +
+    (cs.length ? '<div class="tabla-caja"><table><thead><tr><th>Proveedor</th><th class="num">Valor</th><th>Qué incluye</th><th>Estado</th><th class="num">Frente al actual</th><th></th></tr></thead><tbody>' + cs.map(function(c){
+      var dif = actual && actual.valor && c.valor && c !== actual ? c.valor - actual.valor : null;
+      return '<tr' + (barata && c === barata ? ' class="destacada"' : '') + '><td><b style="font-weight:600">' + esc(c.proveedor) + '</b>' + (c.contacto ? '<br><span class="resultado">' + esc(c.contacto) + '</span>' : '') + (barata && c === barata ? '<br><span class="chip chip-curso" style="margin-top:6px">Más barata</span>' : '') + '</td>' +
+        '<td class="num">' + pesos(c.valor) + '</td><td>' + esc(c.incluye || '—') + (c.notas ? '<br><span class="resultado">' + esc(c.notas) + '</span>' : '') + '</td>' +
+        '<td>' + esc((COTI.find(function(o){ return o[0] === c.estado; }) || ['', ''])[1]) + '</td>' +
+        '<td class="num">' + (dif === null ? '—' : '<span class="' + (dif < 0 ? 'ahorro' : '') + '">' + (dif > 0 ? '+' : '') + pesos(dif) + ' (' + (dif > 0 ? '+' : '') + porc(dif / actual.valor) + ')</span>') + '</td>' +
+        '<td><button class="enlace" data-accion="editar-cotizacion" data-id="' + esc(c.id) + '">Editar</button></td></tr>';
+    }).join('') + '</tbody></table></div>' : '<p class="vacio">Registren primero la cotización del proveedor actual: es la base para comparar.</p>') +
+    '<p class="nota-tabla">Comparen siempre lo mismo: medidas, número de niveles, material, transporte e instalación. Una cotización más barata que no incluye instalación puede salir más cara.</p>';
+}
+function margen(p){
+  var v = Number(p.precio), c = Number(p.costo);
+  if (!v || !c) return {pesos:null, pct:null};
+  return {pesos:v - c, pct:(v - c) / v};
+}
+function vistaPrecios(){
+  var ps = S.d.productos.slice().sort(function(a, b){ return CATEGORIAS.indexOf(a.categoria) - CATEGORIAS.indexOf(b.categoria) || (a.nombre || '').localeCompare(b.nombre || '', 'es'); });
+  var conM = ps.map(margen).filter(function(m){ return m.pct !== null; });
+  var prom = conM.length ? conM.reduce(function(s, m){ return s + m.pct; }, 0) / conM.length : null;
+  var sinPrecio = ps.filter(function(p){ return !p.precio || !p.costo; }).length;
+  return '<div class="resumen">' +
+      '<div class="dato"><b>' + ps.length + '</b><span>Productos en la lista</span></div>' +
+      '<div class="dato"><b>' + porc(prom) + '</b><span>Margen bruto promedio</span></div>' +
+      '<div class="dato"><b>' + sinPrecio + '</b><span>Sin costo o sin precio de venta</span></div>' +
+    '</div>' +
+    (ps.length ? '<div class="tabla-caja"><table><thead><tr><th>Producto</th><th>Categoría</th><th>Proveedor</th><th class="num">Costo</th><th class="num">IVA</th><th class="num">Precio de venta</th><th class="num">Margen</th><th class="num">Margen %</th><th></th></tr></thead><tbody>' + ps.map(function(p){
+      var m = margen(p), iva = IVAS.find(function(o){ return o[0] === String(p.iva); });
+      return '<tr><td><b style="font-weight:600">' + esc(p.nombre) + '</b></td><td>' + esc(p.categoria || '—') + '</td><td>' + esc(p.proveedor || '—') + '</td>' +
+        '<td class="num">' + pesos(p.costo) + '</td><td class="num">' + (iva ? iva[1] : '—') + '</td><td class="num">' + pesos(p.precio) + '</td>' +
+        '<td class="num">' + pesos(m.pesos) + '</td><td class="num">' + porc(m.pct) + '</td><td><button class="enlace" data-accion="editar-producto" data-id="' + esc(p.id) + '">Editar</button></td></tr>';
+    }).join('') + '</tbody></table></div>' : '<p class="vacio">La lista se llena a medida que lleguen las listas 2026 de los proveedores.</p>') +
+    '<p class="nota-tabla">Margen bruto = (precio de venta − costo) ÷ precio de venta. El costo es lo que pagan por unidad, con el IVA incluido. Si MinuteMark es responsable de IVA, el escenario con los financieros lo ajusta.</p>';
+}
+
+// ---------- sala: comercial ----------
+function vistaComercial(){
+  var ps = S.d.prospectos.slice();
+  if (S.comResp !== 'todos') ps = ps.filter(function(p){ return (p.responsable || '') === S.comResp; });
+  if (S.comCanal) ps = ps.filter(function(p){ return p.canal === S.comCanal; });
+  var activos = ps.filter(function(p){ return p.etapa !== 'perdido'; }), perdidos = ps.filter(function(p){ return p.etapa === 'perdido'; });
+  var lunes = lunesDe(hoy()), contactosSemana = 0;
+  S.d.prospectos.forEach(function(p){ (p.contactos || []).forEach(function(c){ if ((c.fecha || '').slice(0, 10) >= lunes) contactosSemana++; }); });
+  return cabecera('Comercial', 'Unidades y administraciones', 'Cada contacto queda registrado con su próximo paso y fecha. Sin próximo paso, el prospecto se enfría.',
+      '<button class="btn btn-primario" data-accion="nuevo-prospecto">' + ICON.mas + 'Prospecto</button>') +
+    '<div class="resumen"><div class="dato"><b>' + contactosSemana + '</b><span>Contactos esta semana</span></div>' +
+      '<div class="dato"><b>' + S.d.prospectos.filter(function(p){ return p.etapa === 'reunion' || p.etapa === 'presentacion' || p.etapa === 'consejo'; }).length + '</b><span>En reunión, presentación o consejo</span></div>' +
+      '<div class="dato"><b>' + S.d.prospectos.filter(function(p){ return p.etapa === 'firmado'; }).length + '</b><span>Firmados</span></div>' +
+      '<div class="dato"><b>' + S.d.prospectos.filter(function(p){ return p.etapa !== 'perdido' && p.etapa !== 'firmado' && p.proximaFecha && p.proximaFecha < hoy(); }).length + '</b><span>Con el próximo paso vencido</span></div></div>' +
+    '<div class="filtros"><div class="filtro"><span class="filtro-label">Responsable</span>' + seg('com-resp', [['todos','Todos'],['simon','Simón'],['sebastian','Sebastián'],['ambos','Ambos']], S.comResp) + '</div>' +
+      '<div class="filtro"><label class="filtro-label" for="com-canal">Canal</label><select id="com-canal" data-cambio="com-canal" data-vivo>' + opciones([['','Todos']].concat(CANALES.map(function(c){ return [c, c]; })), S.comCanal) + '</select></div></div>' +
+    '<div class="pipeline" id="pipeline" data-scroll>' + ETAPAS_COM.map(function(et){
+      var lista = activos.filter(function(p){ return (p.etapa || 'por_contactar') === et[0]; }).sort(function(a, b){ return (a.proximaFecha || '9999').localeCompare(b.proximaFecha || '9999'); });
+      return '<section class="columna" data-columna="p:' + et[0] + '" aria-label="' + et[1] + '"><header class="col-cab"><h2>' + et[1] + '</h2><span class="cuenta-col">' + lista.length + '</span></header><div class="col-lista">' +
+        (lista.map(tarjetaProspecto).join('') || '<p class="vacio vacio-col">' + (et[0] === 'por_contactar' ? 'Carguen aquí las unidades y administraciones por llamar.' : 'Vacío.') + '</p>') + '</div></section>';
+    }).join('') + '</div>' +
+    (perdidos.length ? '<section class="panel"><header class="panel-cab"><div><span class="etiqueta">Perdidos</span><h2>' + perdidos.length + ' que dijeron que no</h2></div><button class="enlace" data-accion="ver-perdidos">' + (S.verPerdidos ? 'Ocultar' : 'Ver') + '</button></header>' +
+      (S.verPerdidos ? '<div class="tarjetas">' + perdidos.map(tarjetaProspecto).join('') + '</div>' : '') + '</section>' : '');
+}
+function tarjetaProspecto(p){
+  var i = ETAPAS_COM.findIndex(function(e){ return e[0] === (p.etapa || 'por_contactar'); });
+  var venc = p.proximaFecha && p.proximaFecha < hoy() && p.etapa !== 'firmado' && p.etapa !== 'perdido';
+  var sig = i >= 0 && i < ETAPAS_COM.length - 1 ? ETAPAS_COM[i + 1] : null;
+  return '<article class="prospecto" draggable="true" data-arrastre="p:' + esc(p.id) + '">' +
+    '<h3><button class="tarea-titulo" style="font-weight:600" data-accion="editar-prospecto" data-id="' + esc(p.id) + '">' + esc(p.nombre) + '</button></h3>' +
+    '<div class="meta"><span class="chip chip-neutro">' + (p.tipo === 'administracion' ? 'Administración' : 'Unidad') + '</span>' + (p.canal ? '<span class="chip chip-etapa">' + esc(p.canal) + '</span>' : '') + '</div>' +
+    ((p.zona || p.aptos) ? '<p>' + esc([p.zona, p.aptos ? p.aptos + ' aptos' : ''].filter(Boolean).join(' · ')) + '</p>' : '') +
+    (p.proximo ? '<p class="proximo"><b style="font-weight:500">Próximo:</b> ' + esc(p.proximo) + '</p>' : '') +
+    '<div class="tarea-pie"><span>' + (p.proximaFecha ? '<span class="chip ' + (venc ? 'chip-alerta' : 'chip-neutro') + '">' + (venc ? 'Vencido · ' : '') + fechaCorta(p.proximaFecha) + '</span>' : '') + '</span>' + (p.responsable ? avatar(p.responsable) : '') + '</div>' +
+    '<div class="prospecto-acc"><button class="enlace" data-accion="registrar-contacto" data-id="' + esc(p.id) + '">Registrar contacto</button>' + (sig && p.etapa !== 'perdido' ? '<button class="enlace enlace-suave" data-accion="avanzar-prospecto" data-id="' + esc(p.id) + '">Pasar a ' + sig[1].toLowerCase() + '</button>' : '') + '</div></article>';
+}
+
+// ---------- sala: libreta ----------
+function vistaLibreta(){
+  var notas = S.d.libreta.slice().sort(function(a, b){ return (a.orden || 99) - (b.orden || 99) || (a.titulo || '').localeCompare(b.titulo || '', 'es'); });
+  var sel = notas.find(function(n){ return n.id === S.notaSel; }) || notas[0];
+  var otros = sel && B.room ? S.presentes.filter(function(p){ return !p.isMe && p.presence && p.presence.sala === 'libreta' && p.presence.nota === sel.id && SOCIOS[p.presence.quien]; }) : [];
+  return cabecera('Libreta', 'Lo que no puede quedar en el aire', 'Guiones, respuestas, preguntas y todo lo que se habla y se necesita después. Se guarda solo mientras escriben.',
+      '<button class="btn btn-primario" data-accion="nueva-nota">' + ICON.mas + 'Nota</button>') +
+    (notas.length ? '<div class="libreta"><nav class="notas-lista" aria-label="Notas">' + notas.map(function(n){
+      return '<button class="nota-item" data-accion="nota-sel" data-id="' + esc(n.id) + '" aria-current="' + (sel && n.id === sel.id) + '"><b>' + esc(n.titulo || 'Sin título') + '</b><span>' + (n.editada ? (SOCIOS[n.editadaPor] ? SOCIOS[n.editadaPor].nombre + ' · ' : '') + haceCuanto(n.editada) : '') + '</span></button>';
+    }).join('') + '</nav>' +
+    '<section class="panel editor"><label class="sr" for="nota-titulo">Título de la nota</label><input class="editor-titulo" id="nota-titulo" data-vivo data-guardar="nota-titulo" data-id="' + esc(sel.id) + '" value="' + esc(sel.titulo || '') + '" maxlength="120">' +
+      '<label class="sr" for="nota-texto">Texto de la nota</label><textarea class="editor-texto" id="nota-texto" data-vivo data-guardar="nota-texto" data-id="' + esc(sel.id) + '" placeholder="Escriban aquí.">' + esc(sel.texto || '') + '</textarea>' +
+      '<div class="editor-pie"><span>' + (otros.length ? '<i class="punto"></i> ' + SOCIOS[otros[0].presence.quien].nombre + ' también está en esta nota · ' : '') + (sel.editada ? 'Guardada ' + haceCuanto(sel.editada) + (SOCIOS[sel.editadaPor] ? ' por ' + SOCIOS[sel.editadaPor].nombre : '') : 'Se guarda sola') + '</span>' +
+      '<button class="btn btn-borrar btn-sm" data-accion="borrar-nota" data-id="' + esc(sel.id) + '">Eliminar nota</button></div></section></div>'
+    : '<p class="vacio">La libreta está vacía. Creen la primera nota.</p>');
+}
+
+// ---------- modales ----------
+var M = null;
+function campoHTML(c){
+  var id = 'm-' + c.id, req = c.requerido ? ' required' : '', cls = 'campo' + (c.ancho === 'medio' ? ' medio' : '');
+  var ayuda = c.ayuda ? '<span class="ayuda">' + c.ayuda + '</span>' : '';
+  var v = c.valor == null ? '' : c.valor;
+  if (c.tipo === 'info') return '<div class="info-modal">' + c.html + '</div>';
+  if (c.tipo === 'segment') return '<fieldset class="' + cls + '"><legend>' + esc(c.label) + '</legend><div class="segmento">' + c.opciones.map(function(o, i){
+      return '<label><input type="radio" name="' + id + '" id="' + id + '-' + i + '" value="' + esc(o[0]) + '"' + (String(o[0]) === String(v) ? ' checked' : '') + '><span>' + esc(o[1]) + '</span></label>';
+    }).join('') + '</div>' + ayuda + '</fieldset>';
+  if (c.tipo === 'pasos') return '<div class="' + cls + '"><span style="font-size:14px;font-weight:500">' + esc(c.label) + '</span><ul class="pasos-lista" id="m-pasos-lista">' + pasosHTML() + '</ul>' +
+      '<div class="paso-nuevo"><label class="sr" for="m-paso-nuevo">Nuevo paso</label><input class="campo-input" id="m-paso-nuevo" placeholder="Agregar un paso" autocomplete="off" maxlength="200"><button type="button" class="btn btn-linea btn-sm" data-accion="paso-agregar">Agregar</button></div></div>';
+  var control;
+  if (c.tipo === 'textarea') control = '<textarea id="' + id + '" name="' + c.id + '"' + req + ' placeholder="' + esc(c.placeholder || '') + '"' + (c.filas ? ' rows="' + c.filas + '"' : '') + '>' + esc(v) + '</textarea>';
+  else if (c.tipo === 'select') control = '<select id="' + id + '" name="' + c.id + '"' + req + '>' + opciones(c.opciones, v) + '</select>';
+  else if (c.tipo === 'pesos') control = '<input id="' + id + '" name="' + c.id + '" inputmode="numeric" autocomplete="off" placeholder="' + esc(c.placeholder || '$0') + '" value="' + (v === '' ? '' : esc(pesos(v))) + '">';
+  else control = '<input id="' + id + '" name="' + c.id + '" type="' + (c.tipo || 'text') + '"' + req + ' autocomplete="off" placeholder="' + esc(c.placeholder || '') + '" value="' + esc(v) + '"' + (c.max ? ' maxlength="' + c.max + '"' : '') + '>';
+  return '<div class="' + cls + '"><label for="' + id + '">' + esc(c.label) + '</label>' + control + ayuda + '</div>';
+}
+function pasosHTML(){
+  if (!M || !M.pasos) return '';
+  return M.pasos.map(function(p, i){
+    return '<li class="paso-item"><input type="checkbox" id="m-paso-ok-' + i + '" data-cambio="paso-ok" data-i="' + i + '"' + (p.ok ? ' checked' : '') + ' aria-label="Paso hecho"><label class="sr" for="m-paso-t-' + i + '">Paso ' + (i + 1) + '</label><input class="campo-input paso-texto" type="text" id="m-paso-t-' + i + '" data-i="' + i + '" value="' + esc(p.t) + '" maxlength="200"><button type="button" class="icono-btn" style="width:32px;height:32px" data-accion="paso-quitar" data-i="' + i + '" aria-label="Quitar paso">' + ICON.x + '</button></li>';
+  }).join('');
+}
+function abrirForm(cfg){
+  var pasos = cfg.campos.find(function(c){ return c.tipo === 'pasos'; });
+  M = {cfg:cfg, pasos:pasos ? (pasos.valor || []).map(function(p){ return {t:p.t, ok:!!p.ok}; }) : null};
+  var dlg = $('#modal');
+  dlg.innerHTML = '<form class="modal-caja" id="modal-form" data-form="modal" novalidate>' +
+    '<header class="modal-cab"><div>' + (cfg.etiqueta ? '<span class="etiqueta">' + esc(cfg.etiqueta) + '</span>' : '') + '<h2 id="modal-titulo">' + esc(cfg.titulo) + '</h2></div><button type="button" class="icono-btn" data-accion="cerrar-modal" aria-label="Cerrar">' + ICON.x + '</button></header>' +
+    '<div class="modal-cuerpo">' + cfg.campos.map(campoHTML).join('') + '</div>' +
+    '<footer class="modal-acciones">' + (cfg.onBorrar ? '<button type="button" class="btn btn-borrar btn-sm" data-accion="borrar-modal">' + esc(cfg.textoBorrar || 'Eliminar') + '</button>' : '') +
+      '<span class="espacio"></span><button type="button" class="btn btn-linea btn-sm" data-accion="cerrar-modal">Cancelar</button><button type="submit" class="btn btn-primario btn-sm">' + esc(cfg.textoGuardar || 'Guardar') + '</button></footer></form>';
+  try { if (!dlg.open) dlg.showModal(); } catch(e){ dlg.setAttribute('open', ''); }
+  var primero = dlg.querySelector('input:not([type=radio]):not([type=checkbox]),textarea,select');
+  if (primero && !cfg.sinFoco) primero.focus();
+  if (cfg.alAbrir) cfg.alAbrir(dlg);
+}
+function cerrarModal(){ var d = $('#modal'); try { d.close(); } catch(e){ d.removeAttribute('open'); } M = null; }
+function enviarModal(form){
+  if (!M) return;
+  var cfg = M.cfg, v = {}, err = null;
+  form.querySelectorAll('.campo.con-error').forEach(function(x){ x.classList.remove('con-error'); var e = x.querySelector('.error'); if (e) e.remove(); });
+  cfg.campos.forEach(function(c){
+    if (!c.id || c.tipo === 'info') return;
+    if (c.tipo === 'pasos') { v[c.id] = M.pasos.filter(function(p){ return p.t.trim(); }).map(function(p){ return {t:p.t.trim(), ok:p.ok}; }); return; }
+    if (c.tipo === 'segment') { var r = form.querySelector('input[name="m-' + c.id + '"]:checked'); v[c.id] = r ? r.value : ''; }
+    else { var el = form.querySelector('#m-' + c.id); var x = el ? el.value : ''; v[c.id] = c.tipo === 'pesos' ? leerPesos(x) : c.tipo === 'number' ? (x === '' ? null : Number(x)) : String(x).trim(); }
+    if (c.requerido && (v[c.id] === '' || v[c.id] === null) && !err) err = [c.id, 'Este campo es obligatorio.'];
+  });
+  if (!err && cfg.validar) err = cfg.validar(v);
+  if (err) {
+    var campo = form.querySelector('#m-' + err[0]);
+    var caja = campo ? campo.closest('.campo') : form.querySelector('.modal-cuerpo');
+    if (caja) { caja.classList.add('con-error'); caja.insertAdjacentHTML('beforeend', '<span class="error" role="alert">' + esc(err[1]) + '</span>'); }
+    if (campo) campo.focus();
+    return;
+  }
+  var r = cfg.onGuardar(v);
+  if (r !== false) cerrarModal();
+}
+
+function modalTarea(t, preset){
+  preset = preset || {};
+  var nueva = !t; t = t || {};
+  var es = etapas();
+  abrirForm({
+    etiqueta: nueva ? 'Nueva tarea' : 'Tarea', titulo: nueva ? '¿Qué hay que hacer?' : t.titulo,
+    campos: [
+      {id:'titulo', label:'Tarea', valor:t.titulo || preset.titulo || '', requerido:true, max:200, placeholder:'Ej.: Pedir 3 cotizaciones de estanterías'},
+      {id:'responsable', label:'Responsable', tipo:'segment', valor:nueva ? (preset.responsable != null ? preset.responsable : (S.yo || '')) : (t.responsable || ''), opciones:RESPONSABLES},
+      {id:'etapa', label:'Etapa de la ruta', tipo:'select', ancho:'medio', valor:nueva ? (preset.etapa || (focoDe(preset.dia || '') || {}).etapa || '') : (t.etapa || ''), opciones:[['','Sin etapa']].concat(es.map(function(e){ return [e.id, e.n + ' · ' + e.titulo]; }))},
+      {id:'dia', label:'Día', tipo:'date', ancho:'medio', valor:nueva ? (preset.dia || '') : (t.dia || '')},
+      {id:'estado', label:'Estado', tipo:'segment', valor:t.estado || preset.estado || 'pendiente', opciones:ESTADOS},
+      {id:'pasos', label:'Pasos', tipo:'pasos', valor:t.pasos || []},
+      {id:'nota', label:'Contexto', tipo:'textarea', valor:t.nota || '', placeholder:'Lo que hay que saber para hacerla.'},
+      {id:'resultado', label:'Cómo se cumplió', tipo:'textarea', valor:t.resultado || '', placeholder:'Se llena al marcarla como hecha.', ayuda:'Obligatorio cuando la tarea está hecha.'}
+    ].concat(nueva ? [] : [{tipo:'info', html:infoTarea(t)}]),
+    validar: function(v){ if (v.estado === 'hecho' && !v.resultado) return ['resultado', 'Cuenten cómo se cumplió antes de marcarla como hecha.']; },
+    onGuardar: function(v){
+      if (nueva) {
+        var doc = Object.assign({}, v, {creada:ahora(), creadaPor:S.yo || '', orden:Date.now(), origen:preset.origen || ''});
+        if (v.estado === 'hecho') { doc.hechaEn = ahora(); doc.hechaPor = S.yo || ''; }
+        crear('tareas', doc);
+        if (preset.idea) { cambiar('parqueadero', preset.idea, {estado:'a_ruta'}); registrar('llevó una idea del parqueadero a la ruta: «' + v.titulo + '»'); }
+        else registrar('creó la tarea «' + v.titulo + '»');
+      } else {
+        var patch = Object.assign({}, v);
+        if (v.estado === 'hecho' && t.estado !== 'hecho') { patch.hechaEn = ahora(); patch.hechaPor = S.yo || ''; registrar('cumplió «' + v.titulo + '»'); }
+        if (v.estado !== 'hecho' && t.estado === 'hecho') { patch.hechaEn = ''; registrar('reabrió «' + v.titulo + '»'); }
+        cambiar('tareas', t.id, patch);
+      }
+    },
+    onBorrar: nueva ? null : function(){ borrar('tareas', t.id); registrar('borró la tarea «' + t.titulo + '»'); }
+  });
+}
+function infoTarea(t){
+  var l = [];
+  if (t.creada) l.push('Creada ' + haceCuanto(t.creada) + (SOCIOS[t.creadaPor] ? ' por <b>' + SOCIOS[t.creadaPor].nombre + '</b>' : ''));
+  if (t.origen) l.push('Compromiso de la reunión del ' + fechaLarga(t.origen));
+  if (t.estado === 'hecho' && t.hechaEn) l.push('Cumplida ' + haceCuanto(t.hechaEn) + (SOCIOS[t.hechaPor] ? ' por <b>' + SOCIOS[t.hechaPor].nombre + '</b>' : ''));
+  return l.map(function(x){ return '<span>' + x + '</span>'; }).join('') || '<span>Sin historial.</span>';
+}
+function modalCompletar(t){
+  var faltan = (t.pasos || []).filter(function(p){ return !p.ok; }).length;
+  abrirForm({
+    etiqueta:'Causar la tarea', titulo:t.titulo, textoGuardar:'Marcar como hecha',
+    campos:[{id:'resultado', label:'¿Cómo se cumplió?', tipo:'textarea', requerido:true, valor:t.resultado || '', placeholder:'Ej.: Llamamos a 3 fabricantes. El más barato cotizó $X por módulo, con instalación.', ayuda:'Una o dos líneas, con datos: qué se hizo, con quién y qué salió.'}]
+      .concat(faltan ? [{tipo:'info', html:'<span>Quedan <b>' + faltan + (faltan === 1 ? ' paso' : ' pasos') + '</b> sin marcar. Al guardar quedan marcados como hechos.</span>'}] : []),
+    onGuardar: function(v){
+      cambiar('tareas', t.id, {estado:'hecho', resultado:v.resultado, hechaEn:ahora(), hechaPor:S.yo || '', pasos:(t.pasos || []).map(function(p){ return {t:p.t, ok:true}; })});
+      registrar('cumplió «' + t.titulo + '»');
+      celebrar('Hecho y causado.');
+    }
+  });
+}
+function modalFoco(f){
+  var fo = focoDe(f) || {}, es = etapas();
+  abrirForm({
+    etiqueta:'Foco del día', titulo:fechaLarga(f).replace(/^./, function(c){ return c.toUpperCase(); }),
+    campos:[
+      {id:'etapa', label:'Etapa de la ruta', tipo:'select', valor:fo.etapa || '', opciones:[['','Ninguna etapa']].concat(es.map(function(e){ return [e.id, e.n + ' · ' + e.titulo]; }))},
+      {id:'foco', label:'En qué se enfocan', valor:fo.foco || '', max:120, placeholder:'Ej.: Cerrar el proveedor de estanterías', ayuda:'Si lo dejan vacío, se usa el nombre de la etapa.'},
+      {id:'nota', label:'Nota para el día', tipo:'textarea', valor:fo.nota || '', placeholder:'Lo que hay que tener presente ese día.'}
+    ],
+    validar: function(v){ if (!v.foco && !v.etapa) return ['foco', 'Elijan una etapa o escriban el foco.']; },
+    onGuardar: function(v){
+      var e = etapa(v.etapa), texto = v.foco || (e ? e.titulo : '');
+      escribir('set', 'semana', f, {foco:texto, etapa:v.etapa, nota:v.nota});
+      registrar('definió el foco del ' + fechaLarga(f) + ': ' + texto);
+    },
+    onBorrar: focoDe(f) ? function(){ borrar('semana', f); } : null, textoBorrar:'Quitar el foco'
+  });
+}
+function modalEtapa(e){
+  var nueva = !e; e = e || {};
+  var ts = nueva ? [] : S.d.tareas.filter(function(t){ return t.etapa === e.id; });
+  abrirForm({
+    etiqueta: nueva ? 'Nueva etapa de la ruta' : 'Etapa ' + e.n + ' de la ruta', titulo: nueva ? 'Etapa ' + (etapas().length + 1) : e.titulo,
+    campos:[
+      {id:'titulo', label:'Nombre', valor:e.titulo || '', requerido:true, max:60},
+      {id:'meta', label:'Está cumplida cuando…', tipo:'textarea', valor:e.meta || '', placeholder:'El resultado concreto que cierra la etapa.'},
+      {id:'cumplida', label:'¿Cumplida?', tipo:'segment', valor:e.cumplida ? 'si' : 'no', opciones:[['no','Todavía no'],['si','Sí, cumplida']]}
+    ].concat(nueva ? [] : [{tipo:'info', html: ts.length ? ts.map(function(t){ return '<span>' + (t.estado === 'hecho' ? '✓ ' : '· ') + esc(t.titulo) + '</span>'; }).join('') : '<span>Esta etapa aún no tiene tareas.</span>'}]),
+    onGuardar: function(v){
+      var cumplida = v.cumplida === 'si';
+      if (nueva) { crear('etapas', {n:etapas().length + 1, titulo:v.titulo, meta:v.meta, cumplida:cumplida}); registrar('agregó la etapa «' + v.titulo + '» a la ruta'); return; }
+      cambiar('etapas', e.id, {titulo:v.titulo, meta:v.meta, cumplida:cumplida, cumplidaEn:cumplida ? (e.cumplidaEn || ahora()) : ''});
+      if (cumplida && !e.cumplida) { registrar('marcó la etapa «' + v.titulo + '» como cumplida'); celebrar('Etapa cumplida.'); }
+    },
+    onBorrar: nueva || ts.length ? null : function(){ borrar('etapas', e.id); }
+  });
+}
+function modalAjustes(){
+  var c = config();
+  abrirForm({
+    etiqueta:'Ajustes de la oficina', titulo:'El norte y la reunión',
+    campos:[
+      {id:'norte', label:'El norte', valor:c.norte || '', requerido:true, max:120, ayuda:'La meta grande que manda sobre todo lo demás.'},
+      {id:'horaReunion', label:'Hora de la reunión diaria', tipo:'time', valor:horaReunion()}
+    ],
+    onGuardar: function(v){ guardarDoc('config', 'oficina', {norte:v.norte, horaReunion:v.horaReunion || '18:00'}); registrar('actualizó el norte y la hora de la reunión'); }
+  });
+}
+function modalObjetivo(o){
+  var nueva = !o; o = o || {};
+  abrirForm({
+    etiqueta: nueva ? 'Nueva meta' : 'Meta', titulo: nueva ? '¿Qué quieren alcanzar?' : o.titulo,
+    campos:[
+      {id:'titulo', label:'Meta', valor:o.titulo || '', requerido:true, max:100, placeholder:'Ej.: Presentaciones hechas a consejos'},
+      {id:'meta', label:'Número a alcanzar', tipo:'number', ancho:'medio', valor:o.meta == null ? '' : o.meta},
+      {id:'unidad', label:'Unidad', ancho:'medio', valor:o.unidad || '', max:30, placeholder:'Ej.: presentaciones'}
+    ].concat(o.auto ? [{tipo:'info', html:'<span>' + AUTO_TXT[o.auto] + '</span>'}] : [{id:'actual', label:'Llevan', tipo:'number', ancho:'medio', valor:o.actual || 0}]),
+    onGuardar: function(v){
+      var doc = {titulo:v.titulo, meta:v.meta, unidad:v.unidad};
+      if (!o.auto) doc.actual = v.actual || 0;
+      if (nueva) { doc.orden = Date.now(); crear('objetivos', doc); registrar('agregó la meta «' + v.titulo + '»'); }
+      else cambiar('objetivos', o.id, doc);
+    },
+    onBorrar: nueva ? null : function(){ borrar('objetivos', o.id); }
+  });
+}
+function modalProveedor(p){
+  var nueva = !p; p = p || {};
+  abrirForm({
+    etiqueta: nueva ? 'Nuevo proveedor' : 'Ficha del proveedor', titulo: nueva ? 'Proveedor' : p.nombre,
+    campos:[
+      {id:'nombre', label:'Nombre', valor:p.nombre || '', requerido:true, max:80},
+      {id:'tipo', label:'Tipo', tipo:'select', ancho:'medio', valor:p.tipo || 'Distribuidor', opciones:TIPOS_PROV.map(function(x){ return [x, x]; })},
+      {id:'contacto', label:'Asesor o contacto', ancho:'medio', valor:p.contacto || '', max:80},
+      {id:'telefono', label:'Teléfono o WhatsApp', ancho:'medio', tipo:'tel', valor:p.telefono || '', max:40},
+      {id:'correo', label:'Correo', ancho:'medio', tipo:'email', valor:p.correo || '', max:80},
+      {id:'lista', label:'Lista de precios 2026', tipo:'segment', valor:p.lista || 'por_pedir', opciones:LISTA},
+      {id:'iva', label:'IVA', tipo:'segment', valor:p.iva || 'sin_aclarar', opciones:[['sin_aclarar','Sin aclarar'],['aclarado','Aclarado']]},
+      {id:'ivaNota', label:'Qué dijeron del IVA', tipo:'textarea', valor:p.ivaNota || '', placeholder:'¿Precios con o sin IVA? ¿Qué tarifa por producto? ¿Impuesto saludable incluido?'},
+      {id:'condiciones', label:'Condiciones', tipo:'textarea', valor:p.condiciones || '', placeholder:'Pedido mínimo, plazo de pago, frecuencia de entrega, cambios por vencimiento.'},
+      {id:'notas', label:'Notas', tipo:'textarea', valor:p.notas || ''}
+    ],
+    onGuardar: function(v){
+      var doc = Object.assign({}, v, {actualizado:ahora()});
+      if (v.lista !== (p.lista || 'por_pedir')) doc.listaFecha = ahora();
+      if (nueva) { crear('proveedores', doc); registrar('agregó el proveedor ' + v.nombre); }
+      else {
+        cambiar('proveedores', p.id, doc);
+        if (v.lista === 'recibida' && p.lista !== 'recibida') registrar('recibió la lista 2026 de ' + v.nombre);
+        if (v.iva === 'aclarado' && p.iva !== 'aclarado') registrar('aclaró el IVA con ' + v.nombre);
+      }
+    },
+    onBorrar: nueva ? null : function(){ borrar('proveedores', p.id); }
+  });
+}
+function modalCotizacion(c){
+  var nueva = !c; c = c || {};
+  abrirForm({
+    etiqueta: nueva ? 'Nueva cotización' : 'Cotización', titulo: nueva ? 'Estantería' : c.proveedor,
+    campos:[
+      {id:'proveedor', label:'Proveedor', valor:c.proveedor || '', requerido:true, max:80},
+      {id:'contacto', label:'Contacto', ancho:'medio', valor:c.contacto || '', max:80},
+      {id:'valor', label:'Valor cotizado', tipo:'pesos', ancho:'medio', valor:c.valor == null ? '' : c.valor},
+      {id:'estado', label:'Estado', tipo:'segment', valor:c.estado || 'pedida', opciones:COTI},
+      {id:'incluye', label:'Qué incluye', tipo:'textarea', valor:c.incluye || '', placeholder:'Medidas, niveles, material, transporte, instalación.'},
+      {id:'notas', label:'Notas', tipo:'textarea', valor:c.notas || ''}
+    ],
+    onGuardar: function(v){
+      if (nueva) { crear('cotizaciones', Object.assign({}, v, {creada:ahora()})); registrar('agregó la cotización de ' + v.proveedor + (v.valor ? ': ' + pesos(v.valor) : '')); }
+      else { cambiar('cotizaciones', c.id, v); if (v.estado === 'elegida' && c.estado !== 'elegida') registrar('eligió las estanterías de ' + v.proveedor); }
+    },
+    onBorrar: nueva ? null : function(){ borrar('cotizaciones', c.id); }
+  });
+}
+function modalProducto(p){
+  var nueva = !p; p = p || {};
+  var provs = S.d.proveedores.map(function(x){ return x.nombre; }).sort(function(a, b){ return a.localeCompare(b, 'es'); });
+  abrirForm({
+    etiqueta: nueva ? 'Nuevo producto' : 'Producto', titulo: nueva ? 'Producto' : p.nombre,
+    campos:[
+      {id:'nombre', label:'Producto', valor:p.nombre || '', requerido:true, max:100, placeholder:'Ej.: Gaseosa 400 ml'},
+      {id:'categoria', label:'Categoría', tipo:'select', ancho:'medio', valor:p.categoria || '', opciones:[['','Sin categoría']].concat(CATEGORIAS.map(function(x){ return [x, x]; }))},
+      {id:'proveedor', label:'Proveedor', tipo:'select', ancho:'medio', valor:p.proveedor || '', opciones:[['','Sin proveedor']].concat(provs.map(function(x){ return [x, x]; }))},
+      {id:'costo', label:'Costo por unidad (con IVA)', tipo:'pesos', ancho:'medio', valor:p.costo == null ? '' : p.costo},
+      {id:'iva', label:'IVA', tipo:'select', ancho:'medio', valor:p.iva == null ? '19' : String(p.iva), opciones:IVAS},
+      {id:'precio', label:'Precio de venta al público', tipo:'pesos', ancho:'medio', valor:p.precio == null ? '' : p.precio},
+      {tipo:'info', html:'<span id="m-margen">' + textoMargen(p.costo, p.precio) + '</span>'},
+      {id:'notas', label:'Notas', tipo:'textarea', valor:p.notas || ''}
+    ],
+    alAbrir: function(dlg){
+      dlg.addEventListener('input', function(ev){
+        if (ev.target.id === 'm-costo' || ev.target.id === 'm-precio') { var m = $('#m-margen'); if (m) m.innerHTML = textoMargen(leerPesos($('#m-costo').value), leerPesos($('#m-precio').value)); }
+      });
+    },
+    onGuardar: function(v){
+      if (nueva) { crear('productos', Object.assign({}, v, {creado:ahora()})); registrar('agregó ' + v.nombre + ' a la lista de precios'); }
+      else cambiar('productos', p.id, v);
+    },
+    onBorrar: nueva ? null : function(){ borrar('productos', p.id); }
+  });
+}
+function textoMargen(costo, precio){
+  var m = margen({costo:costo, precio:precio});
+  return m.pct === null ? 'Con costo y precio de venta, aquí aparece el margen.' : 'Margen: <b>' + pesos(m.pesos) + '</b> por unidad · <b>' + porc(m.pct) + '</b> del precio de venta';
+}
+function modalProspecto(p){
+  var nueva = !p; p = p || {};
+  abrirForm({
+    etiqueta: nueva ? 'Nuevo prospecto' : 'Prospecto', titulo: nueva ? '¿A quién le vamos a vender?' : p.nombre,
+    campos:[
+      {id:'tipo', label:'Tipo', tipo:'segment', valor:p.tipo || 'unidad', opciones:[['unidad','Unidad residencial'],['administracion','Empresa de administración']]},
+      {id:'nombre', label:'Nombre', valor:p.nombre || '', requerido:true, max:100, placeholder:'Ej.: Unidad Altos del Poblado'},
+      {id:'zona', label:'Zona', tipo:'select', ancho:'medio', valor:p.zona || '', opciones:[['','Sin zona']].concat(ZONAS.map(function(x){ return [x, x]; }))},
+      {id:'aptos', label:'Apartamentos', tipo:'select', ancho:'medio', valor:p.aptos || '', opciones:[['','No sé']].concat(APTOS.map(function(x){ return [x, x]; }))},
+      {id:'contacto', label:'Contacto (nombre y cargo)', ancho:'medio', valor:p.contacto || '', max:100},
+      {id:'telefono', label:'Teléfono o WhatsApp', tipo:'tel', ancho:'medio', valor:p.telefono || '', max:40},
+      {id:'canal', label:'Canal', tipo:'select', ancho:'medio', valor:p.canal || 'Llamada', opciones:CANALES.map(function(x){ return [x, x]; })},
+      {id:'etapa', label:'Etapa', tipo:'select', ancho:'medio', valor:p.etapa || 'por_contactar', opciones:ETAPAS_COM.concat([['perdido','Perdido']])},
+      {id:'responsable', label:'Responsable', tipo:'segment', valor:nueva ? (S.yo || '') : (p.responsable || ''), opciones:RESPONSABLES},
+      {id:'proximo', label:'Próximo paso', ancho:'medio', valor:p.proximo || '', max:140, placeholder:'Ej.: Llamar para agendar con el consejo'},
+      {id:'proximaFecha', label:'Fecha del próximo paso', tipo:'date', ancho:'medio', valor:p.proximaFecha || ''},
+      {id:'notas', label:'Notas', tipo:'textarea', valor:p.notas || ''}
+    ].concat((p.contactos || []).length ? [{tipo:'info', html:'<b>Historial</b>' + p.contactos.slice().reverse().map(function(c){ return '<span>' + esc(fechaCorta((c.fecha || '').slice(0, 10) || hoy())) + ' · ' + esc(c.canal || '') + (SOCIOS[c.por] ? ' · ' + SOCIOS[c.por].nombre : '') + ': ' + esc(c.nota || '') + '</span>'; }).join('')}] : []),
+    onGuardar: function(v){
+      if (nueva) { crear('prospectos', Object.assign({}, v, {contactos:[], creado:ahora()})); registrar('agregó a ' + v.nombre + ' en Comercial'); }
+      else {
+        cambiar('prospectos', p.id, v);
+        if (v.etapa !== p.etapa) registrar('pasó a ' + v.nombre + ' a «' + nombreEtapaCom(v.etapa) + '»');
+        if (v.etapa === 'firmado' && p.etapa !== 'firmado') celebrar('Firmado. Primera venta.');
+      }
+    },
+    onBorrar: nueva ? null : function(){ borrar('prospectos', p.id); }
+  });
+}
+function nombreEtapaCom(e){ var x = ETAPAS_COM.concat([['perdido','Perdido']]).find(function(o){ return o[0] === e; }); return x ? x[1] : e; }
+function modalContacto(p){
+  abrirForm({
+    etiqueta:'Registrar contacto', titulo:p.nombre,
+    campos:[
+      {id:'canal', label:'Canal', tipo:'select', ancho:'medio', valor:p.canal || 'Llamada', opciones:CANALES.map(function(x){ return [x, x]; })},
+      {id:'etapa', label:'Queda en', tipo:'select', ancho:'medio', valor:p.etapa === 'por_contactar' || !p.etapa ? 'contactado' : p.etapa, opciones:ETAPAS_COM.concat([['perdido','Perdido']])},
+      {id:'nota', label:'¿Qué pasó?', tipo:'textarea', requerido:true, placeholder:'Ej.: Habló la administradora. Le interesa; pide que lo presentemos al consejo.'},
+      {id:'proximo', label:'Próximo paso', ancho:'medio', valor:'', max:140},
+      {id:'proximaFecha', label:'Fecha', tipo:'date', ancho:'medio', valor:sumarDias(hoy(), 2)}
+    ],
+    validar: function(v){ if (v.etapa !== 'perdido' && v.etapa !== 'firmado' && !v.proximo) return ['proximo', 'Sin próximo paso, el prospecto se enfría. Escriban cuál es.']; },
+    onGuardar: function(v){
+      var contactos = (p.contactos || []).concat([{fecha:ahora(), por:S.yo || '', canal:v.canal, nota:v.nota}]);
+      cambiar('prospectos', p.id, {contactos:contactos, etapa:v.etapa, canal:v.canal, proximo:v.proximo, proximaFecha:v.proximaFecha});
+      registrar('registró un contacto con ' + p.nombre + ' (' + v.canal + ')');
+      if (v.etapa === 'firmado' && p.etapa !== 'firmado') celebrar('Firmado. Primera venta.');
+    }
+  });
+}
+function modalQuien(){
+  abrirForm({
+    etiqueta:'Esta oficina', titulo:'¿Quién eres?', textoGuardar:'Listo', sinFoco:true,
+    campos:[{id:'quien', label:'Socio', tipo:'segment', valor:S.yo || '', opciones:[['simon','Simón Ramírez'],['sebastian','Sebastián Ortiz']]},
+      {tipo:'info', html:'<span>Se recuerda solo en este navegador. Sirve para saludarte, filtrar lo tuyo y firmar lo que haces en la oficina.</span>'}],
+    validar: function(v){ if (!v.quien) return ['quien', 'Elige un nombre.']; },
+    onGuardar: function(v){ ponerYo(v.quien); }
+  });
+}
+function modalParquear(){
+  abrirForm({
+    etiqueta:'Parqueadero', titulo:'Parquear una idea', textoGuardar:'Parquear',
+    campos:[{id:'texto', label:'La idea', tipo:'textarea', requerido:true, placeholder:'Escríbela y sigue con el foco. Se revisa en la revisión semanal.'}],
+    onGuardar: function(v){ parquear(v.texto); }
+  });
+}
+function parquear(texto){ crear('parqueadero', {texto:texto, por:S.yo || '', creada:ahora(), estado:'parqueada'}); registrar('parqueó una idea: «' + texto + '»'); avisar('Idea parqueada. Sigan con el foco.'); }
+function ponerYo(q){ S.yo = SOCIOS[q] ? q : null; LS.set('mm-oficina-yo', S.yo); anunciar(); render(); }
+
+// ---------- avisos ----------
+var avisoT = null;
+function avisar(texto, tipo){
+  var a = $('#aviso');
+  a.className = 'aviso' + (tipo ? ' ' + tipo : '');
+  a.textContent = texto;
+  a.hidden = false;
+  clearTimeout(avisoT); avisoT = setTimeout(function(){ a.hidden = true; }, 4200);
+}
+function celebrar(texto){
+  var a = $('#aviso');
+  a.className = 'aviso logro';
+  a.innerHTML = '<img src="img/mark-10-pulgar-arriba.webp" alt="" width="360" height="326"><span>' + esc(texto) + '</span>';
+  a.hidden = false;
+  clearTimeout(avisoT); avisoT = setTimeout(function(){ a.hidden = true; }, 3600);
+}
+function armado(el){
+  if (el.dataset.armado === '1') return true;
+  el.dataset.armado = '1'; el.dataset.txt = el.textContent; el.textContent = '¿Seguro? Toca otra vez'; el.classList.add('armado');
+  setTimeout(function(){ if (el.isConnected && el.dataset.armado === '1') { el.dataset.armado = ''; el.textContent = el.dataset.txt; el.classList.remove('armado'); } }, 4000);
+  return false;
+}
+
+// ---------- acciones ----------
+function irA(s){
+  if (SALA_IDS.indexOf(s) < 0) return;
+  S.sala = s;
+  try { history.replaceState(null, '', '#' + s); } catch(e){}
+  anunciar(); render();
+  window.scrollTo(0, 0);
+}
+function tarea(id){ return buscar('tareas', id); }
+function moverTarea(id, estado){
+  var t = tarea(id); if (!t || t.estado === estado) return;
+  if (estado === 'hecho') return modalCompletar(t);
+  cambiar('tareas', id, {estado:estado, hechaEn:''});
+  if (estado === 'en_curso') registrar('empezó «' + t.titulo + '»');
+  if (t.estado === 'hecho') registrar('reabrió «' + t.titulo + '»');
+}
+function moverProspecto(id, etapaNueva){
+  var p = buscar('prospectos', id); if (!p || p.etapa === etapaNueva) return;
+  cambiar('prospectos', id, {etapa:etapaNueva});
+  registrar('pasó a ' + p.nombre + ' a «' + nombreEtapaCom(etapaNueva) + '»');
+  if (etapaNueva === 'firmado') celebrar('Firmado. Primera venta.');
+}
+
+var ACC = {
+  'ir': function(el){ irA(el.dataset.sala); },
+  'soy': function(el){ ponerYo(el.dataset.quien); },
+  'cambiar-quien': modalQuien,
+  'parquear': modalParquear,
+  'ajustes': modalAjustes,
+  'nueva-tarea': function(el){ modalTarea(null, {dia:el.dataset.dia || '', estado:el.dataset.estado || '', etapa:el.dataset.etapa || (S.sala === 'tablero' && S.filtro.etapa !== 'todas' && S.filtro.etapa !== 'sin' ? S.filtro.etapa : '')}); },
+  'editar-tarea': function(el){ var t = tarea(el.dataset.id); if (t) modalTarea(t); },
+  'completar': function(el){ var t = tarea(el.dataset.id); if (t) modalCompletar(t); },
+  'reabrir': function(el){ moverTarea(el.dataset.id, 'pendiente'); },
+  'mover-tarea': function(el){ moverTarea(el.dataset.id, el.dataset.estado); },
+  'pasar-dia': function(el){ var t = tarea(el.dataset.id); if (!t) return; cambiar('tareas', t.id, {dia:el.dataset.dia}); registrar('pasó «' + t.titulo + '» al ' + fechaCorta(el.dataset.dia)); },
+  'editar-foco': function(el){ modalFoco(el.dataset.fecha); },
+  'ver-etapa': function(el){ S.filtro.etapa = el.dataset.id; LS.set('mm-oficina-filtro', S.filtro); irA('tablero'); },
+  'filtrar-etapa': function(el){ S.filtro.etapa = S.filtro.etapa === el.dataset.id ? 'todas' : el.dataset.id; LS.set('mm-oficina-filtro', S.filtro); render(); },
+  'editar-etapa': function(el){ var e = etapa(el.dataset.id); if (e) modalEtapa(e); },
+  'nueva-etapa': function(){ modalEtapa(null); },
+  'ver-hechas': function(){ S.verHechas = !S.verHechas; render(); },
+  'ver-hechas-hoy': function(){ S.verHechasHoy = !S.verHechasHoy; render(); },
+  'ver-perdidos': function(){ S.verPerdidos = !S.verPerdidos; render(); },
+  'seg': function(el){
+    var g = el.dataset.grupo, v = el.dataset.valor;
+    if (g === 'hoy-mias') { S.hoyMias = v === '1'; LS.set('mm-oficina-mias', S.hoyMias); }
+    else if (g === 'filtro-resp') { S.filtro.resp = v; LS.set('mm-oficina-filtro', S.filtro); }
+    else if (g === 'prov-tab') { S.provTab = v; LS.set('mm-oficina-prov', v); }
+    else if (g === 'com-resp') { S.comResp = v; }
+    else if (g.indexOf('prov-lista:') === 0) {
+      var p = buscar('proveedores', g.slice(11)); if (!p || (p.lista || 'por_pedir') === v) return;
+      cambiar('proveedores', p.id, {lista:v, listaFecha:ahora(), actualizado:ahora()});
+      if (v === 'recibida') registrar('recibió la lista 2026 de ' + p.nombre);
+      if (v === 'pedida') registrar('pidió la lista 2026 a ' + p.nombre);
+      return;
+    }
+    render();
+  },
+  'semana-mover': function(el){ var n = Number(el.dataset.n); S.semana = n ? sumarDias(S.semana || lunesDe(hoy()), n) : null; render(); },
+  'ver-reunion': function(el){ S.reunionFecha = el.dataset.fecha === hoy() ? null : el.dataset.fecha; irA('reunion'); },
+  'reunion-iniciar': function(){ var f = hoy(); guardarDoc('reuniones', f, {fecha:f, inicio:ahora(), fin:''}); registrar('inició la reunión de ' + nombreReunion()); },
+  'reunion-cerrar': function(el){
+    var f = el.dataset.fecha, man = sumarDias(f, 1);
+    if (!textoFoco(focoDe(man))) { avisar('Antes de cerrar, definan el foco de mañana.'); return modalFoco(man); }
+    var nd = S.d.decisiones.filter(function(d){ return d.reunion === f; }).length, nc = S.d.tareas.filter(function(t){ return t.origen === f; }).length;
+    cambiar('reuniones', f, {fin:ahora()});
+    registrar('cerró la reunión con ' + nd + (nd === 1 ? ' decisión' : ' decisiones') + ' y ' + nc + (nc === 1 ? ' compromiso' : ' compromisos'));
+    celebrar('Reunión cerrada. Mañana: ' + textoFoco(focoDe(man)) + '.');
+  },
+  'reunion-reabrir': function(el){ cambiar('reuniones', el.dataset.fecha, {fin:''}); },
+  'borrar-decision': function(el){ if (armado(el)) borrar('decisiones', el.dataset.id); },
+  'idea-a-ruta': function(el){ var i = buscar('parqueadero', el.dataset.id); if (i) modalTarea(null, {titulo:i.texto, idea:i.id}); },
+  'idea-descartar': function(el){ if (armado(el)) cambiar('parqueadero', el.dataset.id, {estado:'descartada'}); },
+  'nuevo-objetivo': function(){ modalObjetivo(null); },
+  'editar-objetivo': function(el){ var o = buscar('objetivos', el.dataset.id); if (o) modalObjetivo(o); },
+  'obj-sumar': function(el){ var o = buscar('objetivos', el.dataset.id); if (o) cambiar('objetivos', o.id, {actual:Math.max(0, (Number(o.actual) || 0) + Number(el.dataset.n))}); },
+  'nuevo-proveedor': function(){ modalProveedor(null); },
+  'editar-proveedor': function(el){ var p = buscar('proveedores', el.dataset.id); if (p) modalProveedor(p); },
+  'nueva-cotizacion': function(){ modalCotizacion(null); },
+  'editar-cotizacion': function(el){ var c = buscar('cotizaciones', el.dataset.id); if (c) modalCotizacion(c); },
+  'nuevo-producto': function(){ modalProducto(null); },
+  'editar-producto': function(el){ var p = buscar('productos', el.dataset.id); if (p) modalProducto(p); },
+  'nuevo-prospecto': function(){ modalProspecto(null); },
+  'editar-prospecto': function(el){ var p = buscar('prospectos', el.dataset.id); if (p) modalProspecto(p); },
+  'registrar-contacto': function(el){ var p = buscar('prospectos', el.dataset.id); if (p) modalContacto(p); },
+  'avanzar-prospecto': function(el){
+    var p = buscar('prospectos', el.dataset.id); if (!p) return;
+    var i = ETAPAS_COM.findIndex(function(e){ return e[0] === (p.etapa || 'por_contactar'); });
+    if (i >= 0 && i < ETAPAS_COM.length - 1) moverProspecto(p.id, ETAPAS_COM[i + 1][0]);
+  },
+  'nota-sel': function(el){ S.notaSel = el.dataset.id; LS.set('mm-oficina-nota', S.notaSel); anunciar(); render(); },
+  'nueva-nota': function(){ var id = crear('libreta', {titulo:'Nota nueva', texto:'', orden:50, editada:ahora(), editadaPor:S.yo || ''}); S.notaSel = id; LS.set('mm-oficina-nota', id); anunciar(); setTimeout(function(){ var t = $('#nota-titulo'); if (t) { t.focus(); t.select(); } }, 60); },
+  'borrar-nota': function(el){ if (armado(el)) { borrar('libreta', el.dataset.id); S.notaSel = null; } },
+  'cerrar-modal': cerrarModal,
+  'borrar-modal': function(el){ if (M && M.cfg.onBorrar && armado(el)) { M.cfg.onBorrar(); cerrarModal(); } },
+  'paso-agregar': function(){ var i = $('#m-paso-nuevo'); if (!i || !M || !i.value.trim()) return; M.pasos.push({t:i.value.trim(), ok:false}); i.value = ''; $('#m-pasos-lista').innerHTML = pasosHTML(); i.focus(); },
+  'paso-quitar': function(el){ if (!M) return; M.pasos.splice(Number(el.dataset.i), 1); $('#m-pasos-lista').innerHTML = pasosHTML(); }
+};
+var CAMBIO = {
+  'filtro-etapa': function(el){ S.filtro.etapa = el.value; LS.set('mm-oficina-filtro', S.filtro); render(); },
+  'programar': function(el){ var t = tarea(el.dataset.id); if (t && el.value) { cambiar('tareas', t.id, {dia:el.value}); } },
+  'reunion-fecha': function(el){ S.reunionFecha = el.value === hoy() ? null : el.value; render(); },
+  'com-canal': function(el){ S.comCanal = el.value; render(); },
+  'paso-ok': function(el){ if (M && M.pasos[Number(el.dataset.i)]) M.pasos[Number(el.dataset.i)].ok = el.checked; }
+};
+var FORM = {
+  'modal': enviarModal,
+  'parquear': function(f){ var i = f.querySelector('input'), t = i.value.trim(); if (!t) return i.focus(); i.value = ''; parquear(t); },
+  'decision': function(f){
+    var i = f.querySelector('input'), t = i.value.trim(); if (!t) return i.focus();
+    i.value = '';
+    crear('decisiones', {texto:t, reunion:f.dataset.fecha, fecha:ahora(), por:S.yo || ''});
+    registrar('dejó una decisión: «' + t + '»');
+  },
+  'compromiso': function(f){
+    var el = f.elements, titulo = el.titulo.value.trim(), resp = el.responsable.value, dia = el.dia.value;
+    if (!titulo) return el.titulo.focus();
+    if (!resp) { avisar('Cada compromiso necesita responsable.', 'alerta'); return el.responsable.focus(); }
+    if (!dia) { avisar('Cada compromiso necesita día.', 'alerta'); return el.dia.focus(); }
+    var fo = focoDe(dia);
+    crear('tareas', {titulo:titulo, responsable:resp, dia:dia, etapa:fo && fo.etapa || '', estado:'pendiente', pasos:[], nota:'', resultado:'', origen:f.dataset.fecha, creada:ahora(), creadaPor:S.yo || '', orden:Date.now()});
+    registrar('se comprometió con «' + titulo + '» · ' + (resp === 'ambos' ? 'ambos' : SOCIOS[resp].nombre) + (dia ? ', ' + fechaCorta(dia) : ''));
+    el.titulo.value = ''; el.responsable.value = '';
+    el.titulo.focus();
+  }
+};
+
+document.addEventListener('click', function(e){
+  var el = e.target.closest('[data-accion]');
+  if (!el) return;
+  var fn = ACC[el.dataset.accion];
+  if (fn) { e.preventDefault(); fn(el, e); }
+});
+document.addEventListener('change', function(e){ var el = e.target.closest('[data-cambio]'); if (el && CAMBIO[el.dataset.cambio]) CAMBIO[el.dataset.cambio](el, e); });
+document.addEventListener('submit', function(e){ var f = e.target; if (f.dataset && FORM[f.dataset.form]) { e.preventDefault(); FORM[f.dataset.form](f, e); } });
+document.addEventListener('input', function(e){
+  var el = e.target;
+  if (el.dataset && el.dataset.guardar) programarGuardado(el);
+  if (el.classList && el.classList.contains('paso-texto') && M && M.pasos[Number(el.dataset.i)]) M.pasos[Number(el.dataset.i)].t = el.value;
+});
+document.addEventListener('focusout', function(e){ var el = e.target; if (el.dataset && el.dataset.guardar) guardarYa(el); });
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Enter' && e.target.id === 'm-paso-nuevo') { e.preventDefault(); ACC['paso-agregar'](); }
+});
+$('#modal').addEventListener('click', function(e){ if (e.target === this) cerrarModal(); });
+$('#modal').addEventListener('close', function(){ M = null; });
+
+// arrastrar tareas y prospectos entre columnas (escritorio)
+document.addEventListener('dragstart', function(e){
+  var c = e.target.closest && e.target.closest('[data-arrastre]'); if (!c) return;
+  e.dataTransfer.setData('text/plain', c.dataset.arrastre); e.dataTransfer.effectAllowed = 'move'; c.classList.add('arrastrando');
+});
+document.addEventListener('dragend', function(){ document.querySelectorAll('.arrastrando,.sobre').forEach(function(x){ x.classList.remove('arrastrando', 'sobre'); }); });
+document.addEventListener('dragover', function(e){ var col = e.target.closest && e.target.closest('[data-columna]'); if (!col) return; e.preventDefault(); col.classList.add('sobre'); });
+document.addEventListener('dragleave', function(e){ var col = e.target.closest && e.target.closest('[data-columna]'); if (col && !col.contains(e.relatedTarget)) col.classList.remove('sobre'); });
+document.addEventListener('drop', function(e){
+  var col = e.target.closest && e.target.closest('[data-columna]'); if (!col) return;
+  e.preventDefault(); col.classList.remove('sobre');
+  var d = (e.dataTransfer.getData('text/plain') || '').split(':'), c = col.dataset.columna.split(':');
+  if (d[0] !== c[0]) return;
+  if (d[0] === 't') moverTarea(d.slice(1).join(':'), c[1]);
+  if (d[0] === 'p') moverProspecto(d.slice(1).join(':'), c[1]);
+});
+
+// textos que se guardan solos (notas de la reunión y libreta)
+var guardados = {};
+function programarGuardado(el){ clearTimeout(guardados[el.id]); guardados[el.id] = setTimeout(function(){ guardarYa(el); }, 800); }
+function guardarYa(el){
+  clearTimeout(guardados[el.id]); delete guardados[el.id];
+  var v = el.value, k = el.dataset.guardar, id = el.dataset.id, cur;
+  if (k === 'reunion-notas') { cur = buscar('reuniones', id); if ((cur && cur.notas || '') === v) return; guardarDoc('reuniones', id, {fecha:id, notas:v}); }
+  if (k === 'nota-texto') { cur = buscar('libreta', id); if (!cur || (cur.texto || '') === v) return; cambiar('libreta', id, {texto:v, editada:ahora(), editadaPor:S.yo || ''}); }
+  if (k === 'nota-titulo') { cur = buscar('libreta', id); if (!cur || (cur.titulo || '') === v.trim() || !v.trim()) return; cambiar('libreta', id, {titulo:v.trim(), editada:ahora(), editadaPor:S.yo || ''}); }
+}
+
+// el reloj de la reunión avanza solo
+setInterval(function(){
+  if (!listo()) return;
+  document.querySelectorAll('[data-reloj]').forEach(function(el){ el.innerHTML = textoReloj(); });
+  var k = claveReloj();
+  if (k !== S.tickClave) { S.tickClave = k; pedirRender(); }
+}, 20000);
+
+iniciar();
+})();
+</script>
