@@ -32,6 +32,7 @@
   --lado-tenue:#7FA6D4;
   --lado-hover:rgba(255,255,255,.06);
   --lado-activo:rgba(255,255,255,.12);
+  --lado-borde:rgba(255,255,255,.16);
   --verde-abierto:#1FBF6A;
   --alerta:#B42318;
   --alerta-tenue:#FDEDEB;
@@ -105,13 +106,19 @@ svg{display:block}
   .app{display:block}
   .lado{
     position:sticky;top:env(safe-area-inset-top,0px);height:auto;overflow:visible;z-index:30;
-    display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px 12px;
+    display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px 12px;
     padding-block:12px 8px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   }
   .lado-marca{padding-left:0}
-  .lado-logo{width:118px}
+  .lado-logo{width:108px}
   .lado-sub{display:none}
-  .lado-pie{grid-column:2;grid-row:1;margin-top:0;flex-direction:row;justify-content:flex-end;align-items:center;gap:6px}
+  .lado-pie{grid-column:3;grid-row:1;margin-top:0;flex-direction:row;justify-content:flex-end;align-items:center;gap:6px}
+  .buscar-btn{grid-column:2;grid-row:1;justify-self:end;width:auto;padding:8px 10px}
+  .lado-pie [data-accion="nuevo-recordatorio"]{display:none}
+  .lado{gap:10px 8px}
+  .lado-pie{gap:4px}
+  .lado-pie .btn-parquear{padding:8px 9px}
+  .buscar-btn span,.buscar-btn kbd{display:none}
   .presentes,.quien small,.quien .quien-nombre,.btn-parquear span{display:none}
   .btn-parquear{width:auto;padding:8px 10px}
   .quien{padding:4px}
@@ -149,7 +156,7 @@ svg{display:block}
 .mark-recepcion{width:clamp(120px,13vw,176px);margin-bottom:-8px}
 .mark-reunion{width:clamp(150px,15vw,210px);margin-bottom:-10px}
 @media(max-width:700px){.banda{grid-template-columns:1fr}.mark{display:none}}
-@media(prefers-reduced-motion:no-preference){.mark-recepcion{animation:brinco 3.4s ease-in-out infinite}}
+@media(prefers-reduced-motion:no-preference){.mark-recepcion{animation:brinco 1.7s ease-in-out 2}}
 @keyframes brinco{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
 .reloj{display:inline-flex;align-items:center;gap:9px;background:var(--blanco);color:var(--tinta);border-radius:999px;padding:8px 15px 8px 12px;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;box-shadow:0 14px 34px -14px rgba(0,22,70,.55)}
@@ -212,7 +219,7 @@ svg{display:block}
 /* ---------- paneles ---------- */
 .panel{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-m);padding:22px;display:flex;flex-direction:column;gap:16px;min-width:0}
 .panel-cab{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px}
-.panel-cab > div:first-child{display:flex;flex-direction:column;gap:8px;min-width:0}
+.panel-cab > div:first-child{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1 1 200px}
 .panel-cab h2{font-size:22px}
 .panel-herr{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 
@@ -498,14 +505,68 @@ dialog#modal::backdrop{background:var(--velo)}
 .franja.alerta{background:var(--alerta-tenue);color:var(--alerta)}
 .cargando{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:60px 0;color:var(--tinta-suave)}
 .cargando img{width:180px;height:auto}
+
+/* ---------- buscar, volver, deshacer, papelera ---------- */
+.buscar-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--lado-borde);background:transparent;color:var(--lado-texto);cursor:pointer;font-size:14px;text-align:left}
+.buscar-btn:hover{background:var(--lado-hover);color:var(--blanco)}
+.buscar-btn svg{width:18px;height:18px;flex:none}
+.buscar-btn kbd{margin-left:auto;font-family:inherit;font-size:11px;color:var(--lado-tenue);border:1px solid var(--lado-borde);border-radius:6px;padding:1px 6px}
+.volver{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;background:none;border:0;padding:2px 0;color:var(--tinta-suave);font-size:14px;font-weight:500;cursor:pointer}
+.volver:hover{color:var(--azul-profundo)}
+.volver svg{width:16px;height:16px}
+.btn-deshacer{background:var(--blanco);color:var(--tinta);margin-left:6px;padding:6px 12px;font-size:13px}
+.buscar-caja .modal-cab{padding-bottom:12px}
+.buscar-caja .modal-cab > div{flex:1}
+.buscar-input{width:100%;font-size:18px;padding:12px 14px;border:1px solid var(--linea);border-radius:var(--r-s);background:var(--fondo)}
+.buscar-res{display:flex;flex-direction:column;gap:2px;padding:0 14px 18px;max-height:62vh;overflow:auto}
+.buscar-res .vacio{padding:6px 10px}
+.res{display:flex;gap:12px;align-items:flex-start;text-align:left;background:none;border:1px solid transparent;border-radius:var(--r-s);padding:10px 12px;cursor:pointer;width:100%}
+.res:hover,.res:focus-visible{background:var(--fondo);border-color:var(--linea)}
+.res .chip{flex:none;margin-top:1px}
+.res-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.res-txt b{font-weight:600;overflow-wrap:anywhere}
+.res-txt small{color:var(--tinta-suave);font-size:13px;overflow-wrap:anywhere}
+mark{background:var(--azul-tenue);color:var(--azul-profundo);border-radius:4px;padding:0 2px}
+.historial{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.historial > :first-child{grid-row:span 2}
+@media(max-width:900px){.historial{grid-template-columns:1fr}.historial > :first-child{grid-row:auto}}
+.pap-titulo{font-weight:500;overflow-wrap:anywhere}
+.pap-acc{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-items:center}
+.fila-txt > span{overflow-wrap:anywhere}
+
+/* ---------- paneles plegables ---------- */
+.plegar{width:32px;height:32px;flex:none;border-radius:50%;border:1px solid transparent;background:transparent;display:grid;place-items:center;cursor:pointer;color:var(--tinta-suave)}
+.plegar:hover{border-color:var(--linea);color:var(--tinta)}
+.plegar svg{width:18px;height:18px;transition:transform .15s ease}
+.plegado .plegar svg{transform:rotate(-90deg)}
+.panel.plegado{gap:0;padding-block:16px}
+.panel.plegado > :not(.panel-cab){display:none}
+.panel.plegado .panel-cab h2{font-size:17px}
+
+/* ---------- registros editables (avances, contactos) ---------- */
+.campo-label{font-size:14px;font-weight:500}
+.registros{display:flex;flex-direction:column;gap:10px}
+.registro{display:flex;flex-direction:column;gap:6px;background:var(--fondo);border-radius:var(--r-s);padding:10px 12px}
+.registro-cab{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--tinta-suave)}
+.registro-cab .enlace{font-size:12px}
+.campo .reg-texto{width:100%;min-height:0;padding:8px 10px;border:1px solid var(--linea);border-radius:10px;background:var(--superficie);font-size:14px;resize:vertical}
+
+/* ---------- modo pantalla de la reunión ---------- */
+.modo-pantalla .lado{display:none}
+.modo-pantalla .app{grid-template-columns:minmax(0,1fr)}
+.modo-pantalla .sala-in{max-width:1320px;zoom:1.08}
+.modo-pantalla .con-activo .bloque:not(.activo) > :not(.bloque-cab){display:none}
+.modo-pantalla .con-activo .bloque:not(.activo){padding-block:14px}
+.salir-pantalla{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:max(14px,env(safe-area-inset-right,0px));z-index:40;box-shadow:var(--sombra)}
 </style>
 
 <div class="app">
   <aside class="lado" id="lado">
     <div class="lado-marca">
-      <a class="lado-logo" href="#recepcion" data-accion="ir" data-sala="recepcion" aria-label="MinuteMark, ir a la recepción"><img src="img/mm-logo-white.png" alt="MinuteMark" width="720" height="188"></a>
+      <a class="lado-logo" href="#recepcion" data-accion="ir" data-sala="recepcion" aria-label="MinuteMark, ir al inicio"><img src="img/mm-logo-white.png" alt="MinuteMark" width="720" height="188"></a>
       <span class="lado-sub">Oficina de socios</span>
     </div>
+    <button class="buscar-btn" data-accion="buscar" aria-label="Buscar en la oficina"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg><span>Buscar</span><kbd>Ctrl K</kbd></button>
     <nav class="lado-nav" id="lado-nav" aria-label="Salas de la oficina"></nav>
     <div class="lado-pie" id="lado-pie"></div>
   </aside>
@@ -526,13 +587,14 @@ var SOCIOS = {
   sebastian:{nombre:'Sebastián', completo:'Sebastián Ortiz', ini:'SO', rol:'Socio fundador'}
 };
 var SALAS = [
-  ['recepcion','Recepción'],
+  ['recepcion','Inicio'],
   ['tablero','Tablero'],
   ['semana','Semana'],
   ['reunion','Reunión de las 6'],
   ['proveedores','Proveedores y precios'],
   ['comercial','Comercial'],
-  ['libreta','Libreta']
+  ['libreta','Libreta'],
+  ['historial','Historial']
 ];
 var SALA_IDS = SALAS.map(function(s){ return s[0]; });
 var ESTADOS = [['pendiente','Por hacer'],['en_curso','En curso'],['hecho','Hecho']];
@@ -558,7 +620,8 @@ var REGLAS = [
   ['Lo cumplido se causa.','Una línea sobre cómo se cumplió, con datos.'],
   ['Lo decidido no se reabre','sin un dato nuevo.']
 ];
-var COLS = ['config','etapas','tareas','semana','reuniones','decisiones','parqueadero','objetivos','recordatorios','proveedores','cotizaciones','productos','prospectos','libreta'];
+var COLS = ['config','etapas','tareas','semana','reuniones','decisiones','parqueadero','objetivos','recordatorios','proveedores','cotizaciones','productos','prospectos','libreta','papelera'];
+var TIPOS = {tareas:'Tarea', decisiones:'Decisión', parqueadero:'Idea', recordatorios:'Recordatorio', proveedores:'Proveedor', cotizaciones:'Cotización', productos:'Producto', prospectos:'Prospecto', libreta:'Nota', objetivos:'Meta', etapas:'Etapa', semana:'Foco del día', reuniones:'Reunión'};
 
 function svg(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
 var ICON = {
@@ -577,6 +640,10 @@ var ICON = {
   der: svg('<path d="m9 6 6 6-6 6"/>'),
   lapiz: svg('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
   bandera: svg('<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>'),
+  historial: svg('<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/>'),
+  deshacer: svg('<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>'),
+  buscar: svg('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>'),
+  abajo: svg('<path d="m6 9 6 6 6-6"/>'),
   campana: svg('<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>')
 };
 
@@ -639,7 +706,9 @@ var S = {
   notaSel: LS.get('mm-oficina-nota', null),
   semana: null, reunionFecha: null,
   verHechas:false, verHechasHoy:false, verPerdidos:false,
-  presentes: [], tickClave:''
+  presentes: [], tickClave:'',
+  atras: [], plegados: LS.get('mm-oficina-plegados', {reglas:true}), pantalla:false,
+  verRecHechos:false, verDescartadas:false
 };
 COLS.forEach(function(c){ S.d[c] = []; });
 if (S.yo && !SOCIOS[S.yo]) S.yo = null;
@@ -648,6 +717,59 @@ function listo(){ return S.modo === 'local' || (S.modo === 'vivo' && COLS.every(
 
 // ---------- datos: base compartida (claude.ai) o copia local ----------
 var B = { db:null, room:null, local:{} };
+
+// deshacer: cada acción del socio agrupa sus escrituras con el estado anterior de cada documento
+var U = { pila:LS.get('mm-oficina-deshacer-' + new Date().toDateString(), []), grupo:null, deshaciendo:false };
+function sinId(d){ var o = {}; Object.keys(d).forEach(function(k){ if (k !== 'id') o[k] = d[k]; }); return JSON.parse(JSON.stringify(o)); }
+function cortar(t, n){ t = String(t || ''); return t.length > n ? t.slice(0, n - 1) + '…' : t; }
+function desc(t){ if (U.grupo) U.grupo.desc = t; }
+function anotarPrevio(c, id){
+  var g = U.grupo;
+  if (g.ops.some(function(o){ return o.c === c && o.id === id; })) return;
+  var prev = buscar(c, id);
+  g.ops.push({c:c, id:id, prev:prev ? sinId(prev) : null});
+}
+function enGrupo(texto, fn){
+  var propio = !U.grupo;
+  if (propio) U.grupo = {desc:texto, ops:[], avisos:nAvisos};
+  try { return fn(); } finally { if (propio) cerrarGrupo(); }
+}
+try { Object.keys(localStorage).forEach(function(k){ if (k.indexOf('mm-oficina-deshacer-') === 0 && k !== 'mm-oficina-deshacer-' + new Date().toDateString()) localStorage.removeItem(k); }); } catch(e){}
+function guardarPila(){ LS.set('mm-oficina-deshacer-' + new Date().toDateString(), U.pila.slice(-30)); }
+function cerrarGrupo(){
+  var g = U.grupo; U.grupo = null;
+  if (!g || !g.ops.length) return;
+  U.pila.push(g); if (U.pila.length > 30) U.pila.shift();
+  guardarPila();
+  ofrecerDeshacer(g);
+  renderLado();
+}
+function deshacer(){
+  var g = U.pila.pop();
+  if (!g) { avisar('No hay cambios para deshacer.'); return; }
+  U.deshaciendo = true;
+  try { g.ops.slice().reverse().forEach(function(o){ if (o.prev) escribir('set', o.c, o.id, o.prev); else escribir('delete', o.c, o.id); }); }
+  finally { U.deshaciendo = false; }
+  guardarPila();
+  registrar('deshizo: ' + g.desc.charAt(0).toLowerCase() + g.desc.slice(1));
+  avisar('Se deshizo: ' + g.desc.charAt(0).toLowerCase() + g.desc.slice(1) + '.');
+  render();
+}
+// lo que se borra pasa 30 días por la papelera antes de irse
+function tituloDe(c, d){ return c === 'semana' ? 'Foco del ' + fechaCorta(d.id) + ': ' + (d.foco || '') : (d.titulo || d.texto || d.nombre || d.proveedor || 'Sin título'); }
+function aPapelera(c, id){
+  var d = buscar(c, id); if (!d) return;
+  var t = tituloDe(c, d);
+  crear('papelera', {col:c, docId:id, datos:sinId(d), titulo:cortar(t, 140), borradoPor:S.yo || '', borradoEn:ahora()});
+  borrar(c, id);
+  desc('Se borró «' + cortar(t, 50) + '»');
+}
+function limpiarPapelera(){
+  if (S.purgado || !listo()) return;
+  S.purgado = true;
+  var lim = Date.now() - 30 * 864e5;
+  S.d.papelera.filter(function(p){ return Date.parse(p.borradoEn || '') < lim; }).forEach(function(p){ borrar('papelera', p.id); });
+}
 
 function iniciar(){
   render();
@@ -669,7 +791,7 @@ function conectarVivo(db){
       pedirRender();
     }, caida);
   });
-  db.collection('actividad').orderBy('fecha', 'desc').limit(40).onSnapshot(function(snap){
+  db.collection('actividad').orderBy('fecha', 'desc').limit(100).onSnapshot(function(snap){
     S.actividad = snap.docs.map(function(doc){ return Object.assign({id:doc.id}, doc.data()); });
     pedirRender();
   }, caida);
@@ -692,11 +814,12 @@ function conectarLocal(){
 function refrescarLocal(){
   function lista(c){ return Object.keys(B.local[c] || {}).map(function(id){ return Object.assign({id:id}, B.local[c][id]); }); }
   COLS.forEach(function(c){ S.d[c] = lista(c); });
-  S.actividad = lista('actividad').sort(function(a, b){ return (b.fecha || '').localeCompare(a.fecha || ''); }).slice(0, 40);
+  S.actividad = lista('actividad').sort(function(a, b){ return (b.fecha || '').localeCompare(a.fecha || ''); }).slice(0, 100);
   pedirRender();
 }
 
 function escribir(op, c, id, data){
+  if (U.grupo && !U.deshaciendo && c !== 'actividad') anotarPrevio(c, id);
   if (B.db) {
     var ref = B.db.collection(c).doc(id);
     var p = op === 'set' ? ref.set(data) : op === 'update' ? ref.update(data) : ref.delete();
@@ -857,8 +980,14 @@ function filaTarea(t, extra){
     '</div>' + avatar(t.responsable, true) + '</li>';
 }
 function filaIdea(i){
-  return '<li class="idea"><p>' + esc(i.texto) + '</p><div class="idea-pie"><span>' + (SOCIOS[i.por] ? SOCIOS[i.por].nombre + ' · ' : '') + haceCuanto(i.creada) + '</span>' +
+  return '<li class="idea"><p><button class="fila-titulo" style="font-weight:400" data-accion="editar-idea" data-id="' + esc(i.id) + '">' + esc(i.texto) + '</button></p><div class="idea-pie"><span>' + (SOCIOS[i.por] ? SOCIOS[i.por].nombre + ' · ' : '') + haceCuanto(i.creada) + '</span>' +
     '<span class="idea-acc"><button class="enlace" data-accion="idea-a-ruta" data-id="' + esc(i.id) + '">Llevar a la ruta</button><button class="enlace enlace-suave" data-accion="idea-descartar" data-id="' + esc(i.id) + '">Descartar</button></span></div></li>';
+}
+function ideasDescartadas(){
+  var ds = S.d.parqueadero.filter(function(i){ return i.estado === 'descartada'; });
+  if (!ds.length) return '';
+  return (S.verDescartadas ? '<ul class="ideas">' + ds.map(function(i){ return '<li class="idea"><p><button class="fila-titulo" style="font-weight:400" data-accion="editar-idea" data-id="' + esc(i.id) + '">' + esc(i.texto) + '</button></p><div class="idea-pie"><span>Descartada</span><span class="idea-acc"><button class="enlace" data-accion="idea-recuperar" data-id="' + esc(i.id) + '">Volver a parquear</button></span></div></li>'; }).join('') + '</ul>' : '') +
+    '<button class="enlace mostrar-mas enlace-suave" data-accion="ver-descartadas">' + (S.verDescartadas ? 'Ocultar las descartadas' : 'Ver las descartadas (' + ds.length + ')') + '</button>';
 }
 function formParquear(id){
   return '<form class="form-linea" data-form="parquear"><label class="sr" for="' + id + '">Idea para el parqueadero</label><input id="' + id + '" name="texto" placeholder="Ej.: vender también café en grano" autocomplete="off" maxlength="300"><button class="btn btn-linea btn-sm" type="submit">Parquear</button></form>';
@@ -872,9 +1001,17 @@ function pedirRender(){ if (renderPendiente) return; renderPendiente = true; req
 function render(){
   renderLado();
   var sala = $('#sala'), g = capturar(sala);
-  sala.innerHTML = '<div class="sala-in">' + franjas() + vistaSala() + '</div>';
+  var atras = S.atras.length ? SALAS.find(function(x){ return x[0] === S.atras[S.atras.length - 1]; }) : null;
+  sala.innerHTML = '<div class="sala-in">' + (atras ? '<button class="volver" data-accion="volver">' + ICON.izq + 'Volver a ' + atras[1] + '</button>' : '') + franjas() + vistaSala() + '</div>' +
+    (S.pantalla ? '<button class="btn btn-primario btn-sm salir-pantalla" data-accion="pantalla">Salir del modo pantalla</button>' : '');
+  sala.querySelectorAll('.panel[data-panel]').forEach(function(p){
+    var k = p.dataset.panel, cab = p.querySelector('.panel-cab'), pleg = !!S.plegados[k];
+    if (pleg) p.classList.add('plegado');
+    if (cab) cab.insertAdjacentHTML('beforeend', '<button class="plegar" data-accion="plegar" data-panel="' + k + '" aria-expanded="' + !pleg + '" title="' + (pleg ? 'Mostrar' : 'Ocultar') + '">' + ICON.abajo + '</button>');
+  });
   restaurar(sala, g);
   revisarRecordatorios();
+  limpiarPapelera();
 }
 function franjas(){
   var h = '';
@@ -892,6 +1029,7 @@ function vistaSala(){
     case 'proveedores': return vistaProveedores();
     case 'comercial': return vistaComercial();
     case 'libreta': return vistaLibreta();
+    case 'historial': return vistaHistorial();
     default: return vistaRecepcion();
   }
 }
@@ -928,6 +1066,7 @@ function renderLado(){
   var yo = SOCIOS[S.yo];
   $('#lado-pie').innerHTML = presentesHTML() +
     '<button class="quien" data-accion="cambiar-quien">' + (yo ? avatar(S.yo) : '<span class="avatar av-ambos">?</span>') + '<span><span class="quien-nombre">' + (yo ? esc(yo.nombre) : '¿Quién eres?') + '</span><small>' + (yo ? 'Cambiar de socio' : 'Elige tu nombre') + '</small></span></button>' +
+    (U.pila.length ? '<button class="btn btn-sm btn-parquear" data-accion="deshacer" title="Deshacer: ' + esc(U.pila[U.pila.length - 1].desc) + ' (Ctrl + Z)">' + ICON.deshacer.replace('<svg', '<svg style="width:18px;height:18px"') + '<span>Deshacer</span></button>' : '') +
     '<button class="btn btn-sm btn-parquear" data-accion="nuevo-recordatorio" title="Nuevo recordatorio">' + ICON.campana.replace('<svg', '<svg style="width:18px;height:18px"') + '<span>Nuevo recordatorio</span></button>' +
     '<button class="btn btn-sm btn-parquear" data-accion="parquear" title="Parquear una idea">' + ICON.parquear.replace('<svg', '<svg style="width:18px;height:18px"') + '<span>Parquear una idea</span></button>';
 }
@@ -971,7 +1110,7 @@ function panelHoy(){
   if (S.hoyMias && S.yo) lista = lista.filter(function(t){ return t.responsable === S.yo || t.responsable === 'ambos'; });
   lista.sort(ordenTareas);
   var hechas = S.d.tareas.filter(function(t){ return t.estado === 'hecho' && t.hechaEn && fechaISO(new Date(t.hechaEn)) === f; });
-  return '<section class="panel p-hoy"><header class="panel-cab"><div><span class="etiqueta">Lo de hoy</span><h2>' + (lista.length ? lista.length + (lista.length === 1 ? ' pendiente' : ' pendientes') : 'Al día') + '</h2></div>' +
+  return '<section class="panel p-hoy" data-panel="hoy"><header class="panel-cab"><div><span class="etiqueta">Lo de hoy</span><h2>' + (lista.length ? lista.length + (lista.length === 1 ? ' pendiente' : ' pendientes') : 'Al día') + '</h2></div>' +
     '<div class="panel-herr">' + (S.yo ? seg('hoy-mias', [['0','Todas'],['1','Mías']], S.hoyMias ? '1' : '0') : '') +
     '<button class="btn btn-primario btn-sm" data-accion="nueva-tarea" data-dia="' + f + '">' + ICON.mas + 'Tarea para hoy</button></div></header>' +
     (lista.length ? '<ul class="lista-tareas">' + lista.map(function(t){ return filaTarea(t, linkAvance(t)); }).join('') + '</ul>' : '<p class="vacio">Nada pendiente para hoy. Revisa la semana o adelanta el foco de mañana.</p>') +
@@ -986,11 +1125,19 @@ function panelRecordatorios(){
     .concat(S.d.tareas.filter(enAviso).map(function(t){ return {orden:t.plazo + '00', html:filaPlazo(t), hoy:diasHasta(t.plazo) <= 1}; }))
     .sort(function(a, b){ return a.orden.localeCompare(b.orden); });
   var deHoy = items.filter(function(x){ return x.hoy; }).length;
-  return '<section class="panel p-rec"><header class="panel-cab"><div><span class="etiqueta">Recordatorios y plazos</span><h2>' + (deHoy ? deHoy + (deHoy === 1 ? ' urgente' : ' urgentes') : 'Nada urgente') + '</h2></div>' +
+  return '<section class="panel p-rec" data-panel="rec"><header class="panel-cab"><div><span class="etiqueta">Recordatorios y plazos</span><h2>' + (deHoy ? deHoy + (deHoy === 1 ? ' urgente' : ' urgentes') : 'Nada urgente') + '</h2></div>' +
     '<button class="icono-btn" data-accion="nuevo-recordatorio" aria-label="Nuevo recordatorio">' + ICON.mas + '</button></header>' +
     (items.length ? '<ul class="lista-tareas">' + items.slice(0, 7).map(function(x){ return x.html; }).join('') + '</ul>' : '<p class="vacio">Nada en los próximos días. Creen un recordatorio o pónganle fecha límite a una tarea.</p>') +
     (items.length > 7 ? '<p class="panel-ayuda">Y ' + (items.length - 7) + ' más.</p>' : '') +
-    estadoCorreo() + '</section>';
+    recordatoriosHechos() + estadoCorreo() + '</section>';
+}
+function recordatoriosHechos(){
+  var hechos = S.d.recordatorios.filter(function(r){ return r.hecho; }).sort(function(a, b){ return (b.hechoEn || '').localeCompare(a.hechoEn || ''); });
+  if (!hechos.length) return '';
+  return (S.verRecHechos ? '<ul class="lista-tareas">' + hechos.slice(0, 15).map(function(r){
+      return '<li class="fila es-hecha"><button class="check on" data-accion="recordatorio-reabrir" data-id="' + esc(r.id) + '" title="Volver a pendiente" aria-label="Volver a pendiente: ' + esc(r.texto) + '">' + ICON.check + '</button><div class="fila-txt"><button class="fila-titulo" data-accion="editar-recordatorio" data-id="' + esc(r.id) + '">' + esc(r.texto) + '</button><div class="meta"><span class="chip chip-neutro">Hecho ' + haceCuanto(r.hechoEn) + '</span></div></div>' + avatar(r.para || 'ambos', true) + '</li>';
+    }).join('') + '</ul>' : '') +
+    '<button class="enlace mostrar-mas" data-accion="ver-rec-hechos">' + (S.verRecHechos ? 'Ocultar los hechos' : 'Ver los hechos (' + hechos.length + ')') + '</button>';
 }
 function filaPlazo(t){
   return '<li class="fila">' + botonCheck(t) + '<div class="fila-txt"><button class="fila-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button>' +
@@ -1014,7 +1161,7 @@ function filaRecordatorio(r){
 }
 function panelNorte(){
   var c = config(), objs = S.d.objetivos.slice().sort(function(a, b){ return (a.orden || 0) - (b.orden || 0); });
-  return '<section class="panel p-norte"><header class="panel-cab"><div><span class="etiqueta">El norte</span><h2 class="norte">' + esc(c.norte || 'Definan el norte') + '</h2></div>' +
+  return '<section class="panel p-norte" data-panel="norte"><header class="panel-cab"><div><span class="etiqueta">El norte</span><h2 class="norte">' + esc(c.norte || 'Definan el norte') + '</h2></div>' +
     '<button class="icono-btn" data-accion="ajustes" aria-label="Editar el norte y la hora de la reunión">' + ICON.lapiz + '</button></header>' +
     (objs.length ? '<ul class="objetivos">' + objs.map(filaObjetivo).join('') + '</ul>' : '<p class="vacio">Sin metas todavía. Agreguen la primera con un número que se pueda medir.</p>') +
     '<button class="btn btn-linea btn-sm mostrar-mas" data-accion="nuevo-objetivo">' + ICON.mas + 'Meta</button></section>';
@@ -1029,7 +1176,7 @@ function filaObjetivo(o){
 }
 function panelRuta(){
   var es = etapas(), cumplidas = es.filter(function(e){ return e.cumplida; }).length;
-  return '<section class="panel p-ruta"><header class="panel-cab"><div><span class="etiqueta">Ruta a la primera venta</span><h2>' + cumplidas + ' de ' + es.length + ' etapas</h2></div></header>' +
+  return '<section class="panel p-ruta" data-panel="ruta"><header class="panel-cab"><div><span class="etiqueta">Ruta a la primera venta</span><h2>' + cumplidas + ' de ' + es.length + ' etapas</h2></div></header>' +
     (es.length ? '<ol class="ruta-v">' + es.map(function(e){
       var p = progresoEtapa(e.id), st = estadoEtapa(e, p);
       return '<li class="rv ' + st + '"><span class="paso-num">' + (e.cumplida ? ICON.check : e.n) + '</span><div><button class="rv-titulo" data-accion="ver-etapa" data-id="' + esc(e.id) + '">' + esc(e.titulo) + '</button><span class="rv-meta">' + (p.total ? tareasTxt(p) : 'Sin tareas') + (st === 'en-curso' ? ' · en curso' : st === 'cumplida' ? ' · cumplida' : '') + '</span></div></li>';
@@ -1038,21 +1185,21 @@ function panelRuta(){
 }
 function panelActividad(){
   var a = S.actividad.slice(0, 10);
-  return '<section class="panel p-actividad"><header class="panel-cab"><div><span class="etiqueta">Lo último en la oficina</span><h2>Movimientos</h2></div></header>' +
+  return '<section class="panel p-actividad" data-panel="actividad"><header class="panel-cab"><div><span class="etiqueta">Lo último en la oficina</span><h2>Movimientos</h2></div></header>' +
     (a.length ? '<ul class="actividad">' + a.map(function(x){
       return '<li>' + avatarPor(x.por) + '<p>' + (SOCIOS[x.por] ? '<b>' + SOCIOS[x.por].nombre + '</b> ' : '') + esc(x.texto) + '<time datetime="' + esc(x.fecha) + '">' + haceCuanto(x.fecha) + '</time></p></li>';
     }).join('') + '</ul>' : '<p class="vacio">Aquí va quedando lo que cada socio hace: tareas cumplidas, decisiones y cambios.</p>') + '</section>';
 }
 function panelParqueadero(){
   var ideas = ideasParqueadas();
-  return '<section class="panel p-parq"><header class="panel-cab"><div><span class="etiqueta">Parqueadero</span><h2>' + ideas.length + (ideas.length === 1 ? ' idea parqueada' : ' ideas parqueadas') + '</h2></div></header>' +
+  return '<section class="panel p-parq" data-panel="parq"><header class="panel-cab"><div><span class="etiqueta">Parqueadero</span><h2>' + ideas.length + (ideas.length === 1 ? ' idea parqueada' : ' ideas parqueadas') + '</h2></div></header>' +
     '<p class="panel-ayuda">Lo que no es del foco de hoy se anota aquí y se revisa en la revisión semanal. Así no se abren caminos nuevos a mitad de semana.</p>' +
     formParquear('parq-recepcion') +
     (ideas.length ? '<ul class="ideas">' + ideas.slice(0, 3).map(filaIdea).join('') + '</ul>' : '') +
     (ideas.length > 3 ? '<button class="enlace mostrar-mas" data-accion="ir" data-sala="reunion">Ver las ' + ideas.length + ' en la sala de juntas</button>' : '') + '</section>';
 }
 function panelReglas(){
-  return '<section class="panel p-reglas"><span class="etiqueta">Reglas de la oficina</span><ul class="reglas">' + REGLAS.map(function(r){ return '<li><b>' + r[0] + '</b>' + r[1] + '</li>'; }).join('') + '</ul></section>';
+  return '<section class="panel p-reglas" data-panel="reglas"><header class="panel-cab"><div><span class="etiqueta">Reglas de la oficina</span></div></header><ul class="reglas">' + REGLAS.map(function(r){ return '<li><b>' + r[0] + '</b>' + r[1] + '</li>'; }).join('') + '</ul></section>';
 }
 
 // ---------- sala: tablero ----------
@@ -1117,7 +1264,7 @@ function vistaSemana(){
   return cabecera('Semana', rango, 'Un foco por día. El foco de mañana se deja definido en la reunión.',
       '<div class="nav-semana"><button class="icono-btn" data-accion="semana-mover" data-n="-7" aria-label="Semana anterior">' + ICON.izq + '</button><button class="btn btn-linea btn-sm" data-accion="semana-mover" data-n="0">Esta semana</button><button class="icono-btn" data-accion="semana-mover" data-n="7" aria-label="Semana siguiente">' + ICON.der + '</button></div>') +
     '<div class="semana" id="semana-grid" data-scroll>' + dias.map(diaHTML).join('') + '</div>' +
-    '<section class="panel"><header class="panel-cab"><div><span class="etiqueta">Sin día</span><h2>' + (sinDia.length ? sinDia.length + ' por programar' : 'Todo tiene día') + '</h2></div></header>' +
+    '<section class="panel" data-panel="s-sindia"><header class="panel-cab"><div><span class="etiqueta">Sin día</span><h2>' + (sinDia.length ? sinDia.length + ' por programar' : 'Todo tiene día') + '</h2></div></header>' +
     (sinDia.length ? '<ul class="lista-tareas">' + sinDia.map(function(t){
       return '<li class="fila">' + botonCheck(t) + '<div class="fila-txt"><button class="fila-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button><div class="meta">' + (etapa(t.etapa) ? chipEtapa(etapa(t.etapa)) : '') + '</div></div>' +
         '<div class="programar"><label class="sr" for="prog-' + esc(t.id) + '">Programar</label><select id="prog-' + esc(t.id) + '" data-cambio="programar" data-id="' + esc(t.id) + '" data-vivo>' + opciones([['','Programar…']].concat(dias.map(function(f){ return [f, fechaCorta(f)]; })), '') + '</select>' + avatar(t.responsable, true) + '</div></li>';
@@ -1159,10 +1306,10 @@ function vistaReunion(){
   var ideas = ideasParqueadas();
   var fechas = S.d.reuniones.map(function(x){ return x.id; }).filter(function(x){ return x !== hoy(); }).sort().reverse();
 
-  var botones = '';
-  if (esHoy && !r.inicio) botones = '<button class="btn btn-blanco btn-sm" data-accion="reunion-iniciar">Iniciar reunión</button>';
-  else if (r.inicio && !r.fin) botones = '<button class="btn btn-blanco btn-sm" data-accion="reunion-cerrar" data-fecha="' + f + '">Cerrar reunión</button>';
-  else if (r.fin) botones = '<span class="chip chip-blanco">Cerrada · ' + haceCuanto(r.fin) + '</span><button class="btn btn-linea-clara btn-sm" data-accion="reunion-reabrir" data-fecha="' + f + '">Reabrir</button>';
+  var botones = '<button class="btn btn-linea-clara btn-sm" data-accion="pantalla">' + (S.pantalla ? 'Salir del modo pantalla' : 'Modo pantalla') + '</button>';
+  if (esHoy && !r.inicio) botones = '<button class="btn btn-blanco btn-sm" data-accion="reunion-iniciar">Iniciar reunión</button>' + botones;
+  else if (r.inicio && !r.fin) botones = '<button class="btn btn-blanco btn-sm" data-accion="reunion-cerrar" data-fecha="' + f + '">Cerrar reunión</button>' + botones;
+  else if (r.fin) botones = '<span class="chip chip-blanco">Cerrada · ' + haceCuanto(r.fin) + '</span><button class="btn btn-linea-clara btn-sm" data-accion="reunion-reabrir" data-fecha="' + f + '">Reabrir</button>' + botones;
 
   function bloque(b, contenido){
     var st = actual ? (actual.n === b.n ? ' activo' : actual.n > b.n ? ' pasado' : '') : (e.fase === 'curso' && !actual ? ' pasado' : '');
@@ -1189,7 +1336,7 @@ function vistaReunion(){
     '<div class="sub"><label class="sr" for="reunion-notas">Notas del foco</label><textarea class="notas-reunion" id="reunion-notas" data-vivo data-guardar="reunion-notas" data-id="' + f + '" placeholder="Notas del foco: datos, cifras, lo que se habló. Lo que no sea del foco, al parqueadero.">' + esc(r.notas || '') + '</textarea></div>';
 
   var b3 = (decisiones.length ? '<ul class="decisiones">' + decisiones.map(function(d){
-      return '<li class="decision">' + avatarPor(d.por) + '<p>' + esc(d.texto) + '<small>' + (SOCIOS[d.por] ? SOCIOS[d.por].nombre + ' · ' : '') + haceCuanto(d.fecha) + '</small></p><button class="enlace enlace-suave" data-accion="borrar-decision" data-id="' + esc(d.id) + '">Quitar</button></li>';
+      return '<li class="decision">' + avatarPor(d.por) + '<p><button class="fila-titulo" style="font-weight:400" data-accion="editar-decision" data-id="' + esc(d.id) + '">' + esc(d.texto) + '</button><small>' + (SOCIOS[d.por] ? SOCIOS[d.por].nombre + ' · ' : '') + haceCuanto(d.fecha) + '</small></p><button class="enlace enlace-suave" data-accion="editar-decision" data-id="' + esc(d.id) + '">Editar</button></li>';
     }).join('') + '</ul>' : '<p class="vacio">Aún no hay decisiones en esta reunión.</p>') +
     '<form class="form-linea" data-form="decision" data-fecha="' + f + '"><label class="sr" for="decision-nueva">Nueva decisión</label><input id="decision-nueva" name="texto" placeholder="Ej.: El proveedor de estanterías se elige el jueves con 3 cotizaciones." autocomplete="off" maxlength="400"><button class="btn btn-primario btn-sm" type="submit">Decidir</button></form>';
 
@@ -1216,12 +1363,12 @@ function vistaReunion(){
       '</div></div>' +
       '<img class="mark mark-reunion" src="img/mark-08-senalando.webp" alt="" width="400" height="309">' +
     '</section>' +
-    '<div class="reunion"><div class="reunion-agenda">' + bloque(BLOQUES[0], b1) + bloque(BLOQUES[1], b2) + bloque(BLOQUES[2], b3) + bloque(BLOQUES[3], b4) + '</div>' +
+    '<div class="reunion"><div class="reunion-agenda' + (actual ? ' con-activo' : '') + '">' + bloque(BLOQUES[0], b1) + bloque(BLOQUES[1], b2) + bloque(BLOQUES[2], b3) + bloque(BLOQUES[3], b4) + '</div>' +
     '<aside class="reunion-lado">' +
-      '<section class="panel"><header class="panel-cab"><div><span class="etiqueta">Parqueadero</span><h2>' + ideas.length + (ideas.length === 1 ? ' idea' : ' ideas') + '</h2></div></header>' +
+      '<section class="panel" data-panel="r-parq"><header class="panel-cab"><div><span class="etiqueta">Parqueadero</span><h2>' + ideas.length + (ideas.length === 1 ? ' idea' : ' ideas') + '</h2></div></header>' +
         '<p class="panel-ayuda">¿Salió algo que no es del foco? Se parquea y se sigue.</p>' + formParquear('parq-reunion') +
-        (ideas.length ? '<ul class="ideas">' + ideas.map(filaIdea).join('') + '</ul>' : '') + '</section>' +
-      '<section class="panel"><header class="panel-cab"><div><span class="etiqueta">Actas</span><h2>Reuniones pasadas</h2></div></header>' + actas +
+        (ideas.length ? '<ul class="ideas">' + ideas.map(filaIdea).join('') + '</ul>' : '') + ideasDescartadas() + '</section>' +
+      '<section class="panel" data-panel="r-actas"><header class="panel-cab"><div><span class="etiqueta">Actas</span><h2>Reuniones pasadas</h2></div></header>' + actas +
         '<button class="enlace mostrar-mas" data-accion="ajustes">Cambiar la hora de la reunión</button></section>' +
     '</aside></div>';
 }
@@ -1358,6 +1505,66 @@ function vistaLibreta(){
     : '<p class="vacio">La libreta está vacía. Creen la primera nota.</p>');
 }
 
+// ---------- buscar en toda la oficina ----------
+function normal(s){ return String(s || '').split('').map(function(ch){ return ch.normalize('NFD').charAt(0); }).join('').toLowerCase(); }
+function fragmento(txt, k, n){
+  var ini = Math.max(0, k - 40), fin = Math.min(txt.length, k + n + 60);
+  return (ini ? '…' : '') + esc(txt.slice(ini, k)) + '<mark>' + esc(txt.slice(k, k + n)) + '</mark>' + esc(txt.slice(k + n, fin)) + (fin < txt.length ? '…' : '');
+}
+function resultados(q){
+  var n = normal(q.trim());
+  if (n.length < 2) return '<p class="vacio">Escribe al menos dos letras. Busca en tareas, avances, notas, decisiones, ideas, recordatorios, proveedores, precios, prospectos y reuniones.</p>';
+  var res = [];
+  function mirar(c, tipo, titulo, campos, accion, porFecha){
+    S.d[c].forEach(function(d){
+      var txt = campos(d).filter(Boolean).join(' · '), k = normal(txt).indexOf(n);
+      if (k < 0) return;
+      res.push('<button class="res" data-accion="' + accion + '" data-id="' + esc(d.id) + '"' + (porFecha ? ' data-fecha="' + esc(d.id) + '"' : '') + '><span class="chip chip-neutro">' + tipo + '</span><span class="res-txt"><b>' + esc(cortar(titulo(d), 90)) + '</b><small>' + fragmento(txt, k, n.length) + '</small></span></button>');
+    });
+  }
+  mirar('tareas', 'Tarea', function(t){ return t.titulo; }, function(t){ return [t.titulo, t.nota, t.resultado].concat((t.pasos || []).map(function(p){ return p.t; }), (t.avances || []).map(function(a){ return a.texto + ' ' + (a.falta || ''); })); }, 'editar-tarea');
+  mirar('libreta', 'Nota', function(x){ return x.titulo; }, function(x){ return [x.titulo, x.texto]; }, 'abrir-nota');
+  mirar('decisiones', 'Decisión', function(x){ return x.texto; }, function(x){ return [x.texto]; }, 'editar-decision');
+  mirar('parqueadero', 'Idea', function(x){ return x.texto; }, function(x){ return [x.texto]; }, 'editar-idea');
+  mirar('recordatorios', 'Recordatorio', function(x){ return x.texto; }, function(x){ return [x.texto]; }, 'editar-recordatorio');
+  mirar('proveedores', 'Proveedor', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.contacto, x.telefono, x.correo, x.ivaNota, x.condiciones, x.notas]; }, 'editar-proveedor');
+  mirar('cotizaciones', 'Cotización', function(x){ return x.proveedor; }, function(x){ return [x.proveedor, x.contacto, x.incluye, x.notas]; }, 'editar-cotizacion');
+  mirar('productos', 'Producto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.categoria, x.proveedor, x.notas]; }, 'editar-producto');
+  mirar('prospectos', 'Prospecto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.contacto, x.telefono, x.zona, x.proximo, x.notas].concat((x.contactos || []).map(function(c){ return c.nota; })); }, 'editar-prospecto');
+  mirar('reuniones', 'Reunión', function(x){ return 'Reunión del ' + fechaLarga(x.id); }, function(x){ return [x.notas]; }, 'ver-reunion', true);
+  mirar('semana', 'Foco', function(x){ return 'Foco del ' + fechaLarga(x.id) + ': ' + (x.foco || ''); }, function(x){ return [x.foco, x.nota]; }, 'editar-foco', true);
+  if (!res.length) return '<p class="vacio">Nada con «' + esc(q.trim()) + '».</p>';
+  return res.slice(0, 40).join('') + (res.length > 40 ? '<p class="vacio">Y ' + (res.length - 40) + ' resultados más. Afina la búsqueda.</p>' : '');
+}
+function abrirBuscar(){
+  M = null;
+  var dlg = $('#modal');
+  dlg.innerHTML = '<div class="modal-caja buscar-caja"><header class="modal-cab"><div><span class="etiqueta">Buscar en la oficina</span><label class="sr" for="buscar-q">Buscar</label><input class="buscar-input" id="buscar-q" type="text" placeholder="Una tarea, un proveedor, una decisión…" autocomplete="off"></div>' +
+    '<button type="button" class="icono-btn" data-accion="cerrar-modal" aria-label="Cerrar">' + ICON.x + '</button></header><div class="buscar-res" id="buscar-res">' + resultados('') + '</div></div>';
+  try { if (!dlg.open) dlg.showModal(); } catch(e){ dlg.setAttribute('open', ''); }
+  $('#buscar-q').focus();
+}
+
+// ---------- sala: historial y papelera ----------
+function vistaHistorial(){
+  var pap = S.d.papelera.slice().sort(function(a, b){ return (b.borradoEn || '').localeCompare(a.borradoEn || ''); });
+  var ult = U.pila[U.pila.length - 1];
+  return cabecera('Historial', 'Lo que pasó y lo que se borró', 'Casi todo se puede deshacer o recuperar. Lo que se borra se guarda 30 días en la papelera.',
+      ult ? '<button class="btn btn-linea" data-accion="deshacer">' + ICON.deshacer + 'Deshacer el último cambio</button>' : '') +
+    '<div class="historial">' +
+      '<section class="panel" data-panel="h-papelera"><header class="panel-cab"><div><span class="etiqueta">Papelera</span><h2>' + (pap.length ? pap.length + (pap.length === 1 ? ' cosa borrada' : ' cosas borradas') : 'Vacía') + '</h2></div></header>' +
+        (pap.length ? '<ul class="lista-tareas">' + pap.map(function(p){
+          return '<li class="fila"><div class="fila-txt"><span class="pap-titulo">' + esc(p.titulo) + '</span><div class="meta"><span class="chip chip-neutro">' + (TIPOS[p.col] || 'Elemento') + '</span><span class="resultado">Borrado ' + haceCuanto(p.borradoEn) + (SOCIOS[p.borradoPor] ? ' por ' + SOCIOS[p.borradoPor].nombre : '') + '</span></div></div>' +
+            '<div class="pap-acc"><button class="btn btn-linea btn-sm" data-accion="restaurar" data-id="' + esc(p.id) + '">Restaurar</button><button class="btn btn-borrar btn-sm" data-accion="borrar-definitivo" data-id="' + esc(p.id) + '">Borrar para siempre</button></div></li>';
+        }).join('') + '</ul>' : '<p class="vacio">Cuando borren una tarea, una nota o cualquier otra cosa, queda aquí 30 días para recuperarla.</p>') + '</section>' +
+      '<section class="panel" data-panel="h-deshacer"><header class="panel-cab"><div><span class="etiqueta">Cambios de hoy en este equipo</span><h2>' + (U.pila.length ? U.pila.length + ' para deshacer' : 'Nada para deshacer') + '</h2></div></header>' +
+        (U.pila.length ? '<ul class="lista-tareas">' + U.pila.slice().reverse().map(function(g, i){ return '<li class="fila"><div class="fila-txt"><span>' + esc(g.desc) + '</span></div>' + (i === 0 ? '<button class="enlace" data-accion="deshacer">Deshacer</button>' : '') + '</li>'; }).join('') + '</ul>' +
+          '<p class="panel-ayuda">Se deshacen del más reciente al más viejo. También con Ctrl + Z (en Mac, Cmd + Z).</p>' : '<p class="vacio">Cada cambio que hagas hoy desde este equipo se puede deshacer, del más reciente al más viejo. También con Ctrl + Z.</p>') + '</section>' +
+      '<section class="panel" data-panel="h-movimientos"><header class="panel-cab"><div><span class="etiqueta">Movimientos</span><h2>Los últimos ' + S.actividad.length + '</h2></div></header>' +
+        (S.actividad.length ? '<ul class="actividad">' + S.actividad.map(function(x){ return '<li>' + avatarPor(x.por) + '<p>' + (SOCIOS[x.por] ? '<b>' + SOCIOS[x.por].nombre + '</b> ' : '') + esc(x.texto) + '<time datetime="' + esc(x.fecha) + '">' + haceCuanto(x.fecha) + '</time></p></li>'; }).join('') + '</ul>' : '<p class="vacio">Aún no hay movimientos.</p>') + '</section>' +
+    '</div>';
+}
+
 // ---------- modales ----------
 var M = null;
 function campoHTML(c){
@@ -1368,6 +1575,7 @@ function campoHTML(c){
   if (c.tipo === 'segment') return '<fieldset class="' + cls + '"><legend>' + esc(c.label) + '</legend><div class="segmento">' + c.opciones.map(function(o, i){
       return '<label><input type="radio" name="' + id + '" id="' + id + '-' + i + '" value="' + esc(o[0]) + '"' + (String(o[0]) === String(v) ? ' checked' : '') + '><span>' + esc(o[1]) + '</span></label>';
     }).join('') + '</div>' + ayuda + '</fieldset>';
+  if (c.tipo === 'registros') return '<div class="' + cls + '"><span class="campo-label">' + esc(c.label) + '</span><ul class="registros" id="m-reg-' + c.id + '">' + registrosHTML(c.id) + '</ul>' + ayuda + '</div>';
   if (c.tipo === 'pasos') return '<div class="' + cls + '"><span style="font-size:14px;font-weight:500">' + esc(c.label) + '</span><ul class="pasos-lista" id="m-pasos-lista">' + pasosHTML() + '</ul>' +
       '<div class="paso-nuevo"><label class="sr" for="m-paso-nuevo">Nuevo paso</label><input class="campo-input" id="m-paso-nuevo" placeholder="Agregar un paso" autocomplete="off" maxlength="200"><button type="button" class="btn btn-linea btn-sm" data-accion="paso-agregar">Agregar</button></div></div>';
   var control;
@@ -1377,6 +1585,15 @@ function campoHTML(c){
   else control = '<input id="' + id + '" name="' + c.id + '" type="' + (c.tipo || 'text') + '"' + req + ' autocomplete="off" placeholder="' + esc(c.placeholder || '') + '" value="' + esc(v) + '"' + (c.max ? ' maxlength="' + c.max + '"' : '') + '>';
   return '<div class="' + cls + '"><label for="' + id + '">' + esc(c.label) + '</label>' + control + ayuda + '</div>';
 }
+function registrosHTML(campo){
+  var c = M.cfg.campos.find(function(x){ return x.id === campo; }), lista = M.reg[campo];
+  if (!lista.length) return '<li class="vacio">Sin registros.</li>';
+  return lista.map(function(r, i){
+    var f = Date.parse(r.fecha || '') ? fechaCorta(fechaISO(new Date(r.fecha))) : '';
+    return '<li class="registro"><div class="registro-cab"><span>' + [f, SOCIOS[r.por] ? SOCIOS[r.por].nombre : '', esc(r.canal || '')].filter(Boolean).join(' · ') + '</span><button type="button" class="enlace enlace-suave" data-accion="reg-quitar" data-campo="' + campo + '" data-i="' + i + '">Quitar</button></div>' +
+      c.claves.map(function(k){ var id = 'm-reg-' + campo + '-' + i + '-' + k[0]; return '<label class="sr" for="' + id + '">' + esc(k[1]) + '</label><textarea class="reg-texto" rows="2" id="' + id + '" data-campo="' + campo + '" data-i="' + i + '" data-k="' + k[0] + '" placeholder="' + esc(k[1]) + '">' + esc(r[k[0]] || '') + '</textarea>'; }).join('') + '</li>';
+  }).join('');
+}
 function pasosHTML(){
   if (!M || !M.pasos) return '';
   return M.pasos.map(function(p, i){
@@ -1385,7 +1602,8 @@ function pasosHTML(){
 }
 function abrirForm(cfg){
   var pasos = cfg.campos.find(function(c){ return c.tipo === 'pasos'; });
-  M = {cfg:cfg, pasos:pasos ? (pasos.valor || []).map(function(p){ return {t:p.t, ok:!!p.ok}; }) : null};
+  M = {cfg:cfg, pasos:pasos ? (pasos.valor || []).map(function(p){ return {t:p.t, ok:!!p.ok}; }) : null, reg:{}};
+  cfg.campos.forEach(function(c){ if (c.tipo === 'registros') M.reg[c.id] = JSON.parse(JSON.stringify(c.valor || [])); });
   var dlg = $('#modal');
   dlg.innerHTML = '<form class="modal-caja" id="modal-form" data-form="modal" novalidate>' +
     '<header class="modal-cab"><div>' + (cfg.etiqueta ? '<span class="etiqueta">' + esc(cfg.etiqueta) + '</span>' : '') + '<h2 id="modal-titulo">' + esc(cfg.titulo) + '</h2></div><button type="button" class="icono-btn" data-accion="cerrar-modal" aria-label="Cerrar">' + ICON.x + '</button></header>' +
@@ -1404,6 +1622,7 @@ function enviarModal(form){
   form.querySelectorAll('.campo.con-error').forEach(function(x){ x.classList.remove('con-error'); var e = x.querySelector('.error'); if (e) e.remove(); });
   cfg.campos.forEach(function(c){
     if (!c.id || c.tipo === 'info') return;
+    if (c.tipo === 'registros') { v[c.id] = M.reg[c.id]; return; }
     if (c.tipo === 'pasos') { v[c.id] = M.pasos.filter(function(p){ return p.t.trim(); }).map(function(p){ return {t:p.t.trim(), ok:p.ok}; }); return; }
     if (c.tipo === 'segment') { var r = form.querySelector('input[name="m-' + c.id + '"]:checked'); v[c.id] = r ? r.value : ''; }
     else { var el = form.querySelector('#m-' + c.id); var x = el ? el.value : ''; v[c.id] = c.tipo === 'pesos' ? leerPesos(x) : c.tipo === 'number' ? (x === '' ? null : Number(x)) : String(x).trim(); }
@@ -1417,6 +1636,8 @@ function enviarModal(form){
     if (campo) campo.focus();
     return;
   }
+  var nombre = cortar(v.titulo || v.texto || v.nombre || v.proveedor || v.norte || cfg.titulo, 50);
+  desc(cfg.deshacer || (/^Nuev/.test(cfg.etiqueta || '') ? 'Se creó «' + nombre + '»' : 'Se guardaron los cambios en «' + nombre + '»'));
   var r = cfg.onGuardar(v);
   if (r !== false) cerrarModal();
 }
@@ -1438,7 +1659,8 @@ function modalTarea(t, preset){
       {id:'pasos', label:'Pasos', tipo:'pasos', valor:t.pasos || []},
       {id:'nota', label:'Contexto', tipo:'textarea', valor:t.nota || '', placeholder:'Lo que hay que saber para hacerla.'},
       {id:'resultado', label:'Cómo se cumplió', tipo:'textarea', valor:t.resultado || '', placeholder:'Se llena al marcarla como hecha.', ayuda:'Obligatorio cuando la tarea está hecha.'}
-    ].concat(nueva ? [] : [{tipo:'info', html:infoTarea(t)}]),
+    ].concat((t.avances || []).length ? [{id:'avances', label:'Avances registrados', tipo:'registros', claves:[['texto','Qué se avanzó'],['falta','Qué falta']], valor:t.avances, ayuda:'Corrijan o quiten un avance si quedó mal.'}] : [])
+     .concat(nueva ? [] : [{tipo:'info', html:infoTarea(t)}]),
     validar: function(v){ if (v.estado === 'hecho' && !v.resultado) return ['resultado', 'Cuenten cómo se cumplió antes de marcarla como hecha.']; },
     onGuardar: function(v){
       v.avisoDias = Number(v.avisoDias) || 7;
@@ -1456,7 +1678,7 @@ function modalTarea(t, preset){
         cambiar('tareas', t.id, patch);
       }
     },
-    onBorrar: nueva ? null : function(){ borrar('tareas', t.id); registrar('borró la tarea «' + t.titulo + '»'); }
+    onBorrar: nueva ? null : function(){ aPapelera('tareas', t.id); registrar('borró la tarea «' + t.titulo + '»'); }
   });
 }
 function infoTarea(t){
@@ -1464,14 +1686,13 @@ function infoTarea(t){
   if (t.creada) l.push('Creada ' + haceCuanto(t.creada) + (SOCIOS[t.creadaPor] ? ' por <b>' + SOCIOS[t.creadaPor].nombre + '</b>' : ''));
   if (t.origen) l.push('Compromiso de la reunión del ' + fechaLarga(t.origen));
   if (t.plazo && t.estado !== 'hecho') l.push('Fecha límite: <b>' + fechaLarga(t.plazo) + '</b> · los avisos empiezan ' + (Number(t.avisoDias) || 7) + ' días antes');
-  (t.avances || []).forEach(function(a){ l.push('Avance ' + haceCuanto(a.fecha) + (SOCIOS[a.por] ? ' · <b>' + SOCIOS[a.por].nombre + '</b>' : '') + ': ' + esc(a.texto) + (a.falta ? ' Falta: ' + esc(a.falta) : '')); });
   if (t.estado === 'hecho' && t.hechaEn) l.push('Cumplida ' + haceCuanto(t.hechaEn) + (SOCIOS[t.hechaPor] ? ' por <b>' + SOCIOS[t.hechaPor].nombre + '</b>' : ''));
   return l.map(function(x){ return '<span>' + x + '</span>'; }).join('') || '<span>Sin historial.</span>';
 }
 function modalCompletar(t){
   var faltan = (t.pasos || []).filter(function(p){ return !p.ok; }).length;
   abrirForm({
-    etiqueta:'Causar la tarea', titulo:t.titulo, textoGuardar:'Marcar como hecha',
+    etiqueta:'Causar la tarea', titulo:t.titulo, textoGuardar:'Marcar como hecha', deshacer:'Se marcó como hecha «' + cortar(t.titulo, 50) + '»',
     campos:[{id:'resultado', label:'¿Cómo se cumplió?', tipo:'textarea', requerido:true, valor:t.resultado || '', placeholder:'Ej.: Llamamos a 3 fabricantes. El más barato cotizó $X por módulo, con instalación.', ayuda:'Una o dos líneas, con datos: qué se hizo, con quién y qué salió.'}]
       .concat(faltan ? [{tipo:'info', html:'<span>Quedan <b>' + faltan + (faltan === 1 ? ' paso' : ' pasos') + '</b> sin marcar. Al guardar quedan marcados como hechos.</span>'}] : []),
     onGuardar: function(v){
@@ -1484,7 +1705,7 @@ function modalCompletar(t){
 function modalAvance(t){
   var man = sumarDias(hoy(), 1);
   abrirForm({
-    etiqueta:'Registrar avance', titulo:t.titulo, textoGuardar:'Guardar avance',
+    etiqueta:'Registrar avance', titulo:t.titulo, textoGuardar:'Guardar avance', deshacer:'Se registró un avance en «' + cortar(t.titulo, 50) + '»',
     campos:[
       {id:'texto', label:'¿Qué se avanzó?', tipo:'textarea', requerido:true, placeholder:'Ej.: Le pedimos la lista 2026 a Novaventa, Postobón y Bavaria. Unilever la manda el jueves.', ayuda:'Con datos: qué se hizo, con quién y qué salió.'},
       {id:'falta', label:'¿Qué falta?', tipo:'textarea', placeholder:'Ej.: Pedírsela a los otros 6 y hacerle seguimiento a Unilever.'},
@@ -1504,6 +1725,25 @@ function modalAvance(t){
     }
   });
 }
+function modalDecision(d){
+  abrirForm({
+    etiqueta:'Decisión · reunión del ' + fechaCorta(d.reunion || hoy()), titulo:'Editar la decisión',
+    campos:[{id:'texto', label:'Decisión', tipo:'textarea', requerido:true, valor:d.texto || ''}],
+    onGuardar: function(v){ cambiar('decisiones', d.id, {texto:v.texto, editada:ahora(), editadaPor:S.yo || ''}); },
+    onBorrar: function(){ aPapelera('decisiones', d.id); }
+  });
+}
+function modalIdea(i){
+  abrirForm({
+    etiqueta:'Parqueadero', titulo:'Editar la idea',
+    campos:[
+      {id:'texto', label:'La idea', tipo:'textarea', requerido:true, valor:i.texto || ''},
+      {id:'estado', label:'Estado', tipo:'segment', valor:i.estado || 'parqueada', opciones:[['parqueada','Parqueada'],['a_ruta','Ya está en la ruta'],['descartada','Descartada']]}
+    ],
+    onGuardar: function(v){ cambiar('parqueadero', i.id, {texto:v.texto, estado:v.estado}); },
+    onBorrar: function(){ aPapelera('parqueadero', i.id); }
+  });
+}
 function modalRecordatorio(r){
   var nueva = !r; r = r || {};
   abrirForm({
@@ -1512,26 +1752,27 @@ function modalRecordatorio(r){
       {id:'texto', label:'Recordatorio', valor:r.texto || '', requerido:true, max:200, placeholder:'Ej.: Llamar a Unilever por la lista 2026'},
       {id:'para', label:'Para', tipo:'segment', valor:r.para || S.yo || 'ambos', opciones:[['simon','Simón'],['sebastian','Sebastián'],['ambos','Ambos']]},
       {id:'fecha', label:'Día', tipo:'date', ancho:'medio', valor:r.fecha || hoy(), requerido:true},
-      {id:'hora', label:'Hora (opcional)', tipo:'time', ancho:'medio', valor:r.hora || ''},
+      {id:'hora', label:'Hora (opcional)', tipo:'time', ancho:'medio', valor:r.hora || ''}
+    ].concat(nueva ? [] : [{id:'hecho', label:'Estado', tipo:'segment', valor:r.hecho ? 'si' : 'no', opciones:[['no','Pendiente'],['si','Hecho']]}]).concat([
       {tipo:'info', html:'<span>Con la oficina abierta, el aviso sale en pantalla a esa hora.' + (config().correo ? ' Y llega al correo de quien corresponda en el resumen de la mañana y en el de antes de la reunión.' : '') + '</span>'}
-    ],
+    ]),
     onGuardar: function(v){
       if (nueva) {
         crear('recordatorios', {texto:v.texto, para:v.para || 'ambos', fecha:v.fecha, hora:v.hora, hecho:false, hechoEn:'', creado:ahora(), creadoPor:S.yo || '', enviado:''});
         registrar('creó un recordatorio para ' + (v.para === 'ambos' || !v.para ? 'los dos' : SOCIOS[v.para].nombre) + ', ' + fechaCorta(v.fecha) + ': «' + v.texto + '»');
       } else {
-        var patch = {texto:v.texto, para:v.para || 'ambos', fecha:v.fecha, hora:v.hora};
-        if (v.fecha !== r.fecha || v.hora !== r.hora) patch.enviado = '';
+        var patch = {texto:v.texto, para:v.para || 'ambos', fecha:v.fecha, hora:v.hora, hecho:v.hecho === 'si', hechoEn:v.hecho === 'si' ? (r.hechoEn || ahora()) : ''};
+        if (v.fecha !== r.fecha || v.hora !== r.hora || (r.hecho && v.hecho !== 'si')) patch.enviado = '';
         cambiar('recordatorios', r.id, patch);
       }
     },
-    onBorrar: nueva ? null : function(){ borrar('recordatorios', r.id); }
+    onBorrar: nueva ? null : function(){ aPapelera('recordatorios', r.id); }
   });
 }
 function modalFoco(f){
   var fo = focoDe(f) || {}, es = etapas();
   abrirForm({
-    etiqueta:'Foco del día', titulo:fechaLarga(f).replace(/^./, function(c){ return c.toUpperCase(); }),
+    etiqueta:'Foco del día', titulo:fechaLarga(f).replace(/^./, function(c){ return c.toUpperCase(); }), deshacer:'Se cambió el foco del ' + fechaCorta(f),
     campos:[
       {id:'etapa', label:'Etapa de la ruta', tipo:'select', valor:fo.etapa || '', opciones:[['','Ninguna etapa']].concat(es.map(function(e){ return [e.id, e.n + ' · ' + e.titulo]; }))},
       {id:'foco', label:'En qué se enfocan', valor:fo.foco || '', max:120, placeholder:'Ej.: Cerrar el proveedor de estanterías', ayuda:'Si lo dejan vacío, se usa el nombre de la etapa.'},
@@ -1543,7 +1784,7 @@ function modalFoco(f){
       escribir('set', 'semana', f, {foco:texto, etapa:v.etapa, nota:v.nota});
       registrar('definió el foco del ' + fechaLarga(f) + ': ' + texto);
     },
-    onBorrar: focoDe(f) ? function(){ borrar('semana', f); } : null, textoBorrar:'Quitar el foco'
+    onBorrar: focoDe(f) ? function(){ aPapelera('semana', f); } : null, textoBorrar:'Quitar el foco'
   });
 }
 function modalEtapa(e){
@@ -1555,14 +1796,20 @@ function modalEtapa(e){
       {id:'titulo', label:'Nombre', valor:e.titulo || '', requerido:true, max:60},
       {id:'meta', label:'Está cumplida cuando…', tipo:'textarea', valor:e.meta || '', placeholder:'El resultado concreto que cierra la etapa.'},
       {id:'cumplida', label:'¿Cumplida?', tipo:'segment', valor:e.cumplida ? 'si' : 'no', opciones:[['no','Todavía no'],['si','Sí, cumplida']]}
-    ].concat(nueva ? [] : [{tipo:'info', html: ts.length ? ts.map(function(t){ return '<span>' + (t.estado === 'hecho' ? '✓ ' : '· ') + esc(t.titulo) + '</span>'; }).join('') : '<span>Esta etapa aún no tiene tareas.</span>'}]),
+    ].concat(nueva ? [] : [{id:'n', label:'Posición en la ruta', tipo:'select', valor:String(e.n), opciones:etapas().map(function(x, i){ return [String(i + 1), (i + 1) + (x.id === e.id ? ' (donde está)' : ' · en lugar de ' + x.titulo)]; })}]).concat(nueva ? [] : [{tipo:'info', html: ts.length ? ts.map(function(t){ return '<span>' + (t.estado === 'hecho' ? '✓ ' : '· ') + esc(t.titulo) + '</span>'; }).join('') : '<span>Esta etapa aún no tiene tareas.</span>'}]),
     onGuardar: function(v){
       var cumplida = v.cumplida === 'si';
       if (nueva) { crear('etapas', {n:etapas().length + 1, titulo:v.titulo, meta:v.meta, cumplida:cumplida}); registrar('agregó la etapa «' + v.titulo + '» a la ruta'); return; }
       cambiar('etapas', e.id, {titulo:v.titulo, meta:v.meta, cumplida:cumplida, cumplidaEn:cumplida ? (e.cumplidaEn || ahora()) : ''});
+      var pos = Number(v.n) || e.n, orden = etapas().filter(function(x){ return x.id !== e.id; });
+      if (pos !== e.n) {
+        orden.splice(pos - 1, 0, e);
+        orden.forEach(function(x, i){ if (x.n !== i + 1) cambiar('etapas', x.id, {n:i + 1}); });
+        registrar('movió la etapa «' + v.titulo + '» a la posición ' + pos);
+      }
       if (cumplida && !e.cumplida) { registrar('marcó la etapa «' + v.titulo + '» como cumplida'); celebrar('Etapa cumplida.'); }
     },
-    onBorrar: nueva || ts.length ? null : function(){ borrar('etapas', e.id); }
+    onBorrar: nueva || ts.length ? null : function(){ aPapelera('etapas', e.id); }
   });
 }
 function modalAjustes(){
@@ -1591,7 +1838,7 @@ function modalObjetivo(o){
       if (nueva) { doc.orden = Date.now(); crear('objetivos', doc); registrar('agregó la meta «' + v.titulo + '»'); }
       else cambiar('objetivos', o.id, doc);
     },
-    onBorrar: nueva ? null : function(){ borrar('objetivos', o.id); }
+    onBorrar: nueva ? null : function(){ aPapelera('objetivos', o.id); }
   });
 }
 function modalProveedor(p){
@@ -1620,7 +1867,7 @@ function modalProveedor(p){
         if (v.iva === 'aclarado' && p.iva !== 'aclarado') registrar('aclaró el IVA con ' + v.nombre);
       }
     },
-    onBorrar: nueva ? null : function(){ borrar('proveedores', p.id); }
+    onBorrar: nueva ? null : function(){ aPapelera('proveedores', p.id); }
   });
 }
 function modalCotizacion(c){
@@ -1639,7 +1886,7 @@ function modalCotizacion(c){
       if (nueva) { crear('cotizaciones', Object.assign({}, v, {creada:ahora()})); registrar('agregó la cotización de ' + v.proveedor + (v.valor ? ': ' + pesos(v.valor) : '')); }
       else { cambiar('cotizaciones', c.id, v); if (v.estado === 'elegida' && c.estado !== 'elegida') registrar('eligió las estanterías de ' + v.proveedor); }
     },
-    onBorrar: nueva ? null : function(){ borrar('cotizaciones', c.id); }
+    onBorrar: nueva ? null : function(){ aPapelera('cotizaciones', c.id); }
   });
 }
 function modalProducto(p){
@@ -1666,7 +1913,7 @@ function modalProducto(p){
       if (nueva) { crear('productos', Object.assign({}, v, {creado:ahora()})); registrar('agregó ' + v.nombre + ' a la lista de precios'); }
       else cambiar('productos', p.id, v);
     },
-    onBorrar: nueva ? null : function(){ borrar('productos', p.id); }
+    onBorrar: nueva ? null : function(){ aPapelera('productos', p.id); }
   });
 }
 function textoMargen(costo, precio){
@@ -1690,7 +1937,7 @@ function modalProspecto(p){
       {id:'proximo', label:'Próximo paso', ancho:'medio', valor:p.proximo || '', max:140, placeholder:'Ej.: Llamar para agendar con el consejo'},
       {id:'proximaFecha', label:'Fecha del próximo paso', tipo:'date', ancho:'medio', valor:p.proximaFecha || ''},
       {id:'notas', label:'Notas', tipo:'textarea', valor:p.notas || ''}
-    ].concat((p.contactos || []).length ? [{tipo:'info', html:'<b>Historial</b>' + p.contactos.slice().reverse().map(function(c){ return '<span>' + esc(fechaCorta((c.fecha || '').slice(0, 10) || hoy())) + ' · ' + esc(c.canal || '') + (SOCIOS[c.por] ? ' · ' + SOCIOS[c.por].nombre : '') + ': ' + esc(c.nota || '') + '</span>'; }).join('')}] : []),
+    ].concat((p.contactos || []).length ? [{id:'contactos', label:'Historial de contactos', tipo:'registros', claves:[['nota','Qué pasó']], valor:p.contactos}] : []),
     onGuardar: function(v){
       if (nueva) { crear('prospectos', Object.assign({}, v, {contactos:[], creado:ahora()})); registrar('agregó a ' + v.nombre + ' en Comercial'); }
       else {
@@ -1699,13 +1946,13 @@ function modalProspecto(p){
         if (v.etapa === 'firmado' && p.etapa !== 'firmado') celebrar('Firmado. Primera venta.');
       }
     },
-    onBorrar: nueva ? null : function(){ borrar('prospectos', p.id); }
+    onBorrar: nueva ? null : function(){ aPapelera('prospectos', p.id); }
   });
 }
 function nombreEtapaCom(e){ var x = ETAPAS_COM.concat([['perdido','Perdido']]).find(function(o){ return o[0] === e; }); return x ? x[1] : e; }
 function modalContacto(p){
   abrirForm({
-    etiqueta:'Registrar contacto', titulo:p.nombre,
+    etiqueta:'Registrar contacto', titulo:p.nombre, deshacer:'Se registró un contacto con ' + cortar(p.nombre, 50),
     campos:[
       {id:'canal', label:'Canal', tipo:'select', ancho:'medio', valor:p.canal || 'Llamada', opciones:CANALES.map(function(x){ return [x, x]; })},
       {id:'etapa', label:'Queda en', tipo:'select', ancho:'medio', valor:p.etapa === 'por_contactar' || !p.etapa ? 'contactado' : p.etapa, opciones:ETAPAS_COM.concat([['perdido','Perdido']])},
@@ -1733,7 +1980,7 @@ function modalQuien(){
 }
 function modalParquear(){
   abrirForm({
-    etiqueta:'Parqueadero', titulo:'Parquear una idea', textoGuardar:'Parquear',
+    etiqueta:'Parqueadero', titulo:'Parquear una idea', textoGuardar:'Parquear', deshacer:'Se parqueó una idea',
     campos:[{id:'texto', label:'La idea', tipo:'textarea', requerido:true, placeholder:'Escríbela y sigue con el foco. Se revisa en la revisión semanal.'}],
     onGuardar: function(v){ parquear(v.texto); }
   });
@@ -1745,14 +1992,24 @@ function ponerYo(q){ S.yo = SOCIOS[q] ? q : null; LS.set('mm-oficina-yo', S.yo);
 var avisoT = null;
 function avisar(texto, tipo){
   var a = $('#aviso');
+  nAvisos++;
   a.dataset.rec = '';
   a.className = 'aviso' + (tipo ? ' ' + tipo : '');
   a.textContent = texto;
   a.hidden = false;
   clearTimeout(avisoT); avisoT = setTimeout(function(){ a.hidden = true; }, 4200);
 }
+// si la acción no mostró su propio aviso, el aviso dice qué se hizo y ofrece deshacerlo
+var nAvisos = 0;
+function ofrecerDeshacer(g){
+  var a = $('#aviso');
+  if (a.hidden || a.classList.contains('recordar') || nAvisos === g.avisos) avisar(g.desc + '.');
+  if (!a.querySelector('[data-accion="deshacer"]')) a.insertAdjacentHTML('beforeend', '<button class="btn btn-deshacer" data-accion="deshacer">Deshacer</button>');
+  clearTimeout(avisoT); avisoT = setTimeout(function(){ a.hidden = true; }, 8000);
+}
 function celebrar(texto){
   var a = $('#aviso');
+  nAvisos++;
   a.dataset.rec = '';
   a.className = 'aviso logro';
   a.innerHTML = '<img src="img/mark-10-pulgar-arriba.webp" alt="" width="360" height="326"><span>' + esc(texto) + '</span>';
@@ -1792,12 +2049,18 @@ function armado(el){
 }
 
 // ---------- acciones ----------
-function irA(s){
+function irA(s, sinHistorial){
   if (SALA_IDS.indexOf(s) < 0) return;
+  if (!sinHistorial && S.sala !== s) { S.atras.push(S.sala); if (S.atras.length > 20) S.atras.shift(); }
+  if (s !== 'reunion' && S.pantalla) salirPantalla();
   S.sala = s;
   try { history.replaceState(null, '', '#' + s); } catch(e){}
   anunciar(); render();
   window.scrollTo(0, 0);
+}
+function salirPantalla(){
+  S.pantalla = false; document.body.classList.remove('modo-pantalla');
+  try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){}); } catch(e){}
 }
 function tarea(id){ return buscar('tareas', id); }
 function moverTarea(id, estado){
@@ -1814,8 +2077,39 @@ function moverProspecto(id, etapaNueva){
   if (etapaNueva === 'firmado') celebrar('Firmado. Primera venta.');
 }
 
+// texto del botón Deshacer según la acción
+var DESC = {
+  'reabrir':'Se reabrió la tarea', 'mover-tarea':'Se movió la tarea', 'pasar-dia':'Se pasó la tarea de día', 'recordatorio-hecho':'Se marcó el recordatorio como hecho',
+  'recordatorio-reabrir':'El recordatorio volvió a pendiente', 'idea-descartar':'Se descartó la idea', 'idea-recuperar':'La idea volvió al parqueadero', 'obj-sumar':'Se cambió la meta',
+  'seg':'Se cambió la lista de precios', 'reunion-iniciar':'Se inició la reunión', 'reunion-cerrar':'Se cerró la reunión', 'reunion-reabrir':'Se reabrió la reunión',
+  'avanzar-prospecto':'Se avanzó el prospecto', 'nueva-nota':'Se creó una nota', 'borrar-nota':'Se borró la nota', 'restaurar':'Se restauró', 'borrar-definitivo':'Se borró para siempre'
+};
 var ACC = {
-  'ir': function(el){ irA(el.dataset.sala); },
+  'ir': function(el){ if ($('#modal').open) cerrarModal(); irA(el.dataset.sala); },
+  'volver': function(){ var s = S.atras.pop(); if (s) irA(s, true); },
+  'buscar': abrirBuscar,
+  'abrir-nota': function(el){ cerrarModal(); S.notaSel = el.dataset.id; LS.set('mm-oficina-nota', S.notaSel); irA('libreta'); },
+  'deshacer': function(){ if ($('#modal').open && !M) cerrarModal(); deshacer(); },
+  'plegar': function(el){ var k = el.dataset.panel; if (S.plegados[k]) delete S.plegados[k]; else S.plegados[k] = true; LS.set('mm-oficina-plegados', S.plegados); render(); },
+  'pantalla': function(){
+    if (S.pantalla) { salirPantalla(); render(); return; }
+    S.pantalla = true; document.body.classList.add('modo-pantalla');
+    try { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(function(){}); } catch(e){}
+    render(); window.scrollTo(0, 0);
+  },
+  'editar-decision': function(el){ var d = buscar('decisiones', el.dataset.id); if (d) modalDecision(d); },
+  'editar-idea': function(el){ var i = buscar('parqueadero', el.dataset.id); if (i) modalIdea(i); },
+  'idea-recuperar': function(el){ cambiar('parqueadero', el.dataset.id, {estado:'parqueada'}); },
+  'ver-descartadas': function(){ S.verDescartadas = !S.verDescartadas; render(); },
+  'ver-rec-hechos': function(){ S.verRecHechos = !S.verRecHechos; render(); },
+  'recordatorio-reabrir': function(el){ cambiar('recordatorios', el.dataset.id, {hecho:false, hechoEn:'', enviado:''}); },
+  'restaurar': function(el){
+    var p = buscar('papelera', el.dataset.id); if (!p) return;
+    escribir('set', p.col, p.docId, p.datos); borrar('papelera', p.id);
+    desc('Se restauró «' + cortar(p.titulo, 50) + '»'); registrar('restauró de la papelera: «' + p.titulo + '»');
+  },
+  'borrar-definitivo': function(el){ if (armado(el)) borrar('papelera', el.dataset.id); },
+  'reg-quitar': function(el){ if (!M) return; M.reg[el.dataset.campo].splice(Number(el.dataset.i), 1); $('#m-reg-' + el.dataset.campo).innerHTML = registrosHTML(el.dataset.campo); },
   'soy': function(el){ ponerYo(el.dataset.quien); },
   'cambiar-quien': modalQuien,
   'parquear': modalParquear,
@@ -1835,7 +2129,6 @@ var ACC = {
     avisar('Recordatorio hecho.');
   },
   'pasar-dia': function(el){ var t = tarea(el.dataset.id); if (!t) return; cambiar('tareas', t.id, {dia:el.dataset.dia}); registrar('pasó «' + t.titulo + '» al ' + fechaCorta(el.dataset.dia)); },
-  'editar-foco': function(el){ modalFoco(el.dataset.fecha); },
   'ver-etapa': function(el){ S.filtro.etapa = el.dataset.id; LS.set('mm-oficina-filtro', S.filtro); irA('tablero'); },
   'filtrar-etapa': function(el){ S.filtro.etapa = S.filtro.etapa === el.dataset.id ? 'todas' : el.dataset.id; LS.set('mm-oficina-filtro', S.filtro); render(); },
   'editar-etapa': function(el){ var e = etapa(el.dataset.id); if (e) modalEtapa(e); },
@@ -1859,7 +2152,7 @@ var ACC = {
     render();
   },
   'semana-mover': function(el){ var n = Number(el.dataset.n); S.semana = n ? sumarDias(S.semana || lunesDe(hoy()), n) : null; render(); },
-  'ver-reunion': function(el){ S.reunionFecha = el.dataset.fecha === hoy() ? null : el.dataset.fecha; irA('reunion'); },
+  'ver-reunion': function(el){ if ($('#modal').open) cerrarModal(); S.reunionFecha = el.dataset.fecha === hoy() ? null : el.dataset.fecha; irA('reunion'); },
   'reunion-iniciar': function(){ var f = hoy(); guardarDoc('reuniones', f, {fecha:f, inicio:ahora(), fin:''}); registrar('inició la reunión de ' + nombreReunion()); },
   'reunion-cerrar': function(el){
     var f = el.dataset.fecha, man = sumarDias(f, 1);
@@ -1870,9 +2163,9 @@ var ACC = {
     celebrar('Reunión cerrada. Mañana: ' + textoFoco(focoDe(man)) + '.');
   },
   'reunion-reabrir': function(el){ cambiar('reuniones', el.dataset.fecha, {fin:''}); },
-  'borrar-decision': function(el){ if (armado(el)) borrar('decisiones', el.dataset.id); },
+
   'idea-a-ruta': function(el){ var i = buscar('parqueadero', el.dataset.id); if (i) modalTarea(null, {titulo:i.texto, idea:i.id}); },
-  'idea-descartar': function(el){ if (armado(el)) cambiar('parqueadero', el.dataset.id, {estado:'descartada'}); },
+  'idea-descartar': function(el){ cambiar('parqueadero', el.dataset.id, {estado:'descartada'}); },
   'nuevo-objetivo': function(){ modalObjetivo(null); },
   'editar-objetivo': function(el){ var o = buscar('objetivos', el.dataset.id); if (o) modalObjetivo(o); },
   'obj-sumar': function(el){ var o = buscar('objetivos', el.dataset.id); if (o) cambiar('objetivos', o.id, {actual:Math.max(0, (Number(o.actual) || 0) + Number(el.dataset.n))}); },
@@ -1892,9 +2185,10 @@ var ACC = {
   },
   'nota-sel': function(el){ S.notaSel = el.dataset.id; LS.set('mm-oficina-nota', S.notaSel); anunciar(); render(); },
   'nueva-nota': function(){ var id = crear('libreta', {titulo:'Nota nueva', texto:'', orden:50, editada:ahora(), editadaPor:S.yo || ''}); S.notaSel = id; LS.set('mm-oficina-nota', id); anunciar(); setTimeout(function(){ var t = $('#nota-titulo'); if (t) { t.focus(); t.select(); } }, 60); },
-  'borrar-nota': function(el){ if (armado(el)) { borrar('libreta', el.dataset.id); S.notaSel = null; } },
+  'borrar-nota': function(el){ if (armado(el)) { aPapelera('libreta', el.dataset.id); S.notaSel = null; } },
   'cerrar-modal': cerrarModal,
   'borrar-modal': function(el){ if (M && M.cfg.onBorrar && armado(el)) { M.cfg.onBorrar(); cerrarModal(); } },
+  'editar-foco': function(el){ modalFoco(el.dataset.fecha); },
   'paso-agregar': function(){ var i = $('#m-paso-nuevo'); if (!i || !M || !i.value.trim()) return; M.pasos.push({t:i.value.trim(), ok:false}); i.value = ''; $('#m-pasos-lista').innerHTML = pasosHTML(); i.focus(); },
   'paso-quitar': function(el){ if (!M) return; M.pasos.splice(Number(el.dataset.i), 1); $('#m-pasos-lista').innerHTML = pasosHTML(); }
 };
@@ -1930,20 +2224,34 @@ var FORM = {
 document.addEventListener('click', function(e){
   var el = e.target.closest('[data-accion]');
   if (!el) return;
-  var fn = ACC[el.dataset.accion];
-  if (fn) { e.preventDefault(); fn(el, e); }
+  var a = el.dataset.accion, fn = ACC[a];
+  if (fn) { e.preventDefault(); if (a === 'deshacer') fn(el, e); else enGrupo(DESC[a] || 'Cambio hecho', function(){ fn(el, e); }); }
 });
-document.addEventListener('change', function(e){ var el = e.target.closest('[data-cambio]'); if (el && CAMBIO[el.dataset.cambio]) CAMBIO[el.dataset.cambio](el, e); });
-document.addEventListener('submit', function(e){ var f = e.target; if (f.dataset && FORM[f.dataset.form]) { e.preventDefault(); FORM[f.dataset.form](f, e); } });
+document.addEventListener('change', function(e){ var el = e.target.closest('[data-cambio]'); if (el && CAMBIO[el.dataset.cambio]) enGrupo('Cambio hecho', function(){ CAMBIO[el.dataset.cambio](el, e); }); });
+document.addEventListener('submit', function(e){
+  var f = e.target;
+  if (!f.dataset || !FORM[f.dataset.form]) return;
+  e.preventDefault();
+  var textos = {parquear:'Se parqueó una idea', decision:'Se dejó una decisión', compromiso:'Se creó un compromiso'};
+  enGrupo(textos[f.dataset.form] || 'Cambios guardados', function(){ FORM[f.dataset.form](f, e); });
+});
 document.addEventListener('input', function(e){
   var el = e.target;
   if (el.dataset && el.dataset.guardar) programarGuardado(el);
   if (el.classList && el.classList.contains('paso-texto') && M && M.pasos[Number(el.dataset.i)]) M.pasos[Number(el.dataset.i)].t = el.value;
+  if (el.classList && el.classList.contains('reg-texto') && M && M.reg[el.dataset.campo] && M.reg[el.dataset.campo][Number(el.dataset.i)]) M.reg[el.dataset.campo][Number(el.dataset.i)][el.dataset.k] = el.value;
+  if (el.id === 'buscar-q') $('#buscar-res').innerHTML = resultados(el.value);
 });
 document.addEventListener('focusout', function(e){ var el = e.target; if (el.dataset && el.dataset.guardar) guardarYa(el); });
 document.addEventListener('keydown', function(e){
   if (e.key === 'Enter' && e.target.id === 'm-paso-nuevo') { e.preventDefault(); ACC['paso-agregar'](); }
+  if (e.key === 'Enter' && e.target.id === 'buscar-q') { e.preventDefault(); var r = $('#buscar-res .res'); if (r) r.click(); }
+  var mod = e.ctrlKey || e.metaKey, campo = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
+  if (mod && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); abrirBuscar(); }
+  if (mod && !e.shiftKey && (e.key === 'z' || e.key === 'Z') && !campo && !$('#modal').open) { e.preventDefault(); deshacer(); }
+  if (e.key === 'Escape' && S.pantalla && !$('#modal').open) { salirPantalla(); render(); }
 });
+document.addEventListener('fullscreenchange', function(){ if (!document.fullscreenElement && S.pantalla) { salirPantalla(); render(); } });
 $('#modal').addEventListener('click', function(e){ if (e.target === this) cerrarModal(); });
 $('#modal').addEventListener('close', function(){ M = null; });
 
@@ -1960,8 +2268,10 @@ document.addEventListener('drop', function(e){
   e.preventDefault(); col.classList.remove('sobre');
   var d = (e.dataTransfer.getData('text/plain') || '').split(':'), c = col.dataset.columna.split(':');
   if (d[0] !== c[0]) return;
-  if (d[0] === 't') moverTarea(d.slice(1).join(':'), c[1]);
-  if (d[0] === 'p') moverProspecto(d.slice(1).join(':'), c[1]);
+  enGrupo('Se movió de columna', function(){
+    if (d[0] === 't') moverTarea(d.slice(1).join(':'), c[1]);
+    if (d[0] === 'p') moverProspecto(d.slice(1).join(':'), c[1]);
+  });
 });
 
 // textos que se guardan solos (notas de la reunión y libreta)

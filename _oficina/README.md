@@ -16,13 +16,14 @@ Si abren este `index.html` directo desde el repositorio, funciona como copia loc
 
 | Sala | Para qué |
 | --- | --- |
-| Recepción | Al llegar: saludo, foco del día, cuenta regresiva a la reunión, lo pendiente de hoy, el norte y las metas, los recordatorios, la ruta, lo último que pasó y el parqueadero. |
+| Inicio | Al llegar: saludo, foco del día, cuenta regresiva a la reunión, lo pendiente de hoy, el norte y las metas, los recordatorios, la ruta, lo último que pasó y el parqueadero. |
 | Tablero | La ruta a la primera venta (5 etapas) y todas las tareas en Por hacer · En curso · Hecho. Cada tarea con responsable, día, pasos, sus avances y, al cumplirla, cómo se cumplió. |
 | Semana | Un foco por día y las tareas de cada día. Las tareas sin día quedan abajo para programarlas. |
 | Reunión de las 6 | La reunión diaria en cuatro bloques: lo cumplido (10 min), foco de hoy (30), decisiones (10) y compromisos para mañana (10). Guarda notas, decisiones y actas. |
 | Proveedores y precios | Lista de precios 2026 e IVA por proveedor, cotizaciones de estanterías comparadas contra el proveedor actual y la lista de precios con el margen de cada producto. |
 | Comercial | Unidades y empresas de administración por etapa: por contactar → contactado → reunión → presentación → consejo → firmado. Cada contacto queda registrado con su próximo paso. |
 | Libreta | Notas compartidas que se guardan solas: modelo de negocio, objeciones, guion de llamada, preguntas para financieros y proveedores. |
+| Historial | La papelera (lo borrado se guarda 30 días y se puede restaurar), los cambios del día que se pueden deshacer y todos los movimientos. |
 
 ## Lo que se empieza y no se termina
 
@@ -35,6 +36,15 @@ Con **Registrar avance** se anota qué se hizo, qué falta, qué día se sigue y
 - **Correos diarios** a cada socio, con lo suyo y lo de los dos: 6:56 a.m. y 5:20 p.m. (hora de Medellín). Los envía Claude desde la conversación de la oficina, con el Gmail de Simón.
 - **Cómo insisten las fechas límite:** desde el día de aviso (7 días antes por defecto; puede ser 3, 14 o 30) la tarea sale en «Plazos que se acercan» del correo de la mañana. A 3 días o menos pasa a «Urgente», arriba de los dos correos del día. El día que vence, el asunto dice «Vence hoy». Si se vence, sigue saliendo como «Venció hace N días» hasta que se marque como hecha. Los recordatorios vencidos también se repiten cada mañana hasta marcarlos.
 - **Control:** cada envío deja la hora en la oficina («Último envío»). Si pasan más de 15 horas sin correo, la oficina muestra un aviso en rojo.
+
+## Nada se pierde y todo se edita
+
+- **Deshacer:** después de cada cambio sale un aviso con el botón «Deshacer». También está en la barra lateral y con Ctrl + Z (Cmd + Z en Mac). Los cambios del día se pueden deshacer uno a uno, del más reciente al más viejo.
+- **Papelera:** lo que se borra (tareas, notas, decisiones, ideas, recordatorios, proveedores, cotizaciones, productos, prospectos, metas, etapas, focos) queda 30 días en Historial › Papelera para restaurarlo.
+- **Todo se edita:** tareas, avances, decisiones, ideas del parqueadero (también las descartadas), recordatorios (también los hechos), el historial de contactos de cada prospecto y el orden de las etapas de la ruta.
+- **Buscar:** el botón Buscar (o Ctrl + K) encuentra cualquier cosa de la oficina y la abre.
+- **Volver:** arriba de cada sala hay un botón para volver a la sala anterior; «Inicio» siempre lleva a la entrada.
+- **Vista tranquila:** cada panel se oculta o se muestra con la flecha de su esquina, y cada socio ve la oficina como la dejó. En la Reunión de las 6, «Modo pantalla» oculta la barra lateral, agranda todo y, con la reunión en curso, deja abierto solo el bloque del momento.
 
 ## Reglas de la oficina
 
