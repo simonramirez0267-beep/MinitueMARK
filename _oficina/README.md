@@ -35,6 +35,7 @@ Con **Registrar avance** se anota qué se hizo, qué falta, qué día se sigue y
 - Los **recordatorios** tienen día, hora opcional y para quién son (Simón, Sebastián o ambos). Con la oficina abierta salen en pantalla a su hora.
 - **Correos diarios** a cada socio, con lo suyo y lo de los dos: 6:56 a.m. y 5:20 p.m. (hora de Medellín). Los envía Claude desde la conversación de la oficina, con el Gmail de Simón.
 - **Cómo insisten las fechas límite:** desde el día de aviso (7 días antes por defecto; puede ser 3, 14 o 30) la tarea sale en «Plazos que se acercan» del correo de la mañana. A 3 días o menos pasa a «Urgente», arriba de los dos correos del día. El día que vence, el asunto dice «Vence hoy». Si se vence, sigue saliendo como «Venció hace N días» hasta que se marque como hecha. Los recordatorios vencidos también se repiten cada mañana hasta marcarlos.
+- **Google Calendar (lo más confiable):** cada recordatorio y cada fecha límite tiene el botón «Agregar al calendario». Abre Google Calendar con la fecha, la hora y el otro socio invitado; se guarda y listo. Desde ahí los avisos al celular y al correo los manda Google, aunque nadie abra la oficina ni Claude. Los correos de los socios están en Ajustes (el lápiz del Norte).
 - **Control:** cada envío deja la hora en la oficina («Último envío»). Si pasan más de 15 horas sin correo, la oficina muestra un aviso en rojo.
 
 ## Nada se pierde y todo se edita
@@ -44,6 +45,7 @@ Con **Registrar avance** se anota qué se hizo, qué falta, qué día se sigue y
 - **Todo se edita:** tareas, avances, decisiones, ideas del parqueadero (también las descartadas), recordatorios (también los hechos), el historial de contactos de cada prospecto y el orden de las etapas de la ruta.
 - **Buscar:** el botón Buscar (o Ctrl + K) encuentra cualquier cosa de la oficina y la abre.
 - **Volver:** arriba de cada sala hay un botón para volver a la sala anterior; «Inicio» siempre lleva a la entrada.
+- **Copia de seguridad:** en Historial se descarga una copia completa (.json) o las tareas en Excel (.csv). La información vive en la oficina de claude.ai, no en la conversación con Claude.
 - **Vista tranquila:** cada panel se oculta o se muestra con la flecha de su esquina, y cada socio ve la oficina como la dejó. En la Reunión de las 6, «Modo pantalla» oculta la barra lateral, agranda todo y, con la reunión en curso, deja abierto solo el bloque del momento.
 
 ## Reglas de la oficina

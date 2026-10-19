@@ -501,6 +501,7 @@ dialog#modal::backdrop{background:var(--velo)}
 .aviso.recordar{background:var(--azul-profundo);padding:10px 10px 10px 16px}
 .aviso > svg{width:20px;height:20px;flex:none}
 .aviso b{font-weight:600}
+.aviso{flex-wrap:wrap;justify-content:center}
 .franja{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;border-radius:var(--r-m);padding:12px 16px;font-size:14px;background:var(--azul-tenue);color:var(--tinta)}
 .franja.alerta{background:var(--alerta-tenue);color:var(--alerta)}
 .cargando{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:60px 0;color:var(--tinta-suave)}
@@ -1139,9 +1140,45 @@ function recordatoriosHechos(){
     }).join('') + '</ul>' : '') +
     '<button class="enlace mostrar-mas" data-accion="ver-rec-hechos">' + (S.verRecHechos ? 'Ocultar los hechos' : 'Ver los hechos (' + hechos.length + ')') + '</button>';
 }
+// Google Calendar: el evento queda en el calendario de quien lo agrega, con el otro socio invitado.
+// Los avisos al celular y al correo los manda Google, así nadie tenga la oficina ni Claude abiertos.
+function correosDe(para){
+  var c = config().correos || {};
+  return (para === 'simon' || para === 'sebastian' ? [para] : ['simon', 'sebastian']).map(function(k){ return c[k]; }).filter(Boolean);
+}
+function fechaCal(f, h, m){ var d = desdeISO(f); d.setHours(h, m, 0, 0); return fechaISO(d).replace(/-/g, '') + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00'; }
+function urlCalendario(o){
+  var dates, inv = correosDe(o.para);
+  if (/^\d{2}:\d{2}$/.test(o.hora || '')) { var h = Number(o.hora.slice(0, 2)), m = Number(o.hora.slice(3, 5)); dates = fechaCal(o.fecha, h, m) + '/' + fechaCal(o.fecha, h, m + 30); }
+  else dates = o.fecha.replace(/-/g, '') + '/' + sumarDias(o.fecha, 1).replace(/-/g, '');
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(o.titulo) + '&dates=' + dates + '&ctz=America%2FBogota' +
+    '&details=' + encodeURIComponent(o.detalles + (OFICINA_URL ? '\n\nOficina MinuteMark: ' + OFICINA_URL : '')) + (inv.length ? '&add=' + encodeURIComponent(inv.join(',')) : '');
+}
+function calRecordatorio(r){
+  return urlCalendario({titulo:'MinuteMark · ' + r.texto, fecha:r.fecha, hora:r.hora, para:r.para,
+    detalles:'Recordatorio de la oficina para ' + (SOCIOS[r.para] ? SOCIOS[r.para].nombre : 'los dos') + '.'});
+}
+function calPlazo(t){
+  var ua = ultimoAvance(t);
+  return urlCalendario({titulo:'Vence: ' + t.titulo, fecha:t.plazo, para:t.responsable || 'ambos',
+    detalles:'Fecha límite de una tarea de la oficina.' + (ua ? '\nÚltimo avance: ' + ua.texto + (ua.falta ? '\nFalta: ' + ua.falta : '') : '')});
+}
+function linkCal(col, d, boton){
+  if (d.calendario && !boton) return '<span class="chip chip-etapa" title="Agregado ' + haceCuanto(d.calendario) + '">En el calendario</span>';
+  var url = col === 'recordatorios' ? calRecordatorio(d) : calPlazo(d);
+  return '<a class="' + (boton ? 'btn btn-blanco btn-sm' : 'enlace') + '" href="' + esc(url) + '" target="_blank" rel="noopener" data-accion="marcar-calendario" data-col="' + col + '" data-id="' + esc(d.id) + '" data-deja>' + (boton ? 'Agregar a Google Calendar' : (d.calendario ? 'Volver a agregar al calendario' : 'Agregar al calendario')) + '</a>';
+}
+function avisarCal(texto, col, d){
+  var a = $('#aviso');
+  nAvisos++;
+  a.className = 'aviso'; a.dataset.rec = '';
+  a.innerHTML = '<span>' + esc(texto) + '</span>' + linkCal(col, d, true);
+  a.hidden = false;
+  clearTimeout(avisoT); avisoT = setTimeout(function(){ a.hidden = true; }, 15000);
+}
 function filaPlazo(t){
   return '<li class="fila">' + botonCheck(t) + '<div class="fila-txt"><button class="fila-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button>' +
-    '<div class="meta">' + chipPlazo(t) + '<span class="chip chip-neutro">Tarea</span></div></div>' + avatar(t.responsable, true) + '</li>';
+    '<div class="meta">' + chipPlazo(t) + '<span class="chip chip-neutro">Tarea</span>' + linkCal('tareas', t) + '</div></div>' + avatar(t.responsable, true) + '</li>';
 }
 // los correos los manda Claude; cada envío deja la hora en config/oficina.ultimoCorreo
 function correoAtrasado(){
@@ -1151,13 +1188,13 @@ function correoAtrasado(){
 function estadoCorreo(){
   var c = config();
   if (!c.correo) return '<p class="panel-ayuda">Con la oficina abierta, los recordatorios salen en pantalla a su hora.</p>';
-  return '<p class="panel-ayuda">Les llegan al correo a las 6:56 a.m. y a las 5:20 p.m.' + (c.ultimoCorreo ? ' Último envío: ' + haceCuanto(c.ultimoCorreo) : '') + '</p>';
+  return '<p class="panel-ayuda">Agreguen cada uno a Google Calendar: así el aviso les llega al celular aunque nadie abra la oficina. Además llega un resumen al correo a las 6:56 a.m. y a las 5:20 p.m.' + (c.ultimoCorreo ? ' Último envío: ' + haceCuanto(c.ultimoCorreo) : '') + '</p>';
 }
 function filaRecordatorio(r){
   var f = hoy(), clase = r.fecha < f ? 'chip-alerta' : r.fecha === f ? 'chip-curso' : 'chip-neutro';
   return '<li class="fila"><button class="check" data-accion="recordatorio-hecho" data-id="' + esc(r.id) + '" title="Marcar como hecho" aria-label="Marcar como hecho: ' + esc(r.texto) + '">' + ICON.check + '</button>' +
     '<div class="fila-txt"><button class="fila-titulo" data-accion="editar-recordatorio" data-id="' + esc(r.id) + '">' + esc(r.texto) + '</button>' +
-    '<div class="meta"><span class="chip ' + clase + '">' + textoCuando(r) + '</span>' + (r.enviado ? '<span class="chip chip-neutro">Enviado al correo</span>' : '') + '</div></div>' + avatar(r.para || 'ambos', true) + '</li>';
+    '<div class="meta"><span class="chip ' + clase + '">' + textoCuando(r) + '</span>' + (r.enviado ? '<span class="chip chip-neutro">Enviado al correo</span>' : '') + linkCal('recordatorios', r) + '</div></div>' + avatar(r.para || 'ambos', true) + '</li>';
 }
 function panelNorte(){
   var c = config(), objs = S.d.objetivos.slice().sort(function(a, b){ return (a.orden || 0) - (b.orden || 0); });
@@ -1545,12 +1582,41 @@ function abrirBuscar(){
   $('#buscar-q').focus();
 }
 
+// ---------- copia de seguridad ----------
+function respaldo(){
+  var data = {exportado:ahora(), oficina:OFICINA_URL, colecciones:{}};
+  COLS.forEach(function(c){ data.colecciones[c] = S.d[c]; });
+  data.colecciones.actividad = S.actividad;
+  return JSON.stringify(data, null, 2);
+}
+function csvTareas(){
+  var resp = {simon:'Simón', sebastian:'Sebastián', ambos:'Ambos'};
+  var filas = [['Tarea','Estado','Responsable','Etapa','Día','Fecha límite','Último avance','Qué falta','Cómo se cumplió','Cumplida el']];
+  S.d.tareas.slice().sort(ordenTareas).forEach(function(t){
+    var ua = ultimoAvance(t) || {}, e = etapa(t.etapa), est = ESTADOS.find(function(x){ return x[0] === t.estado; });
+    filas.push([t.titulo, est ? est[1] : '', resp[t.responsable] || 'Sin responsable', e ? e.n + '. ' + e.titulo : '', t.dia || '', t.plazo || '', ua.texto || '', ua.falta || '', t.resultado || '', t.hechaEn ? fechaISO(new Date(t.hechaEn)) : '']);
+  });
+  return '\ufeff' + filas.map(function(f){ return f.map(function(x){ return '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"'; }).join(';'); }).join('\r\n');
+}
+function descargar(nombre, contenido){
+  if (!(window.claude && typeof window.claude.use === 'function')) {
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([contenido])); a.download = nombre; a.click(); return;
+  }
+  window.claude.use('downloads').then(function(d){
+    if (!d) { avisar('Desde este equipo no se pueden descargar archivos de la oficina.', 'alerta'); return; }
+    return d.save({filename:nombre, data:contenido}).then(function(){ avisar('Copia descargada: ' + nombre); }, function(e){ if (!e || e.code !== 'declined') avisar('No se pudo descargar la copia. Intenta de nuevo.', 'alerta'); });
+  }).catch(function(){ avisar('No se pudo descargar la copia. Intenta de nuevo.', 'alerta'); });
+}
+
 // ---------- sala: historial y papelera ----------
 function vistaHistorial(){
   var pap = S.d.papelera.slice().sort(function(a, b){ return (b.borradoEn || '').localeCompare(a.borradoEn || ''); });
   var ult = U.pila[U.pila.length - 1];
   return cabecera('Historial', 'Lo que pasó y lo que se borró', 'Casi todo se puede deshacer o recuperar. Lo que se borra se guarda 30 días en la papelera.',
       ult ? '<button class="btn btn-linea" data-accion="deshacer">' + ICON.deshacer + 'Deshacer el último cambio</button>' : '') +
+    '<section class="panel" data-panel="h-respaldo"><header class="panel-cab"><div><span class="etiqueta">Dónde vive la información</span><h2>En la oficina, no en la conversación con Claude</h2></div></header>' +
+      '<p class="panel-ayuda">Todo lo que anotan queda guardado en esta página de claude.ai, aunque se borre la conversación con Claude. Para tener una copia propia, descárguenla de vez en cuando (por ejemplo, cada viernes).</p>' +
+      '<div class="panel-herr"><button class="btn btn-linea btn-sm" data-accion="respaldo-json">Descargar copia completa (.json)</button><button class="btn btn-linea btn-sm" data-accion="respaldo-csv">Tareas en Excel (.csv)</button></div></section>' +
     '<div class="historial">' +
       '<section class="panel" data-panel="h-papelera"><header class="panel-cab"><div><span class="etiqueta">Papelera</span><h2>' + (pap.length ? pap.length + (pap.length === 1 ? ' cosa borrada' : ' cosas borradas') : 'Vacía') + '</h2></div></header>' +
         (pap.length ? '<ul class="lista-tareas">' + pap.map(function(p){
@@ -1667,15 +1733,18 @@ function modalTarea(t, preset){
       if (nueva) {
         var doc = Object.assign({}, v, {creada:ahora(), creadaPor:S.yo || '', orden:Date.now(), origen:preset.origen || ''});
         if (v.estado === 'hecho') { doc.hechaEn = ahora(); doc.hechaPor = S.yo || ''; }
-        crear('tareas', doc);
+        var nid = crear('tareas', doc);
+        if (v.plazo) avisarCal('Tarea creada con fecha límite.', 'tareas', Object.assign({id:nid}, doc));
         if (preset.idea) { cambiar('parqueadero', preset.idea, {estado:'a_ruta'}); registrar('llevó una idea del parqueadero a la ruta: «' + v.titulo + '»'); }
         else registrar('creó la tarea «' + v.titulo + '»');
       } else {
         var patch = Object.assign({}, v);
         if (v.estado === 'hecho' && t.estado !== 'hecho') { patch.hechaEn = ahora(); patch.hechaPor = S.yo || ''; registrar('cumplió «' + v.titulo + '»'); }
         if (v.estado !== 'hecho' && t.estado === 'hecho') { patch.hechaEn = ''; registrar('reabrió «' + v.titulo + '»'); }
+        if (v.plazo !== (t.plazo || '')) patch.calendario = '';
         if (v.plazo && v.plazo !== (t.plazo || '')) registrar('le puso fecha límite a «' + v.titulo + '»: ' + fechaCorta(v.plazo));
         cambiar('tareas', t.id, patch);
+        if (v.plazo && v.plazo !== (t.plazo || '') && v.estado !== 'hecho') avisarCal('Fecha límite guardada.', 'tareas', Object.assign({}, t, patch));
       }
     },
     onBorrar: nueva ? null : function(){ aPapelera('tareas', t.id); registrar('borró la tarea «' + t.titulo + '»'); }
@@ -1685,7 +1754,7 @@ function infoTarea(t){
   var l = [];
   if (t.creada) l.push('Creada ' + haceCuanto(t.creada) + (SOCIOS[t.creadaPor] ? ' por <b>' + SOCIOS[t.creadaPor].nombre + '</b>' : ''));
   if (t.origen) l.push('Compromiso de la reunión del ' + fechaLarga(t.origen));
-  if (t.plazo && t.estado !== 'hecho') l.push('Fecha límite: <b>' + fechaLarga(t.plazo) + '</b> · los avisos empiezan ' + (Number(t.avisoDias) || 7) + ' días antes');
+  if (t.plazo && t.estado !== 'hecho') l.push('Fecha límite: <b>' + fechaLarga(t.plazo) + '</b> · los avisos empiezan ' + (Number(t.avisoDias) || 7) + ' días antes · ' + linkCal('tareas', t));
   if (t.estado === 'hecho' && t.hechaEn) l.push('Cumplida ' + haceCuanto(t.hechaEn) + (SOCIOS[t.hechaPor] ? ' por <b>' + SOCIOS[t.hechaPor].nombre + '</b>' : ''));
   return l.map(function(x){ return '<span>' + x + '</span>'; }).join('') || '<span>Sin historial.</span>';
 }
@@ -1719,9 +1788,13 @@ function modalAvance(t){
     onGuardar: function(v){
       var r = buscar('reuniones', hoy());
       var avs = (t.avances || []).concat([{fecha:ahora(), por:S.yo || '', texto:v.texto, falta:v.falta, reunion:r && r.inicio && !r.fin ? hoy() : ''}]);
-      cambiar('tareas', t.id, {avances:avs, estado:'en_curso', dia:v.dia, plazo:v.plazo, avisoDias:Number(t.avisoDias) || 7, responsable:v.responsable, pasos:v.pasos});
+      var cambioPlazo = v.plazo !== (t.plazo || '');
+      var patchAv = {avances:avs, estado:'en_curso', dia:v.dia, plazo:v.plazo, avisoDias:Number(t.avisoDias) || 7, responsable:v.responsable, pasos:v.pasos};
+      if (cambioPlazo) patchAv.calendario = '';
+      cambiar('tareas', t.id, patchAv);
       registrar('avanzó en «' + t.titulo + '»; sigue el ' + fechaCorta(v.dia) + (v.plazo ? ' y vence el ' + fechaCorta(v.plazo) : ''));
-      avisar('Avance guardado. La tarea sigue en curso el ' + fechaCorta(v.dia) + '.');
+      if (v.plazo && cambioPlazo) avisarCal('Avance guardado. Vence el ' + fechaCorta(v.plazo) + '.', 'tareas', Object.assign({}, t, patchAv));
+      else avisar('Avance guardado. La tarea sigue en curso el ' + fechaCorta(v.dia) + '.');
     }
   });
 }
@@ -1754,16 +1827,21 @@ function modalRecordatorio(r){
       {id:'fecha', label:'Día', tipo:'date', ancho:'medio', valor:r.fecha || hoy(), requerido:true},
       {id:'hora', label:'Hora (opcional)', tipo:'time', ancho:'medio', valor:r.hora || ''}
     ].concat(nueva ? [] : [{id:'hecho', label:'Estado', tipo:'segment', valor:r.hecho ? 'si' : 'no', opciones:[['no','Pendiente'],['si','Hecho']]}]).concat([
-      {tipo:'info', html:'<span>Con la oficina abierta, el aviso sale en pantalla a esa hora.' + (config().correo ? ' Y llega al correo de quien corresponda en el resumen de la mañana y en el de antes de la reunión.' : '') + '</span>'}
+      {tipo:'info', html:'<span>Con la oficina abierta, el aviso sale en pantalla a esa hora.' + (config().correo ? ' Y llega al correo de quien corresponda en el resumen de la mañana y en el de antes de la reunión.' : '') + '</span>' +
+        (nueva ? '<span>Al guardarlo pueden agregarlo a Google Calendar: así el aviso les llega al celular siempre.</span>' : '<span>' + linkCal('recordatorios', r) + '</span>')}
     ]),
     onGuardar: function(v){
       if (nueva) {
-        crear('recordatorios', {texto:v.texto, para:v.para || 'ambos', fecha:v.fecha, hora:v.hora, hecho:false, hechoEn:'', creado:ahora(), creadoPor:S.yo || '', enviado:''});
+        var rdoc = {texto:v.texto, para:v.para || 'ambos', fecha:v.fecha, hora:v.hora, hecho:false, hechoEn:'', creado:ahora(), creadoPor:S.yo || '', enviado:'', calendario:''};
+        rdoc.id = crear('recordatorios', sinId(rdoc));
+        avisarCal('Recordatorio creado.', 'recordatorios', rdoc);
         registrar('creó un recordatorio para ' + (v.para === 'ambos' || !v.para ? 'los dos' : SOCIOS[v.para].nombre) + ', ' + fechaCorta(v.fecha) + ': «' + v.texto + '»');
       } else {
         var patch = {texto:v.texto, para:v.para || 'ambos', fecha:v.fecha, hora:v.hora, hecho:v.hecho === 'si', hechoEn:v.hecho === 'si' ? (r.hechoEn || ahora()) : ''};
         if (v.fecha !== r.fecha || v.hora !== r.hora || (r.hecho && v.hecho !== 'si')) patch.enviado = '';
+        if (v.fecha !== r.fecha || v.hora !== r.hora || v.texto !== r.texto) patch.calendario = '';
         cambiar('recordatorios', r.id, patch);
+        if (patch.calendario === '' && r.calendario && v.hecho !== 'si') avisarCal('Cambió el recordatorio: agréguenlo de nuevo al calendario y borren el evento viejo.', 'recordatorios', Object.assign({}, r, patch));
       }
     },
     onBorrar: nueva ? null : function(){ aPapelera('recordatorios', r.id); }
@@ -1818,9 +1896,12 @@ function modalAjustes(){
     etiqueta:'Ajustes de la oficina', titulo:'El norte y la reunión',
     campos:[
       {id:'norte', label:'El norte', valor:c.norte || '', requerido:true, max:120, ayuda:'La meta grande que manda sobre todo lo demás.'},
-      {id:'horaReunion', label:'Hora de la reunión diaria', tipo:'time', valor:horaReunion()}
+      {id:'horaReunion', label:'Hora de la reunión diaria', tipo:'time', valor:horaReunion()},
+      {id:'correoSimon', label:'Correo de Simón', tipo:'email', ancho:'medio', valor:(c.correos || {}).simon || '', max:120},
+      {id:'correoSebastian', label:'Correo de Sebastián', tipo:'email', ancho:'medio', valor:(c.correos || {}).sebastian || '', max:120},
+      {tipo:'info', html:'<span>Los correos se usan para invitar al otro socio cuando agregan algo a Google Calendar. Si cambian, avísenle también a Claude para el resumen diario.</span>'}
     ],
-    onGuardar: function(v){ guardarDoc('config', 'oficina', {norte:v.norte, horaReunion:v.horaReunion || '18:00'}); registrar('actualizó el norte y la hora de la reunión'); }
+    onGuardar: function(v){ guardarDoc('config', 'oficina', {norte:v.norte, horaReunion:v.horaReunion || '18:00', correos:{simon:v.correoSimon.toLowerCase(), sebastian:v.correoSebastian.toLowerCase()}}); registrar('actualizó los ajustes de la oficina'); }
   });
 }
 function modalObjetivo(o){
@@ -2005,7 +2086,7 @@ function ofrecerDeshacer(g){
   var a = $('#aviso');
   if (a.hidden || a.classList.contains('recordar') || nAvisos === g.avisos) avisar(g.desc + '.');
   if (!a.querySelector('[data-accion="deshacer"]')) a.insertAdjacentHTML('beforeend', '<button class="btn btn-deshacer" data-accion="deshacer">Deshacer</button>');
-  clearTimeout(avisoT); avisoT = setTimeout(function(){ a.hidden = true; }, 8000);
+  clearTimeout(avisoT); avisoT = setTimeout(function(){ a.hidden = true; }, a.querySelector('a[href]') ? 15000 : 8000);
 }
 function celebrar(texto){
   var a = $('#aviso');
@@ -2082,7 +2163,7 @@ var DESC = {
   'reabrir':'Se reabrió la tarea', 'mover-tarea':'Se movió la tarea', 'pasar-dia':'Se pasó la tarea de día', 'recordatorio-hecho':'Se marcó el recordatorio como hecho',
   'recordatorio-reabrir':'El recordatorio volvió a pendiente', 'idea-descartar':'Se descartó la idea', 'idea-recuperar':'La idea volvió al parqueadero', 'obj-sumar':'Se cambió la meta',
   'seg':'Se cambió la lista de precios', 'reunion-iniciar':'Se inició la reunión', 'reunion-cerrar':'Se cerró la reunión', 'reunion-reabrir':'Se reabrió la reunión',
-  'avanzar-prospecto':'Se avanzó el prospecto', 'nueva-nota':'Se creó una nota', 'borrar-nota':'Se borró la nota', 'restaurar':'Se restauró', 'borrar-definitivo':'Se borró para siempre'
+  'avanzar-prospecto':'Se avanzó el prospecto', 'marcar-calendario':'Quedó marcado como agregado al calendario', 'nueva-nota':'Se creó una nota', 'borrar-nota':'Se borró la nota', 'restaurar':'Se restauró', 'borrar-definitivo':'Se borró para siempre'
 };
 var ACC = {
   'ir': function(el){ if ($('#modal').open) cerrarModal(); irA(el.dataset.sala); },
@@ -2099,6 +2180,9 @@ var ACC = {
   },
   'editar-decision': function(el){ var d = buscar('decisiones', el.dataset.id); if (d) modalDecision(d); },
   'editar-idea': function(el){ var i = buscar('parqueadero', el.dataset.id); if (i) modalIdea(i); },
+  'marcar-calendario': function(el){ var d = buscar(el.dataset.col, el.dataset.id); if (d) cambiar(el.dataset.col, d.id, {calendario:ahora(), calendarioPor:S.yo || ''}); },
+  'respaldo-json': function(){ descargar('oficina-minutemark-' + hoy() + '.json', respaldo()); },
+  'respaldo-csv': function(){ descargar('tareas-minutemark-' + hoy() + '.csv', csvTareas()); },
   'idea-recuperar': function(el){ cambiar('parqueadero', el.dataset.id, {estado:'parqueada'}); },
   'ver-descartadas': function(){ S.verDescartadas = !S.verDescartadas; render(); },
   'ver-rec-hechos': function(){ S.verRecHechos = !S.verRecHechos; render(); },
@@ -2225,7 +2309,7 @@ document.addEventListener('click', function(e){
   var el = e.target.closest('[data-accion]');
   if (!el) return;
   var a = el.dataset.accion, fn = ACC[a];
-  if (fn) { e.preventDefault(); if (a === 'deshacer') fn(el, e); else enGrupo(DESC[a] || 'Cambio hecho', function(){ fn(el, e); }); }
+  if (fn) { if (!el.hasAttribute('data-deja')) e.preventDefault(); if (a === 'deshacer') fn(el, e); else enGrupo(DESC[a] || 'Cambio hecho', function(){ fn(el, e); }); }
 });
 document.addEventListener('change', function(e){ var el = e.target.closest('[data-cambio]'); if (el && CAMBIO[el.dataset.cambio]) enGrupo('Cambio hecho', function(){ CAMBIO[el.dataset.cambio](el, e); }); });
 document.addEventListener('submit', function(e){
