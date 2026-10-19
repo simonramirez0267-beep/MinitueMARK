@@ -752,6 +752,25 @@ function ordenTareas(a, b){ return (a.dia || '9999').localeCompare(b.dia || '999
 function ultimoAvance(t){ var a = t.avances || []; return a.length ? a[a.length - 1] : null; }
 function textoAvance(a){ return '<p class="resultado"><b>Último avance · ' + (SOCIOS[a.por] ? SOCIOS[a.por].nombre + ', ' : '') + haceCuanto(a.fecha) + ':</b> ' + esc(a.texto) + (a.falta ? ' <b>Falta:</b> ' + esc(a.falta) : '') + '</p>'; }
 function linkAvance(t){ return t.estado === 'hecho' ? '' : '<button class="enlace" data-accion="avance" data-id="' + esc(t.id) + '">Registrar avance</button>'; }
+// plazos: «dia» es cuándo se trabaja la tarea; «plazo» es la fecha límite y activa los avisos
+var AVISOS = [['3','3 días antes'],['7','7 días antes'],['14','14 días antes'],['30','30 días antes']];
+function diasHasta(f){ return Math.round((desdeISO(f) - desdeISO(hoy())) / 864e5); }
+function enAviso(t){ return t.estado !== 'hecho' && t.plazo && diasHasta(t.plazo) <= (Number(t.avisoDias) || 7); }
+function textoPlazo(t){
+  var d = diasHasta(t.plazo);
+  if (d < 0) return 'Venció hace ' + (-d) + (d === -1 ? ' día' : ' días');
+  if (d === 0) return 'Vence hoy';
+  if (d === 1) return 'Vence mañana';
+  return 'Vence en ' + d + ' días · ' + fechaCorta(t.plazo);
+}
+function chipPlazo(t){
+  if (!t.plazo || t.estado === 'hecho') return '';
+  var d = diasHasta(t.plazo);
+  if (!enAviso(t)) return '<span class="chip chip-neutro">Plazo · ' + fechaCorta(t.plazo) + '</span>';
+  return '<span class="chip ' + (d <= 1 ? 'chip-alerta' : 'chip-curso') + '">' + textoPlazo(t) + '</span>';
+}
+function esMia(t){ return !S.yo || !t.responsable || t.responsable === 'ambos' || t.responsable === S.yo; }
+function plazosUrgentes(){ return S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.plazo && diasHasta(t.plazo) <= 1; }); }
 function horaActual(){ var n = new Date(); return pad(n.getHours()) + ':' + pad(n.getMinutes()); }
 function esParaMi(r){ return !S.yo || !r.para || r.para === 'ambos' || r.para === S.yo; }
 function recordatoriosVencidos(){
@@ -830,7 +849,7 @@ function filaTarea(t, extra){
   return '<li class="fila' + (hecha ? ' es-hecha' : '') + '">' + botonCheck(t) +
     '<div class="fila-txt"><button class="fila-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button>' +
     '<div class="meta">' + (e ? chipEtapa(e) : '') +
-      (venc ? '<span class="chip chip-alerta">Vencida · ' + fechaCorta(t.dia) + '</span>' : '') +
+      (venc ? '<span class="chip chip-alerta">Atrasada · ' + fechaCorta(t.dia) + '</span>' : '') + chipPlazo(t) +
       (t.estado === 'en_curso' ? '<span class="chip chip-curso">En curso</span>' : '') +
       (pasos.length ? '<span class="chip chip-neutro">' + ok + '/' + pasos.length + ' pasos</span>' : '') + (extra || '') + '</div>' +
     (ua ? textoAvance(ua) : '') +
@@ -859,6 +878,7 @@ function render(){
 }
 function franjas(){
   var h = '';
+  if (listo() && correoAtrasado()) h += '<p class="franja alerta" role="alert">Los correos de la oficina no salen desde ' + (config().ultimoCorreo ? haceCuanto(config().ultimoCorreo) : 'hace rato') + ' · Si no les llegó el último, avísenle a Claude en la conversación de la oficina.</p>';
   if (S.error) h += '<p class="franja alerta" role="alert">' + esc(S.error) + '</p>';
   if (S.modo === 'local') h += '<p class="franja">Copia local: lo que anotes aquí queda solo en este navegador.' + (OFICINA_URL ? ' <a class="enlace" href="' + esc(OFICINA_URL) + '" target="_blank" rel="noopener">Abrir la oficina compartida</a>' : '') + '</p>';
   return h;
@@ -900,7 +920,7 @@ function renderLado(){
   nav.innerHTML = SALAS.map(function(s){
     var extra = '';
     if (s[0] === 'tablero' && abiertas) extra = '<b class="cuenta">' + abiertas + '</b>';
-    if (s[0] === 'recepcion' && listo()) { var nr = recordatoriosVencidos().filter(esParaMi).length; if (nr) extra = '<b class="cuenta" title="Recordatorios pendientes">' + nr + '</b>'; }
+    if (s[0] === 'recepcion' && listo()) { var nr = recordatoriosVencidos().filter(esParaMi).length + plazosUrgentes().filter(esMia).length; if (nr) extra = '<b class="cuenta" title="Recordatorios y plazos urgentes">' + nr + '</b>'; }
     if (s[0] === 'reunion' && (er === 'curso' || er === 'hora')) extra = '<i class="punto vivo-dot" title="Es hora de la reunión"></i>';
     return '<a href="#' + s[0] + '" class="sala-link' + (S.sala === s[0] ? ' on' : '') + '" data-accion="ir" data-sala="' + s[0] + '"' + (S.sala === s[0] ? ' aria-current="page"' : '') + '>' + ICON[s[0]] + '<span>' + s[1] + '</span>' + extra + '</a>';
   }).join('');
@@ -961,14 +981,30 @@ function panelHoy(){
 }
 function panelRecordatorios(){
   var f = hoy(), lim = sumarDias(f, 7);
-  var lista = S.d.recordatorios.filter(function(r){ return !r.hecho && r.fecha && r.fecha <= lim; })
-    .sort(function(a, b){ return (a.fecha + (a.hora || '99')).localeCompare(b.fecha + (b.hora || '99')); });
-  var deHoy = lista.filter(function(r){ return r.fecha <= f; }).length;
-  return '<section class="panel p-rec"><header class="panel-cab"><div><span class="etiqueta">Recordatorios</span><h2>' + (deHoy ? deHoy + ' para hoy' : 'Nada para hoy') + '</h2></div>' +
+  var items = S.d.recordatorios.filter(function(r){ return !r.hecho && r.fecha && r.fecha <= lim; })
+    .map(function(r){ return {orden:r.fecha + (r.hora || '99'), html:filaRecordatorio(r), hoy:r.fecha <= f}; })
+    .concat(S.d.tareas.filter(enAviso).map(function(t){ return {orden:t.plazo + '00', html:filaPlazo(t), hoy:diasHasta(t.plazo) <= 1}; }))
+    .sort(function(a, b){ return a.orden.localeCompare(b.orden); });
+  var deHoy = items.filter(function(x){ return x.hoy; }).length;
+  return '<section class="panel p-rec"><header class="panel-cab"><div><span class="etiqueta">Recordatorios y plazos</span><h2>' + (deHoy ? deHoy + (deHoy === 1 ? ' urgente' : ' urgentes') : 'Nada urgente') + '</h2></div>' +
     '<button class="icono-btn" data-accion="nuevo-recordatorio" aria-label="Nuevo recordatorio">' + ICON.mas + '</button></header>' +
-    (lista.length ? '<ul class="lista-tareas">' + lista.slice(0, 6).map(filaRecordatorio).join('') + '</ul>' : '<p class="vacio">Nada en los próximos 7 días. Creen uno para no depender de la memoria.</p>') +
-    (lista.length > 6 ? '<p class="panel-ayuda">Y ' + (lista.length - 6) + ' más esta semana.</p>' : '') +
-    '<p class="panel-ayuda">' + (config().correo ? 'Les llegan al correo en el resumen de la mañana y antes de la reunión. ' : '') + 'Con la oficina abierta, salen en pantalla a su hora.</p></section>';
+    (items.length ? '<ul class="lista-tareas">' + items.slice(0, 7).map(function(x){ return x.html; }).join('') + '</ul>' : '<p class="vacio">Nada en los próximos días. Creen un recordatorio o pónganle fecha límite a una tarea.</p>') +
+    (items.length > 7 ? '<p class="panel-ayuda">Y ' + (items.length - 7) + ' más.</p>' : '') +
+    estadoCorreo() + '</section>';
+}
+function filaPlazo(t){
+  return '<li class="fila">' + botonCheck(t) + '<div class="fila-txt"><button class="fila-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button>' +
+    '<div class="meta">' + chipPlazo(t) + '<span class="chip chip-neutro">Tarea</span></div></div>' + avatar(t.responsable, true) + '</li>';
+}
+// los correos los manda Claude; cada envío deja la hora en config/oficina.ultimoCorreo
+function correoAtrasado(){
+  var c = config(); if (!c.correo) return false;
+  var t = Date.parse(c.ultimoCorreo || ''); return !t || Date.now() - t > 15 * 3600e3;
+}
+function estadoCorreo(){
+  var c = config();
+  if (!c.correo) return '<p class="panel-ayuda">Con la oficina abierta, los recordatorios salen en pantalla a su hora.</p>';
+  return '<p class="panel-ayuda">Les llegan al correo a las 6:56 a.m. y a las 5:20 p.m.' + (c.ultimoCorreo ? ' Último envío: ' + haceCuanto(c.ultimoCorreo) : '') + '</p>';
 }
 function filaRecordatorio(r){
   var f = hoy(), clase = r.fecha < f ? 'chip-alerta' : r.fecha === f ? 'chip-curso' : 'chip-neutro';
@@ -1063,7 +1099,7 @@ function tarjetaTarea(t){
   return '<article class="tarea' + (hecha ? ' es-hecha' : '') + '" draggable="true" data-arrastre="t:' + esc(t.id) + '">' +
     '<div class="tarea-fila">' + botonCheck(t) + '<button class="tarea-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button></div>' +
     '<div class="meta">' + (e ? chipEtapa(e) : '') +
-      (t.dia ? '<span class="chip ' + (venc ? 'chip-alerta' : 'chip-neutro') + '">' + (venc ? 'Vencida · ' : '') + fechaCorta(t.dia) + '</span>' : '') +
+      (t.dia ? '<span class="chip ' + (venc ? 'chip-alerta' : 'chip-neutro') + '">' + (venc ? 'Atrasada · ' : '') + fechaCorta(t.dia) + '</span>' : '') + chipPlazo(t) +
       (pasos.length ? '<span class="chip chip-neutro">' + ok + '/' + pasos.length + ' pasos</span>' : '') + '</div>' +
     (ua ? textoAvance(ua) : '') +
     (hecha && t.resultado ? '<p class="resultado"><b>Cómo se cumplió:</b> ' + esc(t.resultado) + '</p>' : '') +
@@ -1134,7 +1170,9 @@ function vistaReunion(){
     return '<section class="bloque' + st + '"><header class="bloque-cab"><span class="paso-num">' + b.n + '</span><div><h2>' + b.titulo + '</h2><p><span class="hora">' + horaTexto(minutosReunion() + b.min) + '</span> · ' + b.dur + ' min · ' + b.ayuda + '</p></div>' + quedan + '</header>' + contenido + '</section>';
   }
 
-  var b1 = '<div class="sub"><h3>Cumplido desde la última reunión · ' + cumplidas.length + '</h3>' +
+  var plazos = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.plazo && t.plazo <= sumarDias(f, 7); }).sort(function(a, b){ return a.plazo.localeCompare(b.plazo); });
+  var b1 = (plazos.length ? '<div class="sub"><h3>Plazos de los próximos 7 días · ' + plazos.length + '</h3><ul class="lista-tareas">' + plazos.map(function(t){ return filaTarea(t, linkAvance(t)); }).join('') + '</ul></div>' : '') +
+    '<div class="sub"><h3>Cumplido desde la última reunión · ' + cumplidas.length + '</h3>' +
       (cumplidas.length ? '<ul class="lista-tareas">' + cumplidas.map(function(t){ return filaTarea(t); }).join('') + '</ul>' : '<p class="vacio">Nada se marcó como hecho desde la última reunión.</p>') + '</div>' +
     (avanzadas.length ? '<div class="sub"><h3>Avanzado, sin terminar · ' + avanzadas.length + '</h3><ul class="lista-tareas">' + avanzadas.map(function(t){
       return filaTarea(t, linkAvance(t) + (t.dia && t.dia <= f ? '<button class="enlace enlace-suave" data-accion="pasar-dia" data-id="' + esc(t.id) + '" data-dia="' + man + '">Pasar a ' + fechaCorta(man) + '</button>' : ''));
@@ -1393,7 +1431,9 @@ function modalTarea(t, preset){
       {id:'titulo', label:'Tarea', valor:t.titulo || preset.titulo || '', requerido:true, max:200, placeholder:'Ej.: Pedir 3 cotizaciones de estanterías'},
       {id:'responsable', label:'Responsable', tipo:'segment', valor:nueva ? (preset.responsable != null ? preset.responsable : (S.yo || '')) : (t.responsable || ''), opciones:RESPONSABLES},
       {id:'etapa', label:'Etapa de la ruta', tipo:'select', ancho:'medio', valor:nueva ? (preset.etapa || (focoDe(preset.dia || '') || {}).etapa || '') : (t.etapa || ''), opciones:[['','Sin etapa']].concat(es.map(function(e){ return [e.id, e.n + ' · ' + e.titulo]; }))},
-      {id:'dia', label:'Día', tipo:'date', ancho:'medio', valor:nueva ? (preset.dia || '') : (t.dia || '')},
+      {id:'dia', label:'Día en que se trabaja', tipo:'date', ancho:'medio', valor:nueva ? (preset.dia || '') : (t.dia || '')},
+      {id:'plazo', label:'Fecha límite (opcional)', tipo:'date', ancho:'medio', valor:t.plazo || '', ayuda:'Si tiene plazo, la oficina y los correos empiezan a avisar antes.'},
+      {id:'avisoDias', label:'Empezar a avisar', tipo:'select', ancho:'medio', valor:String(t.avisoDias || 7), opciones:AVISOS},
       {id:'estado', label:'Estado', tipo:'segment', valor:t.estado || preset.estado || 'pendiente', opciones:ESTADOS},
       {id:'pasos', label:'Pasos', tipo:'pasos', valor:t.pasos || []},
       {id:'nota', label:'Contexto', tipo:'textarea', valor:t.nota || '', placeholder:'Lo que hay que saber para hacerla.'},
@@ -1401,6 +1441,7 @@ function modalTarea(t, preset){
     ].concat(nueva ? [] : [{tipo:'info', html:infoTarea(t)}]),
     validar: function(v){ if (v.estado === 'hecho' && !v.resultado) return ['resultado', 'Cuenten cómo se cumplió antes de marcarla como hecha.']; },
     onGuardar: function(v){
+      v.avisoDias = Number(v.avisoDias) || 7;
       if (nueva) {
         var doc = Object.assign({}, v, {creada:ahora(), creadaPor:S.yo || '', orden:Date.now(), origen:preset.origen || ''});
         if (v.estado === 'hecho') { doc.hechaEn = ahora(); doc.hechaPor = S.yo || ''; }
@@ -1411,6 +1452,7 @@ function modalTarea(t, preset){
         var patch = Object.assign({}, v);
         if (v.estado === 'hecho' && t.estado !== 'hecho') { patch.hechaEn = ahora(); patch.hechaPor = S.yo || ''; registrar('cumplió «' + v.titulo + '»'); }
         if (v.estado !== 'hecho' && t.estado === 'hecho') { patch.hechaEn = ''; registrar('reabrió «' + v.titulo + '»'); }
+        if (v.plazo && v.plazo !== (t.plazo || '')) registrar('le puso fecha límite a «' + v.titulo + '»: ' + fechaCorta(v.plazo));
         cambiar('tareas', t.id, patch);
       }
     },
@@ -1421,6 +1463,7 @@ function infoTarea(t){
   var l = [];
   if (t.creada) l.push('Creada ' + haceCuanto(t.creada) + (SOCIOS[t.creadaPor] ? ' por <b>' + SOCIOS[t.creadaPor].nombre + '</b>' : ''));
   if (t.origen) l.push('Compromiso de la reunión del ' + fechaLarga(t.origen));
+  if (t.plazo && t.estado !== 'hecho') l.push('Fecha límite: <b>' + fechaLarga(t.plazo) + '</b> · los avisos empiezan ' + (Number(t.avisoDias) || 7) + ' días antes');
   (t.avances || []).forEach(function(a){ l.push('Avance ' + haceCuanto(a.fecha) + (SOCIOS[a.por] ? ' · <b>' + SOCIOS[a.por].nombre + '</b>' : '') + ': ' + esc(a.texto) + (a.falta ? ' Falta: ' + esc(a.falta) : '')); });
   if (t.estado === 'hecho' && t.hechaEn) l.push('Cumplida ' + haceCuanto(t.hechaEn) + (SOCIOS[t.hechaPor] ? ' por <b>' + SOCIOS[t.hechaPor].nombre + '</b>' : ''));
   return l.map(function(x){ return '<span>' + x + '</span>'; }).join('') || '<span>Sin historial.</span>';
@@ -1447,15 +1490,16 @@ function modalAvance(t){
       {id:'falta', label:'¿Qué falta?', tipo:'textarea', placeholder:'Ej.: Pedírsela a los otros 6 y hacerle seguimiento a Unilever.'},
       {id:'pasos', label:'Pasos (marquen los que quedaron hechos)', tipo:'pasos', valor:t.pasos || []},
       {id:'dia', label:'¿Qué día se sigue?', tipo:'date', ancho:'medio', valor:t.dia && t.dia > hoy() ? t.dia : man, requerido:true},
+      {id:'plazo', label:'¿Tiene fecha límite?', tipo:'date', ancho:'medio', valor:t.plazo || '', ayuda:'Si sí o sí tiene que quedar lista ese día.'},
       {id:'responsable', label:'¿Quién sigue?', tipo:'segment', valor:t.responsable || '', opciones:RESPONSABLES.slice(0, 3)},
-      {tipo:'info', html:'<span>La tarea queda <b>en curso</b>, con este avance a la vista y programada para el día que elijan. Se cierra solo cuando se marque como hecha.</span>'}
+      {tipo:'info', html:'<span>La tarea queda <b>en curso</b>, con este avance a la vista y programada para el día que elijan. Si tiene fecha límite, los correos y la oficina avisan a medida que se acerca. Se cierra solo cuando se marque como hecha.</span>'}
     ],
     validar: function(v){ if (!v.responsable) return ['responsable-0', 'Elijan quién sigue con la tarea.']; },
     onGuardar: function(v){
       var r = buscar('reuniones', hoy());
       var avs = (t.avances || []).concat([{fecha:ahora(), por:S.yo || '', texto:v.texto, falta:v.falta, reunion:r && r.inicio && !r.fin ? hoy() : ''}]);
-      cambiar('tareas', t.id, {avances:avs, estado:'en_curso', dia:v.dia, responsable:v.responsable, pasos:v.pasos});
-      registrar('avanzó en «' + t.titulo + '»; sigue el ' + fechaCorta(v.dia));
+      cambiar('tareas', t.id, {avances:avs, estado:'en_curso', dia:v.dia, plazo:v.plazo, avisoDias:Number(t.avisoDias) || 7, responsable:v.responsable, pasos:v.pasos});
+      registrar('avanzó en «' + t.titulo + '»; sigue el ' + fechaCorta(v.dia) + (v.plazo ? ' y vence el ' + fechaCorta(v.plazo) : ''));
       avisar('Avance guardado. La tarea sigue en curso el ' + fechaCorta(v.dia) + '.');
     }
   });
@@ -1726,11 +1770,19 @@ function recordar(r){
 function revisarRecordatorios(){
   if (!listo()) return;
   var vistos = LS.get('mm-oficina-avisados', []);
+  function nuevo(k){ if (vistos.indexOf(k) >= 0) return false; vistos.push(k); LS.set('mm-oficina-avisados', vistos.slice(-200)); return true; }
   var r = recordatoriosVencidos().filter(esParaMi).find(function(x){ return vistos.indexOf(x.id + '@' + x.fecha + x.hora) < 0; });
-  if (!r) return;
-  vistos.push(r.id + '@' + r.fecha + r.hora);
-  LS.set('mm-oficina-avisados', vistos.slice(-200));
-  recordar(r);
+  if (r) { nuevo(r.id + '@' + r.fecha + r.hora); return recordar(r); }
+  var t = plazosUrgentes().filter(esMia).find(function(x){ return vistos.indexOf(x.id + '@plazo@' + hoy()) < 0; });
+  if (t) { nuevo(t.id + '@plazo@' + hoy()); recordarPlazo(t); }
+}
+function recordarPlazo(t){
+  var a = $('#aviso');
+  a.className = 'aviso recordar';
+  a.dataset.rec = '';
+  a.innerHTML = ICON.campana + '<span><b>' + textoPlazo(t) + ':</b> ' + esc(t.titulo) + '</span><button class="btn btn-blanco btn-sm" data-accion="editar-tarea" data-id="' + esc(t.id) + '">Ver</button>';
+  a.hidden = false;
+  clearTimeout(avisoT); avisoT = setTimeout(function(){ a.hidden = true; }, 15000);
 }
 function armado(el){
   if (el.dataset.armado === '1') return true;

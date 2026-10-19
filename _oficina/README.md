@@ -28,9 +28,13 @@ Si abren este `index.html` directo desde el repositorio, funciona como copia loc
 
 Con **Registrar avance** se anota qué se hizo, qué falta, qué día se sigue y quién sigue. La tarea queda en curso para ese día, con el último avance a la vista, y la reunión siguiente la muestra en «Avanzado, sin terminar». Se cierra solo cuando se marca como hecha y se cuenta cómo se cumplió.
 
-## Recordatorios y correos
+## Fechas límite, recordatorios y correos
 
-Los recordatorios tienen día, hora opcional y para quién son. Con la oficina abierta salen en pantalla a su hora. Además, dos tareas programadas en Claude le envían un correo a Simón todos los días: a las 6:56 a.m. (foco, tareas y recordatorios del día) y a las 5:20 p.m. (lo cumplido, lo avanzado, lo abierto y el foco de mañana). Para sumar a Sebastián hay que darle su correo a Claude.
+- **Día** es cuándo se trabaja una tarea; **fecha límite** es cuándo tiene que estar lista. Con fecha límite, la tarea muestra «Vence en N días», «Vence mañana», «Vence hoy» o «Venció hace N días», y la oficina avisa en pantalla cuando faltan 1 día o menos.
+- Los **recordatorios** tienen día, hora opcional y para quién son (Simón, Sebastián o ambos). Con la oficina abierta salen en pantalla a su hora.
+- **Correos diarios** a cada socio, con lo suyo y lo de los dos: 6:56 a.m. y 5:20 p.m. (hora de Medellín). Los envía Claude desde la conversación de la oficina, con el Gmail de Simón.
+- **Cómo insisten las fechas límite:** desde el día de aviso (7 días antes por defecto; puede ser 3, 14 o 30) la tarea sale en «Plazos que se acercan» del correo de la mañana. A 3 días o menos pasa a «Urgente», arriba de los dos correos del día. El día que vence, el asunto dice «Vence hoy». Si se vence, sigue saliendo como «Venció hace N días» hasta que se marque como hecha. Los recordatorios vencidos también se repiten cada mañana hasta marcarlos.
+- **Control:** cada envío deja la hora en la oficina («Último envío»). Si pasan más de 15 horas sin correo, la oficina muestra un aviso en rojo.
 
 ## Reglas de la oficina
 
