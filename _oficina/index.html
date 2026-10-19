@@ -219,9 +219,11 @@ svg{display:block}
 .rejilla{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;align-items:start}
 .p-hoy{grid-column:span 7}
 .p-norte{grid-column:span 5}
-.p-ruta,.p-actividad,.p-parq{grid-column:span 4}
-.p-reglas{grid-column:1/-1}
-@media(max-width:1180px){.p-hoy,.p-norte{grid-column:1/-1}.p-ruta,.p-actividad{grid-column:span 6}.p-parq{grid-column:1/-1}}
+.p-rec,.p-ruta,.p-actividad{grid-column:span 4}
+.p-parq{grid-column:span 7}
+.p-reglas{grid-column:span 5}
+@media(min-width:1181px){.p-reglas .reglas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1180px){.p-hoy,.p-norte,.p-reglas{grid-column:1/-1}.p-rec,.p-ruta,.p-actividad,.p-parq{grid-column:span 6}}
 @media(max-width:720px){.rejilla > *{grid-column:1/-1!important}}
 
 /* listas de tareas */
@@ -333,6 +335,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azul-bri
 .tarea-fila{display:flex;gap:10px;align-items:flex-start}
 .tarea-pie{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .tarea-pie .enlace{font-size:13px}
+.tarea-acc{display:flex;flex-wrap:wrap;gap:4px 14px}
 @media(max-width:900px){.kanban{grid-template-columns:repeat(3,minmax(260px,82%));scroll-snap-type:x mandatory}.columna{scroll-snap-align:start}}
 
 /* ---------- semana ---------- */
@@ -488,6 +491,9 @@ dialog#modal::backdrop{background:var(--velo)}
 .aviso.alerta{background:var(--alerta)}
 .aviso.logro{background:var(--azul-profundo);padding:8px 20px 8px 10px}
 .aviso.logro img{width:58px;height:auto;margin-block:-14px -4px}
+.aviso.recordar{background:var(--azul-profundo);padding:10px 10px 10px 16px}
+.aviso > svg{width:20px;height:20px;flex:none}
+.aviso b{font-weight:600}
 .franja{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;border-radius:var(--r-m);padding:12px 16px;font-size:14px;background:var(--azul-tenue);color:var(--tinta)}
 .franja.alerta{background:var(--alerta-tenue);color:var(--alerta)}
 .cargando{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:60px 0;color:var(--tinta-suave)}
@@ -552,7 +558,7 @@ var REGLAS = [
   ['Lo cumplido se causa.','Una línea sobre cómo se cumplió, con datos.'],
   ['Lo decidido no se reabre','sin un dato nuevo.']
 ];
-var COLS = ['config','etapas','tareas','semana','reuniones','decisiones','parqueadero','objetivos','proveedores','cotizaciones','productos','prospectos','libreta'];
+var COLS = ['config','etapas','tareas','semana','reuniones','decisiones','parqueadero','objetivos','recordatorios','proveedores','cotizaciones','productos','prospectos','libreta'];
 
 function svg(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
 var ICON = {
@@ -570,7 +576,8 @@ var ICON = {
   izq: svg('<path d="m15 6-6 6 6 6"/>'),
   der: svg('<path d="m9 6 6 6-6 6"/>'),
   lapiz: svg('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
-  bandera: svg('<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>')
+  bandera: svg('<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>'),
+  campana: svg('<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>')
 };
 
 // ---------- utilidades ----------
@@ -742,6 +749,19 @@ function etapa(id){ return id ? buscar('etapas', id) : null; }
 function focoDe(f){ return buscar('semana', f); }
 function textoFoco(fo){ if (!fo) return ''; var e = etapa(fo.etapa); return fo.foco || (e ? e.titulo : ''); }
 function ordenTareas(a, b){ return (a.dia || '9999').localeCompare(b.dia || '9999') || (a.orden || 0) - (b.orden || 0); }
+function ultimoAvance(t){ var a = t.avances || []; return a.length ? a[a.length - 1] : null; }
+function textoAvance(a){ return '<p class="resultado"><b>Último avance · ' + (SOCIOS[a.por] ? SOCIOS[a.por].nombre + ', ' : '') + haceCuanto(a.fecha) + ':</b> ' + esc(a.texto) + (a.falta ? ' <b>Falta:</b> ' + esc(a.falta) : '') + '</p>'; }
+function linkAvance(t){ return t.estado === 'hecho' ? '' : '<button class="enlace" data-accion="avance" data-id="' + esc(t.id) + '">Registrar avance</button>'; }
+function horaActual(){ var n = new Date(); return pad(n.getHours()) + ':' + pad(n.getMinutes()); }
+function esParaMi(r){ return !S.yo || !r.para || r.para === 'ambos' || r.para === S.yo; }
+function recordatoriosVencidos(){
+  var f = hoy(), hm = horaActual();
+  return S.d.recordatorios.filter(function(r){ return !r.hecho && r.fecha && (r.fecha < f || (r.fecha === f && (!r.hora || r.hora <= hm))); });
+}
+function textoCuando(r){
+  var f = hoy(), d = r.fecha < f ? 'Vencido · ' + fechaCorta(r.fecha) : r.fecha === f ? 'Hoy' : r.fecha === sumarDias(f, 1) ? 'Mañana' : fechaCorta(r.fecha);
+  return d + (/^\d{2}:\d{2}$/.test(r.hora || '') ? ' · ' + horaTexto(Number(r.hora.slice(0, 2)) * 60 + Number(r.hora.slice(3, 5))) : '');
+}
 function tareasTxt(p){ return p.hechas + ' de ' + p.total + (p.total === 1 ? ' tarea' : ' tareas'); }
 function progresoEtapa(id){
   var ts = S.d.tareas.filter(function(t){ return t.etapa === id; });
@@ -805,7 +825,7 @@ function cabecera(etq, titulo, lead, derecha){
   return '<header class="sala-cab"><div><span class="etiqueta">' + etq + '</span><h1>' + titulo + '</h1>' + (lead ? '<p class="lead">' + lead + '</p>' : '') + '</div>' + (derecha || '') + '</header>';
 }
 function filaTarea(t, extra){
-  var e = etapa(t.etapa), hecha = t.estado === 'hecho', venc = !hecha && t.dia && t.dia < hoy();
+  var e = etapa(t.etapa), hecha = t.estado === 'hecho', venc = !hecha && t.dia && t.dia < hoy(), ua = !hecha && ultimoAvance(t);
   var pasos = t.pasos || [], ok = pasos.filter(function(p){ return p.ok; }).length;
   return '<li class="fila' + (hecha ? ' es-hecha' : '') + '">' + botonCheck(t) +
     '<div class="fila-txt"><button class="fila-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button>' +
@@ -813,6 +833,7 @@ function filaTarea(t, extra){
       (venc ? '<span class="chip chip-alerta">Vencida · ' + fechaCorta(t.dia) + '</span>' : '') +
       (t.estado === 'en_curso' ? '<span class="chip chip-curso">En curso</span>' : '') +
       (pasos.length ? '<span class="chip chip-neutro">' + ok + '/' + pasos.length + ' pasos</span>' : '') + (extra || '') + '</div>' +
+    (ua ? textoAvance(ua) : '') +
     (hecha && t.resultado ? '<p class="resultado"><b>Cómo se cumplió:</b> ' + esc(t.resultado) + '</p>' : '') +
     '</div>' + avatar(t.responsable, true) + '</li>';
 }
@@ -834,6 +855,7 @@ function render(){
   var sala = $('#sala'), g = capturar(sala);
   sala.innerHTML = '<div class="sala-in">' + franjas() + vistaSala() + '</div>';
   restaurar(sala, g);
+  revisarRecordatorios();
 }
 function franjas(){
   var h = '';
@@ -878,6 +900,7 @@ function renderLado(){
   nav.innerHTML = SALAS.map(function(s){
     var extra = '';
     if (s[0] === 'tablero' && abiertas) extra = '<b class="cuenta">' + abiertas + '</b>';
+    if (s[0] === 'recepcion' && listo()) { var nr = recordatoriosVencidos().filter(esParaMi).length; if (nr) extra = '<b class="cuenta" title="Recordatorios pendientes">' + nr + '</b>'; }
     if (s[0] === 'reunion' && (er === 'curso' || er === 'hora')) extra = '<i class="punto vivo-dot" title="Es hora de la reunión"></i>';
     return '<a href="#' + s[0] + '" class="sala-link' + (S.sala === s[0] ? ' on' : '') + '" data-accion="ir" data-sala="' + s[0] + '"' + (S.sala === s[0] ? ' aria-current="page"' : '') + '>' + ICON[s[0]] + '<span>' + s[1] + '</span>' + extra + '</a>';
   }).join('');
@@ -885,6 +908,7 @@ function renderLado(){
   var yo = SOCIOS[S.yo];
   $('#lado-pie').innerHTML = presentesHTML() +
     '<button class="quien" data-accion="cambiar-quien">' + (yo ? avatar(S.yo) : '<span class="avatar av-ambos">?</span>') + '<span><span class="quien-nombre">' + (yo ? esc(yo.nombre) : '¿Quién eres?') + '</span><small>' + (yo ? 'Cambiar de socio' : 'Elige tu nombre') + '</small></span></button>' +
+    '<button class="btn btn-sm btn-parquear" data-accion="nuevo-recordatorio" title="Nuevo recordatorio">' + ICON.campana.replace('<svg', '<svg style="width:18px;height:18px"') + '<span>Nuevo recordatorio</span></button>' +
     '<button class="btn btn-sm btn-parquear" data-accion="parquear" title="Parquear una idea">' + ICON.parquear.replace('<svg', '<svg style="width:18px;height:18px"') + '<span>Parquear una idea</span></button>';
 }
 function presentesHTML(){
@@ -919,7 +943,7 @@ function vistaRecepcion(){
     '</div>' +
     '<img class="mark mark-recepcion" src="img/mark-02-saludo.webp" alt="" width="280" height="239">' +
   '</section>' +
-  '<div class="rejilla">' + panelHoy() + panelNorte() + panelRuta() + panelActividad() + panelParqueadero() + panelReglas() + '</div>';
+  '<div class="rejilla">' + panelHoy() + panelNorte() + panelRecordatorios() + panelRuta() + panelActividad() + panelParqueadero() + panelReglas() + '</div>';
 }
 function panelHoy(){
   var f = hoy();
@@ -930,10 +954,27 @@ function panelHoy(){
   return '<section class="panel p-hoy"><header class="panel-cab"><div><span class="etiqueta">Lo de hoy</span><h2>' + (lista.length ? lista.length + (lista.length === 1 ? ' pendiente' : ' pendientes') : 'Al día') + '</h2></div>' +
     '<div class="panel-herr">' + (S.yo ? seg('hoy-mias', [['0','Todas'],['1','Mías']], S.hoyMias ? '1' : '0') : '') +
     '<button class="btn btn-primario btn-sm" data-accion="nueva-tarea" data-dia="' + f + '">' + ICON.mas + 'Tarea para hoy</button></div></header>' +
-    (lista.length ? '<ul class="lista-tareas">' + lista.map(filaTarea).join('') + '</ul>' : '<p class="vacio">Nada pendiente para hoy. Revisa la semana o adelanta el foco de mañana.</p>') +
+    (lista.length ? '<ul class="lista-tareas">' + lista.map(function(t){ return filaTarea(t, linkAvance(t)); }).join('') + '</ul>' : '<p class="vacio">Nada pendiente para hoy. Revisa la semana o adelanta el foco de mañana.</p>') +
     (hechas.length ? (S.verHechasHoy ? '<ul class="lista-tareas">' + hechas.map(filaTarea).join('') + '</ul>' : '') +
       '<button class="enlace mostrar-mas" data-accion="ver-hechas-hoy">' + (S.verHechasHoy ? 'Ocultar las cumplidas hoy' : 'Ver las cumplidas hoy (' + hechas.length + ')') + '</button>' : '') +
   '</section>';
+}
+function panelRecordatorios(){
+  var f = hoy(), lim = sumarDias(f, 7);
+  var lista = S.d.recordatorios.filter(function(r){ return !r.hecho && r.fecha && r.fecha <= lim; })
+    .sort(function(a, b){ return (a.fecha + (a.hora || '99')).localeCompare(b.fecha + (b.hora || '99')); });
+  var deHoy = lista.filter(function(r){ return r.fecha <= f; }).length;
+  return '<section class="panel p-rec"><header class="panel-cab"><div><span class="etiqueta">Recordatorios</span><h2>' + (deHoy ? deHoy + ' para hoy' : 'Nada para hoy') + '</h2></div>' +
+    '<button class="icono-btn" data-accion="nuevo-recordatorio" aria-label="Nuevo recordatorio">' + ICON.mas + '</button></header>' +
+    (lista.length ? '<ul class="lista-tareas">' + lista.slice(0, 6).map(filaRecordatorio).join('') + '</ul>' : '<p class="vacio">Nada en los próximos 7 días. Creen uno para no depender de la memoria.</p>') +
+    (lista.length > 6 ? '<p class="panel-ayuda">Y ' + (lista.length - 6) + ' más esta semana.</p>' : '') +
+    '<p class="panel-ayuda">' + (config().correo ? 'Les llegan al correo en el resumen de la mañana y antes de la reunión. ' : '') + 'Con la oficina abierta, salen en pantalla a su hora.</p></section>';
+}
+function filaRecordatorio(r){
+  var f = hoy(), clase = r.fecha < f ? 'chip-alerta' : r.fecha === f ? 'chip-curso' : 'chip-neutro';
+  return '<li class="fila"><button class="check" data-accion="recordatorio-hecho" data-id="' + esc(r.id) + '" title="Marcar como hecho" aria-label="Marcar como hecho: ' + esc(r.texto) + '">' + ICON.check + '</button>' +
+    '<div class="fila-txt"><button class="fila-titulo" data-accion="editar-recordatorio" data-id="' + esc(r.id) + '">' + esc(r.texto) + '</button>' +
+    '<div class="meta"><span class="chip ' + clase + '">' + textoCuando(r) + '</span>' + (r.enviado ? '<span class="chip chip-neutro">Enviado al correo</span>' : '') + '</div></div>' + avatar(r.para || 'ambos', true) + '</li>';
 }
 function panelNorte(){
   var c = config(), objs = S.d.objetivos.slice().sort(function(a, b){ return (a.orden || 0) - (b.orden || 0); });
@@ -1015,7 +1056,7 @@ function columna(estado, titulo, lista){
     (estado !== 'hecho' ? '<button class="col-mas" data-accion="nueva-tarea" data-estado="' + estado + '">' + ICON.mas + 'Agregar</button>' : '') + '</section>';
 }
 function tarjetaTarea(t){
-  var e = etapa(t.etapa), hecha = t.estado === 'hecho', venc = !hecha && t.dia && t.dia < hoy();
+  var e = etapa(t.etapa), hecha = t.estado === 'hecho', venc = !hecha && t.dia && t.dia < hoy(), ua = !hecha && ultimoAvance(t);
   var pasos = t.pasos || [], ok = pasos.filter(function(p){ return p.ok; }).length;
   var mover = t.estado === 'pendiente' ? '<button class="enlace" data-accion="mover-tarea" data-estado="en_curso" data-id="' + esc(t.id) + '">Empezar</button>'
     : t.estado === 'en_curso' ? '<button class="enlace enlace-suave" data-accion="mover-tarea" data-estado="pendiente" data-id="' + esc(t.id) + '">Volver a por hacer</button>' : '';
@@ -1024,8 +1065,9 @@ function tarjetaTarea(t){
     '<div class="meta">' + (e ? chipEtapa(e) : '') +
       (t.dia ? '<span class="chip ' + (venc ? 'chip-alerta' : 'chip-neutro') + '">' + (venc ? 'Vencida · ' : '') + fechaCorta(t.dia) + '</span>' : '') +
       (pasos.length ? '<span class="chip chip-neutro">' + ok + '/' + pasos.length + ' pasos</span>' : '') + '</div>' +
+    (ua ? textoAvance(ua) : '') +
     (hecha && t.resultado ? '<p class="resultado"><b>Cómo se cumplió:</b> ' + esc(t.resultado) + '</p>' : '') +
-    '<div class="tarea-pie">' + (mover || (hecha && t.hechaEn ? '<span class="resultado">' + (SOCIOS[t.hechaPor] ? SOCIOS[t.hechaPor].nombre + ' · ' : '') + haceCuanto(t.hechaEn) + '</span>' : '<span></span>')) + avatar(t.responsable) + '</div>' +
+    '<div class="tarea-pie">' + (hecha ? (t.hechaEn ? '<span class="resultado">' + (SOCIOS[t.hechaPor] ? SOCIOS[t.hechaPor].nombre + ' · ' : '') + haceCuanto(t.hechaEn) + '</span>' : '<span></span>') : '<span class="tarea-acc">' + mover + '<button class="enlace" data-accion="avance" data-id="' + esc(t.id) + '">Avance</button></span>') + avatar(t.responsable) + '</div>' +
   '</article>';
 }
 
@@ -1070,8 +1112,12 @@ function vistaReunion(){
   var fo = focoDe(f), tf = textoFoco(fo), man = sumarDias(f, 1), foM = focoDe(man);
   var desde = desdeUltimaReunion(f), hasta = esHoy ? null : (r.fin || new Date(desdeISO(sumarDias(f, 1)).getTime()).toISOString());
   var cumplidas = S.d.tareas.filter(function(t){ return t.estado === 'hecho' && t.hechaEn && t.hechaEn >= desde && (!hasta || t.hechaEn <= hasta); }).sort(function(a, b){ return (a.hechaEn || '').localeCompare(b.hechaEn || ''); });
-  var abiertas = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.dia && t.dia <= f; }).sort(ordenTareas);
-  var delFoco = fo && fo.etapa ? S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.etapa === fo.etapa && !(t.dia && t.dia <= f); }).sort(ordenTareas) : [];
+  // bloque 2: lo del foco; bloque 1: lo que se avanzó sin terminar y lo comprometido que sigue abierto
+  var delFoco = fo && fo.etapa ? S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.etapa === fo.etapa; }).sort(ordenTareas) : [];
+  var enFoco = {}; delFoco.forEach(function(t){ enFoco[t.id] = true; });
+  var avanzadas = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && !enFoco[t.id] && (t.avances || []).some(function(a){ return a.fecha >= desde && (!hasta || a.fecha <= hasta); }); }).sort(ordenTareas);
+  var yaVistas = {}; avanzadas.forEach(function(t){ yaVistas[t.id] = true; });
+  var abiertas = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.dia && t.dia <= f && !enFoco[t.id] && !yaVistas[t.id]; }).sort(ordenTareas);
   var decisiones = S.d.decisiones.filter(function(d){ return d.reunion === f; }).sort(function(a, b){ return (a.fecha || '').localeCompare(b.fecha || ''); });
   var compromisos = S.d.tareas.filter(function(t){ return t.origen === f; }).sort(ordenTareas);
   var ideas = ideasParqueadas();
@@ -1089,15 +1135,19 @@ function vistaReunion(){
   }
 
   var b1 = '<div class="sub"><h3>Cumplido desde la última reunión · ' + cumplidas.length + '</h3>' +
-      (cumplidas.length ? '<ul class="lista-tareas">' + cumplidas.map(filaTarea).join('') + '</ul>' : '<p class="vacio">Nada se marcó como hecho desde la última reunión.</p>') + '</div>' +
+      (cumplidas.length ? '<ul class="lista-tareas">' + cumplidas.map(function(t){ return filaTarea(t); }).join('') + '</ul>' : '<p class="vacio">Nada se marcó como hecho desde la última reunión.</p>') + '</div>' +
+    (avanzadas.length ? '<div class="sub"><h3>Avanzado, sin terminar · ' + avanzadas.length + '</h3><ul class="lista-tareas">' + avanzadas.map(function(t){
+      return filaTarea(t, linkAvance(t) + (t.dia && t.dia <= f ? '<button class="enlace enlace-suave" data-accion="pasar-dia" data-id="' + esc(t.id) + '" data-dia="' + man + '">Pasar a ' + fechaCorta(man) + '</button>' : ''));
+    }).join('') + '</ul></div>' : '') +
     '<div class="sub"><h3>Comprometido y abierto · ' + abiertas.length + '</h3>' +
       (abiertas.length ? '<ul class="lista-tareas">' + abiertas.map(function(t){
-        return filaTarea(t, '<button class="enlace" data-accion="pasar-dia" data-id="' + esc(t.id) + '" data-dia="' + man + '">Pasar a ' + fechaCorta(man) + '</button>');
-      }).join('') + '</ul><p class="panel-ayuda">Para cada una: ¿qué pasó? Si sigue viva, pásenla a mañana; si ya no aplica, bórrenla.</p>' : '<p class="vacio">No quedó nada abierto de los días anteriores.</p>') + '</div>';
+        return filaTarea(t, linkAvance(t) + '<button class="enlace enlace-suave" data-accion="pasar-dia" data-id="' + esc(t.id) + '" data-dia="' + man + '">Pasar a ' + fechaCorta(man) + '</button>');
+      }).join('') + '</ul><p class="panel-ayuda">Para cada una: ¿qué pasó? Si se avanzó, registren el avance; si ya no aplica, bórrenla.</p>' : '<p class="vacio">No quedó nada abierto de los días anteriores.</p>') + '</div>';
 
   var b2 = (tf ? '<div class="foco-hoy">' + (fo.etapa && etapa(fo.etapa) ? '<span class="chip chip-etapa">Etapa ' + etapa(fo.etapa).n + '</span>' : '') + '<b>' + esc(tf) + '</b>' + (fo.nota ? '<p>' + esc(fo.nota) + '</p>' : '') + '</div>'
       : '<p class="franja alerta">Este día no tiene foco. <button class="enlace" data-accion="editar-foco" data-fecha="' + f + '">Definirlo ahora</button></p>') +
-    (delFoco.length ? '<div class="sub"><h3>Más tareas de esta etapa</h3><ul class="lista-tareas">' + delFoco.map(filaTarea).join('') + '</ul></div>' : '') +
+    (delFoco.length ? '<div class="sub"><h3>Tareas del foco · ' + delFoco.length + '</h3><ul class="lista-tareas">' + delFoco.map(function(t){ return filaTarea(t, linkAvance(t)); }).join('') + '</ul>' +
+      '<p class="panel-ayuda">Si al final del bloque una tarea no quedó terminada, registren el avance: qué se hizo, qué falta y cuándo se sigue.</p></div>' : '') +
     '<div class="sub"><label class="sr" for="reunion-notas">Notas del foco</label><textarea class="notas-reunion" id="reunion-notas" data-vivo data-guardar="reunion-notas" data-id="' + f + '" placeholder="Notas del foco: datos, cifras, lo que se habló. Lo que no sea del foco, al parqueadero.">' + esc(r.notas || '') + '</textarea></div>';
 
   var b3 = (decisiones.length ? '<ul class="decisiones">' + decisiones.map(function(d){
@@ -1105,7 +1155,7 @@ function vistaReunion(){
     }).join('') + '</ul>' : '<p class="vacio">Aún no hay decisiones en esta reunión.</p>') +
     '<form class="form-linea" data-form="decision" data-fecha="' + f + '"><label class="sr" for="decision-nueva">Nueva decisión</label><input id="decision-nueva" name="texto" placeholder="Ej.: El proveedor de estanterías se elige el jueves con 3 cotizaciones." autocomplete="off" maxlength="400"><button class="btn btn-primario btn-sm" type="submit">Decidir</button></form>';
 
-  var b4 = (compromisos.length ? '<ul class="lista-tareas">' + compromisos.map(filaTarea).join('') + '</ul>' : '<p class="vacio">Aún no hay compromisos para mañana.</p>') +
+  var b4 = (compromisos.length ? '<ul class="lista-tareas">' + compromisos.map(function(t){ return filaTarea(t); }).join('') + '</ul>' : '<p class="vacio">Aún no hay compromisos para mañana.</p>') +
     '<form class="form-compromiso" data-form="compromiso" data-fecha="' + f + '">' +
       '<label class="sr" for="comp-titulo">Compromiso</label><input class="campo-input" id="comp-titulo" name="titulo" placeholder="¿Qué se hace?" autocomplete="off" maxlength="200">' +
       '<label class="sr" for="comp-resp">Responsable</label><select class="campo-input" id="comp-resp" name="responsable">' + opciones([['','¿Quién?']].concat(RESPONSABLES.slice(0, 3)), '') + '</select>' +
@@ -1371,6 +1421,7 @@ function infoTarea(t){
   var l = [];
   if (t.creada) l.push('Creada ' + haceCuanto(t.creada) + (SOCIOS[t.creadaPor] ? ' por <b>' + SOCIOS[t.creadaPor].nombre + '</b>' : ''));
   if (t.origen) l.push('Compromiso de la reunión del ' + fechaLarga(t.origen));
+  (t.avances || []).forEach(function(a){ l.push('Avance ' + haceCuanto(a.fecha) + (SOCIOS[a.por] ? ' · <b>' + SOCIOS[a.por].nombre + '</b>' : '') + ': ' + esc(a.texto) + (a.falta ? ' Falta: ' + esc(a.falta) : '')); });
   if (t.estado === 'hecho' && t.hechaEn) l.push('Cumplida ' + haceCuanto(t.hechaEn) + (SOCIOS[t.hechaPor] ? ' por <b>' + SOCIOS[t.hechaPor].nombre + '</b>' : ''));
   return l.map(function(x){ return '<span>' + x + '</span>'; }).join('') || '<span>Sin historial.</span>';
 }
@@ -1385,6 +1436,52 @@ function modalCompletar(t){
       registrar('cumplió «' + t.titulo + '»');
       celebrar('Hecho y causado.');
     }
+  });
+}
+function modalAvance(t){
+  var man = sumarDias(hoy(), 1);
+  abrirForm({
+    etiqueta:'Registrar avance', titulo:t.titulo, textoGuardar:'Guardar avance',
+    campos:[
+      {id:'texto', label:'¿Qué se avanzó?', tipo:'textarea', requerido:true, placeholder:'Ej.: Le pedimos la lista 2026 a Novaventa, Postobón y Bavaria. Unilever la manda el jueves.', ayuda:'Con datos: qué se hizo, con quién y qué salió.'},
+      {id:'falta', label:'¿Qué falta?', tipo:'textarea', placeholder:'Ej.: Pedírsela a los otros 6 y hacerle seguimiento a Unilever.'},
+      {id:'pasos', label:'Pasos (marquen los que quedaron hechos)', tipo:'pasos', valor:t.pasos || []},
+      {id:'dia', label:'¿Qué día se sigue?', tipo:'date', ancho:'medio', valor:t.dia && t.dia > hoy() ? t.dia : man, requerido:true},
+      {id:'responsable', label:'¿Quién sigue?', tipo:'segment', valor:t.responsable || '', opciones:RESPONSABLES.slice(0, 3)},
+      {tipo:'info', html:'<span>La tarea queda <b>en curso</b>, con este avance a la vista y programada para el día que elijan. Se cierra solo cuando se marque como hecha.</span>'}
+    ],
+    validar: function(v){ if (!v.responsable) return ['responsable-0', 'Elijan quién sigue con la tarea.']; },
+    onGuardar: function(v){
+      var r = buscar('reuniones', hoy());
+      var avs = (t.avances || []).concat([{fecha:ahora(), por:S.yo || '', texto:v.texto, falta:v.falta, reunion:r && r.inicio && !r.fin ? hoy() : ''}]);
+      cambiar('tareas', t.id, {avances:avs, estado:'en_curso', dia:v.dia, responsable:v.responsable, pasos:v.pasos});
+      registrar('avanzó en «' + t.titulo + '»; sigue el ' + fechaCorta(v.dia));
+      avisar('Avance guardado. La tarea sigue en curso el ' + fechaCorta(v.dia) + '.');
+    }
+  });
+}
+function modalRecordatorio(r){
+  var nueva = !r; r = r || {};
+  abrirForm({
+    etiqueta: nueva ? 'Nuevo recordatorio' : 'Recordatorio', titulo: nueva ? '¿Qué hay que recordar?' : r.texto,
+    campos:[
+      {id:'texto', label:'Recordatorio', valor:r.texto || '', requerido:true, max:200, placeholder:'Ej.: Llamar a Unilever por la lista 2026'},
+      {id:'para', label:'Para', tipo:'segment', valor:r.para || S.yo || 'ambos', opciones:[['simon','Simón'],['sebastian','Sebastián'],['ambos','Ambos']]},
+      {id:'fecha', label:'Día', tipo:'date', ancho:'medio', valor:r.fecha || hoy(), requerido:true},
+      {id:'hora', label:'Hora (opcional)', tipo:'time', ancho:'medio', valor:r.hora || ''},
+      {tipo:'info', html:'<span>Con la oficina abierta, el aviso sale en pantalla a esa hora.' + (config().correo ? ' Y llega al correo de quien corresponda en el resumen de la mañana y en el de antes de la reunión.' : '') + '</span>'}
+    ],
+    onGuardar: function(v){
+      if (nueva) {
+        crear('recordatorios', {texto:v.texto, para:v.para || 'ambos', fecha:v.fecha, hora:v.hora, hecho:false, hechoEn:'', creado:ahora(), creadoPor:S.yo || '', enviado:''});
+        registrar('creó un recordatorio para ' + (v.para === 'ambos' || !v.para ? 'los dos' : SOCIOS[v.para].nombre) + ', ' + fechaCorta(v.fecha) + ': «' + v.texto + '»');
+      } else {
+        var patch = {texto:v.texto, para:v.para || 'ambos', fecha:v.fecha, hora:v.hora};
+        if (v.fecha !== r.fecha || v.hora !== r.hora) patch.enviado = '';
+        cambiar('recordatorios', r.id, patch);
+      }
+    },
+    onBorrar: nueva ? null : function(){ borrar('recordatorios', r.id); }
   });
 }
 function modalFoco(f){
@@ -1586,7 +1683,7 @@ function modalQuien(){
     etiqueta:'Esta oficina', titulo:'¿Quién eres?', textoGuardar:'Listo', sinFoco:true,
     campos:[{id:'quien', label:'Socio', tipo:'segment', valor:S.yo || '', opciones:[['simon','Simón Ramírez'],['sebastian','Sebastián Ortiz']]},
       {tipo:'info', html:'<span>Se recuerda solo en este navegador. Sirve para saludarte, filtrar lo tuyo y firmar lo que haces en la oficina.</span>'}],
-    validar: function(v){ if (!v.quien) return ['quien', 'Elige un nombre.']; },
+    validar: function(v){ if (!v.quien) return ['quien-0', 'Elige un nombre.']; },
     onGuardar: function(v){ ponerYo(v.quien); }
   });
 }
@@ -1604,6 +1701,7 @@ function ponerYo(q){ S.yo = SOCIOS[q] ? q : null; LS.set('mm-oficina-yo', S.yo);
 var avisoT = null;
 function avisar(texto, tipo){
   var a = $('#aviso');
+  a.dataset.rec = '';
   a.className = 'aviso' + (tipo ? ' ' + tipo : '');
   a.textContent = texto;
   a.hidden = false;
@@ -1611,10 +1709,28 @@ function avisar(texto, tipo){
 }
 function celebrar(texto){
   var a = $('#aviso');
+  a.dataset.rec = '';
   a.className = 'aviso logro';
   a.innerHTML = '<img src="img/mark-10-pulgar-arriba.webp" alt="" width="360" height="326"><span>' + esc(texto) + '</span>';
   a.hidden = false;
   clearTimeout(avisoT); avisoT = setTimeout(function(){ a.hidden = true; }, 3600);
+}
+function recordar(r){
+  var a = $('#aviso');
+  a.className = 'aviso recordar';
+  a.dataset.rec = r.id;
+  a.innerHTML = ICON.campana + '<span><b>Recordatorio' + (r.para && r.para !== 'ambos' && SOCIOS[r.para] ? ' para ' + SOCIOS[r.para].nombre : '') + ':</b> ' + esc(r.texto) + '</span><button class="btn btn-blanco btn-sm" data-accion="recordatorio-hecho" data-id="' + esc(r.id) + '">Hecho</button>';
+  a.hidden = false;
+  clearTimeout(avisoT); avisoT = setTimeout(function(){ a.hidden = true; }, 15000);
+}
+function revisarRecordatorios(){
+  if (!listo()) return;
+  var vistos = LS.get('mm-oficina-avisados', []);
+  var r = recordatoriosVencidos().filter(esParaMi).find(function(x){ return vistos.indexOf(x.id + '@' + x.fecha + x.hora) < 0; });
+  if (!r) return;
+  vistos.push(r.id + '@' + r.fecha + r.hora);
+  LS.set('mm-oficina-avisados', vistos.slice(-200));
+  recordar(r);
 }
 function armado(el){
   if (el.dataset.armado === '1') return true;
@@ -1657,6 +1773,15 @@ var ACC = {
   'completar': function(el){ var t = tarea(el.dataset.id); if (t) modalCompletar(t); },
   'reabrir': function(el){ moverTarea(el.dataset.id, 'pendiente'); },
   'mover-tarea': function(el){ moverTarea(el.dataset.id, el.dataset.estado); },
+  'avance': function(el){ var t = tarea(el.dataset.id); if (t) modalAvance(t); },
+  'nuevo-recordatorio': function(){ modalRecordatorio(null); },
+  'editar-recordatorio': function(el){ var r = buscar('recordatorios', el.dataset.id); if (r) modalRecordatorio(r); },
+  'recordatorio-hecho': function(el){
+    var r = buscar('recordatorios', el.dataset.id); if (!r) return;
+    cambiar('recordatorios', r.id, {hecho:true, hechoEn:ahora()});
+    var a = $('#aviso'); if (a.dataset.rec === r.id) a.hidden = true;
+    avisar('Recordatorio hecho.');
+  },
   'pasar-dia': function(el){ var t = tarea(el.dataset.id); if (!t) return; cambiar('tareas', t.id, {dia:el.dataset.dia}); registrar('pasó «' + t.titulo + '» al ' + fechaCorta(el.dataset.dia)); },
   'editar-foco': function(el){ modalFoco(el.dataset.fecha); },
   'ver-etapa': function(el){ S.filtro.etapa = el.dataset.id; LS.set('mm-oficina-filtro', S.filtro); irA('tablero'); },
@@ -1804,6 +1929,8 @@ setInterval(function(){
   document.querySelectorAll('[data-reloj]').forEach(function(el){ el.innerHTML = textoReloj(); });
   var k = claveReloj();
   if (k !== S.tickClave) { S.tickClave = k; pedirRender(); }
+  revisarRecordatorios();
+  renderLado();
 }, 20000);
 
 iniciar();
