@@ -16,13 +16,21 @@ Si abren este `index.html` directo desde el repositorio, funciona como copia loc
 
 | Sala | Para qué |
 | --- | --- |
-| Recepción | Al llegar: saludo, foco del día, cuenta regresiva a la reunión, lo pendiente de hoy, el norte y las metas, la ruta, lo último que pasó y el parqueadero. |
-| Tablero | La ruta a la primera venta (5 etapas) y todas las tareas en Por hacer · En curso · Hecho. Cada tarea con responsable, día, pasos y, al cumplirla, cómo se cumplió. |
+| Recepción | Al llegar: saludo, foco del día, cuenta regresiva a la reunión, lo pendiente de hoy, el norte y las metas, los recordatorios, la ruta, lo último que pasó y el parqueadero. |
+| Tablero | La ruta a la primera venta (5 etapas) y todas las tareas en Por hacer · En curso · Hecho. Cada tarea con responsable, día, pasos, sus avances y, al cumplirla, cómo se cumplió. |
 | Semana | Un foco por día y las tareas de cada día. Las tareas sin día quedan abajo para programarlas. |
 | Reunión de las 6 | La reunión diaria en cuatro bloques: lo cumplido (10 min), foco de hoy (30), decisiones (10) y compromisos para mañana (10). Guarda notas, decisiones y actas. |
 | Proveedores y precios | Lista de precios 2026 e IVA por proveedor, cotizaciones de estanterías comparadas contra el proveedor actual y la lista de precios con el margen de cada producto. |
 | Comercial | Unidades y empresas de administración por etapa: por contactar → contactado → reunión → presentación → consejo → firmado. Cada contacto queda registrado con su próximo paso. |
 | Libreta | Notas compartidas que se guardan solas: modelo de negocio, objeciones, guion de llamada, preguntas para financieros y proveedores. |
+
+## Lo que se empieza y no se termina
+
+Con **Registrar avance** se anota qué se hizo, qué falta, qué día se sigue y quién sigue. La tarea queda en curso para ese día, con el último avance a la vista, y la reunión siguiente la muestra en «Avanzado, sin terminar». Se cierra solo cuando se marca como hecha y se cuenta cómo se cumplió.
+
+## Recordatorios y correos
+
+Los recordatorios tienen día, hora opcional y para quién son. Con la oficina abierta salen en pantalla a su hora. Además, dos tareas programadas en Claude le envían un correo a Simón todos los días: a las 6:56 a.m. (foco, tareas y recordatorios del día) y a las 5:20 p.m. (lo cumplido, lo avanzado, lo abierto y el foco de mañana). Para sumar a Sebastián hay que darle su correo a Claude.
 
 ## Reglas de la oficina
 
