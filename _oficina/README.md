@@ -22,10 +22,10 @@ Si abren este `index.html` directo desde el repositorio, funciona como copia loc
 | Tablero | Todas las tareas en Por hacer · En curso · Hecho, con las áreas arriba para filtrar. Cada tarea con área, responsable, día, pasos, sus avances y, al cumplirla, cómo se cumplió. |
 | Semana | Un foco por día y las tareas de cada día. Las tareas sin día quedan abajo para programarlas. |
 | Reunión de las 6 | La reunión diaria en cuatro bloques: lo cumplido, lo avanzado y lo atrasado (10 min), el foco y las tareas de hoy (30), decisiones (10) y compromisos para mañana (10). Guarda notas, decisiones y actas. |
-| Finanzas y proveedores | Las tareas abiertas del área Financiero y legal, la lista de precios 2026 e IVA por proveedor, las cotizaciones de estanterías y la lista de precios con el margen de cada producto. |
+| Finanzas y proveedores | Las tareas abiertas del área Financiero y legal; la ficha de cada proveedor (cómo se pide, entrega, cuánto dura el producto, pedido mínimo, si cambian lo que se vence, lista 2026 e IVA) con sus pedidos; las cotizaciones de estanterías y la lista de precios con el margen de cada producto. |
 | Comercial | Las tareas abiertas del área Comercial y las unidades y empresas de administración por etapa: por contactar → contactado → reunión → presentación → consejo → firmado. Cada contacto queda registrado con su próximo paso. |
 | Libreta | Notas compartidas que se guardan solas: modelo de negocio, objeciones, guion de llamada, preguntas para financieros y proveedores. |
-| Caja fuerte | NIT, accesos, contraseñas, bancos y contactos de clientes y proveedores, cifrados con una clave que solo tienen los dos socios. |
+| Caja fuerte | NIT, bancos, códigos y accesos de proveedores, contraseñas y contactos, cifrados con una clave que solo tienen los dos socios. |
 | Historial | La papelera (lo borrado se guarda 30 días y se puede restaurar), los cambios del día que se pueden deshacer y todos los movimientos. |
 
 ## Áreas
@@ -37,7 +37,13 @@ Cada tarea va en un área: **Comercial**, **Financiero y legal**, **Operación**
 - Todo lo que se guarda se cifra en el navegador (AES-GCM de 256 bits, con la llave sacada de la clave con PBKDF2-SHA-256 y 310.000 vueltas). En la base de datos solo queda texto cifrado: sin la clave nadie lo lee, tampoco Claude.
 - La clave la eligen los dos al crear la caja (mínimo 10 caracteres) y se puede cambiar desde la misma sala. **Si se olvida, lo guardado no se recupera.**
 - Se cierra sola al salir de la sala o tras 10 minutos sin uso. Lo de la caja no sale en el buscador ni en el historial de cambios.
+- Solo la pueden leer el dueño y quienes tienen permiso de Editor (regla de la base de datos sobre `caja`); con el enlace público no se ve ni el texto cifrado.
+- Si Claude carga datos, quedan en `caja/semilla` y entran cifrados la próxima vez que un socio abre la caja; ahí mismo se borra la semilla.
 - Las claves no se escriben en ninguna otra parte de la oficina ni se le mandan a Claude por chat.
+
+## Pedidos a proveedores
+
+En cada ficha, «Registrar pedido» anota qué se pidió, cuándo llega y cuánto costó. El pedido queda «en camino» (en rojo si ya debía haber llegado) hasta que se marca «Ya llegó»; ahí la oficina recuerda anotar la fecha de vencimiento. Los pedidos quedan en la ficha y salen en el buscador.
 
 ## Lo que se empieza y no se termina
 

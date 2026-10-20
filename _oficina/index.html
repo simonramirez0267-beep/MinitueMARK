@@ -419,6 +419,15 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azul-bri
 .prov p{font-size:14px;color:var(--tinta-suave);overflow-wrap:anywhere}
 .prov .seg{align-self:flex-start}
 .prov-pie{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.prov-pie div{display:flex;gap:14px;flex-wrap:wrap}
+.prov-datos{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:0;font-size:14px}
+.prov-datos dt{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-suave);padding-top:2px;white-space:nowrap}
+.prov-datos dd{margin:0;color:var(--tinta);overflow-wrap:anywhere}
+.prov-chips{display:flex;flex-wrap:wrap;gap:6px}
+.prov-chips .chip svg{width:13px;height:13px;margin-right:4px;vertical-align:-2px}
+.pedido{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;background:var(--azul-tenue);border-radius:var(--r-s);padding:10px 12px;font-size:14px;color:var(--tinta)}
+.pedido.atrasado{background:var(--alerta-tenue)}
+.pedido-ultimo{font-size:13px;color:var(--tinta-suave)}
 .tabla-caja{overflow-x:auto;border:1px solid var(--linea);border-radius:var(--r-m);background:var(--superficie)}
 table{border-collapse:collapse;width:100%;min-width:760px;font-size:14px}
 th{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave);text-align:left;padding:12px 14px;white-space:nowrap}
@@ -828,7 +837,11 @@ function conectarVivo(db){
     pedirRender();
   }, caida);
   db.doc('acceso/visita').set({en:ahora()}).catch(function(e){ if (e && e.code === 'invalid_argument') marcarSoloLectura(); });
-  window.claude.use('user').then(function(u){ return u ? u.can('data.write') : null; }).then(function(r){ if (r === false) marcarSoloLectura(); }).catch(function(){});
+  window.claude.use('user').then(function(u){
+    if (!u) return;
+    u.can('data.write').then(function(r){ if (r === false) marcarSoloLectura(); }).catch(function(){});
+    u.canEdit().then(function(r){ S.editor = r; pedirRender(); }).catch(function(){});
+  }).catch(function(){});
   // la actividad se guarda 60 días; lo más viejo se borra para no llenar la base
   var limite = new Date(Date.now() - 60 * 864e5).toISOString();
   db.collection('actividad').where('fecha', '<', limite).limit(100).get().then(function(snap){
@@ -1486,11 +1499,31 @@ function vistaListaProveedores(){
       var lista = p.lista || 'por_pedir';
       return '<article class="prov"><header class="prov-cab"><div><h3>' + esc(p.nombre) + '</h3><span>' + esc(p.tipo || '') + '</span></div>' + (p.iva === 'aclarado' ? '<span class="chip chip-etapa">IVA aclarado</span>' : '<span class="chip chip-neutro">IVA sin aclarar</span>') + '</header>' +
         '<p>' + (p.contacto || p.telefono ? esc([p.contacto, p.telefono].filter(Boolean).join(' · ')) : 'Sin contacto todavía') + '</p>' +
+        datosProveedor(p) + pedidoProveedor(p) +
         '<div><span class="filtro-label" style="display:block;margin-bottom:6px">Lista 2026</span>' + seg('prov-lista:' + p.id, LISTA, lista, 'estado-seg') + '</div>' +
         (p.ivaNota ? '<p><b style="color:var(--tinta);font-weight:500">IVA:</b> ' + esc(p.ivaNota) + '</p>' : '') +
         (p.notas ? '<p>' + esc(p.notas) + '</p>' : '') +
-        '<div class="prov-pie"><span class="resultado">' + (p.actualizado ? 'Actualizado ' + haceCuanto(p.actualizado) : '') + '</span><button class="enlace" data-accion="editar-proveedor" data-id="' + esc(p.id) + '">Abrir ficha</button></div></article>';
+        '<div class="prov-pie"><span class="resultado">' + (p.actualizado ? 'Actualizado ' + haceCuanto(p.actualizado) : '') + '</span><div><button class="enlace" data-accion="nuevo-pedido" data-id="' + esc(p.id) + '">Registrar pedido</button><button class="enlace" data-accion="editar-proveedor" data-id="' + esc(p.id) + '">Abrir ficha</button></div></div></article>';
     }).join('') + '</div>' : '<p class="vacio">Aún no hay proveedores. Agreguen el primero con su contacto.</p>');
+}
+function datosProveedor(p){
+  var filas = [['Cómo se pide', p.comoPedir], ['Entrega', p.entrega], ['Dura', p.vidaUtil], ['Mínimo', p.pedidoMinimo]].filter(function(x){ return x[1]; });
+  var chips = (p.cambios === 'si' ? '<span class="chip chip-curso">Cambian lo que se va a vencer</span>' : p.cambios === 'no' ? '<span class="chip chip-alerta">No cambian lo vencido</span>' : '') +
+    (p.enCaja === 'si' ? '<span class="chip chip-neutro">' + ICON.caja + 'Código en la Caja fuerte</span>' : '');
+  return (filas.length ? '<dl class="prov-datos">' + filas.map(function(x){ return '<dt>' + x[0] + '</dt><dd>' + esc(x[1]) + '</dd>'; }).join('') + '</dl>' : '') +
+    (chips ? '<div class="prov-chips">' + chips + '</div>' : '');
+}
+// el pedido que está en camino, o el último que llegó
+function pedidoProveedor(p){
+  var ps = p.pedidos || [], i;
+  for (i = ps.length - 1; i >= 0; i--) if (!ps[i].llego) break;
+  if (i >= 0) {
+    var x = ps[i], tarde = x.llega && x.llega < hoy();
+    return '<div class="pedido' + (tarde ? ' atrasado' : '') + '"><span><b>' + (tarde ? 'Pedido atrasado' : 'Pedido en camino') + ':</b> ' + esc(cortar(x.texto || '', 80)) +
+      (x.llega ? ' · ' + (tarde ? 'debía llegar el ' : 'llega el ') + fechaCorta(x.llega) : '') + '</span><button class="enlace" data-accion="pedido-llego" data-id="' + esc(p.id) + '" data-i="' + i + '">Ya llegó</button></div>';
+  }
+  var u = ps[ps.length - 1];
+  return u ? '<p class="pedido-ultimo">Último pedido: ' + fechaCorta(fechaISO(new Date(u.fecha))) + ' · ' + esc(cortar(u.texto || '', 60)) + '</p>' : '';
 }
 function vistaEstanterias(){
   var cs = S.d.cotizaciones.slice().sort(function(a, b){ return (a.estado === 'actual' ? -1 : 0) - (b.estado === 'actual' ? -1 : 0) || (a.valor || 9e15) - (b.valor || 9e15); });
@@ -1615,7 +1648,7 @@ function resultados(q){
   mirar('decisiones', 'Decisión', function(x){ return x.texto; }, function(x){ return [x.texto]; }, 'editar-decision');
   mirar('parqueadero', 'Idea', function(x){ return x.texto; }, function(x){ return [x.texto]; }, 'editar-idea');
   mirar('recordatorios', 'Recordatorio', function(x){ return x.texto; }, function(x){ return [x.texto]; }, 'editar-recordatorio');
-  mirar('proveedores', 'Proveedor', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.contacto, x.telefono, x.correo, x.ivaNota, x.condiciones, x.notas]; }, 'editar-proveedor');
+  mirar('proveedores', 'Proveedor', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.contacto, x.telefono, x.correo, x.comoPedir, x.entrega, x.vidaUtil, x.pedidoMinimo, x.ivaNota, x.condiciones, x.notas].concat((x.pedidos || []).map(function(o){ return o.texto; })); }, 'editar-proveedor');
   mirar('cotizaciones', 'Cotización', function(x){ return x.proveedor; }, function(x){ return [x.proveedor, x.contacto, x.incluye, x.notas]; }, 'editar-cotizacion');
   mirar('productos', 'Producto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.categoria, x.proveedor, x.notas]; }, 'editar-producto');
   mirar('prospectos', 'Prospecto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.contacto, x.telefono, x.zona, x.proximo, x.notas].concat((x.contactos || []).map(function(c){ return c.nota; })); }, 'editar-prospecto');
@@ -1664,7 +1697,7 @@ function descargar(nombre, contenido){
 // En la base solo queda el texto cifrado: sin la clave nadie lo puede leer, tampoco Claude.
 var CAJA = {clave:null, datos:null, version:'', abierta:false, error:'', ver:{}, filtro:'', ultimo:0, ocupado:false};
 var CAJA_ITER = 310000;
-var TIPOS_CAJA = [['empresa','Empresa'],['acceso','Accesos y contraseñas'],['banco','Bancos y pagos'],['contacto','Contactos: clientes y proveedores'],['otro','Otros']];
+var TIPOS_CAJA = [['empresa','Empresa'],['banco','Bancos y pagos'],['proveedor','Proveedores: códigos y accesos'],['acceso','Accesos y contraseñas'],['contacto','Contactos: clientes y proveedores'],['otro','Otros']];
 function b64(u8){ var t = ''; for (var i = 0; i < u8.length; i += 0x8000) t += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(t); }
 function deb64(t){ var b = atob(t), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
 function cajaDoc(){ return buscar('caja', 'fuerte'); }
@@ -1706,7 +1739,7 @@ function abrirCaja(frase){
   }).catch(function(){ CAJA.error = 'Esa no es la clave.'; }).then(function(){ CAJA.ocupado = false; render(); });
 }
 // cada cambio parte de la última versión guardada, para no pisar lo que el otro socio acaba de agregar
-function guardarCaja(mutar, mensaje, nuevaClave){
+function guardarCaja(mutar, mensaje, nuevaClave, luego){
   if (!CAJA.abierta || !CAJA.clave) return;
   CAJA.ocupado = true;
   var leer = B.db ? B.db.doc('caja/fuerte').get().then(function(x){ return x.exists ? x.data() : null; }) : Promise.resolve(cajaDoc());
@@ -1721,11 +1754,26 @@ function guardarCaja(mutar, mensaje, nuevaClave){
           CAJA.datos = datos; CAJA.version = c.iv; CAJA.clave = llave;
           registrar(nuevaClave ? 'cambió la clave de la caja fuerte' : 'actualizó la caja fuerte');
           avisar(mensaje);
+          if (luego) luego();
         });
       });
     });
   }).catch(function(){ avisar('No se pudo guardar en la caja fuerte. Ciérrenla, ábranla de nuevo e intenten otra vez.', 'alerta'); })
     .then(function(){ CAJA.ocupado = false; CAJA.ultimo = Date.now(); pedirRender(); });
+}
+// lo que llega en caja/semilla (por ejemplo, lo que carga Claude) entra cifrado la próxima vez que un socio abre la caja
+function importarSemilla(){
+  var nuevas = cajaSemilla();
+  if (!nuevas.length || CAJA.ocupado) return;
+  guardarCaja(function(d){
+    var ents = d.entradas || [];
+    nuevas.forEach(function(n){
+      var e = Object.assign({actualizado:ahora(), por:''}, n, {id:n.id || nuevoId()});
+      var i = ents.findIndex(function(x){ return x.id === e.id; });
+      if (i < 0) ents.push(e); else if ((e.actualizado || '') > (ents[i].actualizado || '')) ents[i] = e;
+    });
+    d.entradas = ents;
+  }, nuevas.length === 1 ? 'Entró 1 dato nuevo a la caja.' : 'Entraron ' + nuevas.length + ' datos nuevos a la caja.', null, function(){ borrar('caja', 'semilla'); });
 }
 function revisarCajaRemota(doc){
   if (CAJA.ocupado || !doc || doc.iv === CAJA.version) return;
@@ -1738,9 +1786,11 @@ function vistaCaja(){
   var der = CAJA.abierta ? '<div class="panel-herr"><button class="btn btn-primario btn-sm" data-accion="caja-nueva">' + ICON.mas + 'Agregar</button><button class="btn btn-linea btn-sm" data-accion="caja-cambiar">Cambiar la clave</button><button class="btn btn-linea btn-sm" data-accion="caja-cerrar">' + ICON.caja + 'Cerrar con llave</button></div>' : '';
   var cab = cabecera('Caja fuerte', 'Lo importante, bajo llave', 'NIT, accesos, contraseñas, cuentas y contactos clave. Se guarda cifrado con una clave que solo ustedes dos conocen: sin ella, nadie puede leerlo, tampoco Claude.', der);
   if (!(window.crypto && crypto.subtle)) return cab + '<p class="franja alerta">Este navegador no permite abrir la caja fuerte. Ábranla desde la app de Claude, Chrome o Safari.</p>';
+  if (S.editor === false) return cab + '<p class="franja alerta">La caja fuerte solo la abren los socios con permiso de Editor. Pídele a Simón que te invite con tu correo como Editor y que apague el acceso con enlace.</p>';
   if (!doc) return cab + cajaCrearHTML();
   if (!CAJA.abierta) return cab + cajaAbrirHTML(doc);
   revisarCajaRemota(doc);
+  importarSemilla();
   return cab + cajaContenidoHTML();
 }
 function cajaCrearHTML(){
@@ -1776,7 +1826,7 @@ function cajaContenidoHTML(){
   return barra + (grupos || '<p class="vacio">Nada con esa búsqueda.</p>');
 }
 function secretoHTML(e){
-  var filas = [], id = esc(e.id), etq = {acceso:'Usuario', banco:'Número', contacto:'Contacto'}[e.tipo] || 'Dato';
+  var filas = [], id = esc(e.id), etq = e.clave ? 'Usuario' : {proveedor:'Código', banco:'Número', contacto:'Contacto'}[e.tipo] || 'Dato';
   function copiar(k){ return '<button class="enlace" data-accion="caja-copiar" data-id="' + id + '" data-k="' + k + '">Copiar</button>'; }
   function fila(etiqueta, valor, extra){ filas.push('<div class="dato-s"><span>' + etiqueta + '</span><code>' + valor + '</code>' + (extra || '') + '</div>'); }
   if (e.usuario) fila(etq, esc(e.usuario), copiar('usuario'));
@@ -1793,8 +1843,8 @@ function modalCaja(e){
     etiqueta:'Caja fuerte', titulo: nueva ? 'Agregar a la caja' : e.titulo,
     campos:[
       {id:'tipo', label:'Tipo', tipo:'select', valor:e.tipo || 'acceso', opciones:TIPOS_CAJA},
-      {id:'titulo', label:'Nombre', valor:e.titulo || '', requerido:true, max:120, placeholder:'Ej.: Correo info@, Bancolombia, RUT, Asesor Postobón'},
-      {id:'usuario', label:'Usuario, número o dato', ancho:'medio', valor:e.usuario || '', max:200, crudo:true},
+      {id:'titulo', label:'Nombre', valor:e.titulo || '', requerido:true, max:120, placeholder:'Ej.: Correo info@, Bancolombia, Postobón · código de cliente'},
+      {id:'usuario', label:'Usuario, código o número', ancho:'medio', valor:e.usuario || '', max:200, crudo:true},
       {id:'clave', label:'Contraseña o clave', tipo:'password', ancho:'medio', valor:e.clave || '', max:300, crudo:true},
       {id:'telefono', label:'Teléfono', tipo:'tel', ancho:'medio', valor:e.telefono || '', max:60},
       {id:'correo', label:'Correo', tipo:'email', ancho:'medio', valor:e.correo || '', max:120},
@@ -2145,12 +2195,18 @@ function modalProveedor(p){
       {id:'contacto', label:'Asesor o contacto', ancho:'medio', valor:p.contacto || '', max:80},
       {id:'telefono', label:'Teléfono o WhatsApp', ancho:'medio', tipo:'tel', valor:p.telefono || '', max:40},
       {id:'correo', label:'Correo', ancho:'medio', tipo:'email', valor:p.correo || '', max:80},
+      {id:'comoPedir', label:'Cómo se pide', valor:p.comoPedir || '', max:200, placeholder:'Ej.: por Bees, por WhatsApp un día antes, al repartidor'},
+      {id:'entrega', label:'Entrega', ancho:'medio', valor:p.entrega || '', max:160, placeholder:'Ej.: llega en 3 días, reparto martes y viernes'},
+      {id:'vidaUtil', label:'Cuánto dura el producto', ancho:'medio', valor:p.vidaUtil || '', max:120, placeholder:'Ej.: 2 meses'},
+      {id:'pedidoMinimo', label:'Pedido mínimo', ancho:'medio', valor:p.pedidoMinimo || '', max:120, placeholder:'Ej.: 24 unidades'},
+      {id:'cambios', label:'¿Cambian lo que se va a vencer?', tipo:'segment', ancho:'medio', valor:p.cambios || '', opciones:[['','Sin saber'],['si','Sí'],['no','No']]},
+      {id:'enCaja', label:'¿Tiene código o acceso en la Caja fuerte?', tipo:'segment', valor:p.enCaja || '', opciones:[['','No'],['si','Sí']]},
       {id:'lista', label:'Lista de precios 2026', tipo:'segment', valor:p.lista || 'por_pedir', opciones:LISTA},
       {id:'iva', label:'IVA', tipo:'segment', valor:p.iva || 'sin_aclarar', opciones:[['sin_aclarar','Sin aclarar'],['aclarado','Aclarado']]},
       {id:'ivaNota', label:'Qué dijeron del IVA', tipo:'textarea', valor:p.ivaNota || '', placeholder:'¿Precios con o sin IVA? ¿Qué tarifa por producto? ¿Impuesto saludable incluido?'},
-      {id:'condiciones', label:'Condiciones', tipo:'textarea', valor:p.condiciones || '', placeholder:'Pedido mínimo, plazo de pago, frecuencia de entrega, cambios por vencimiento.'},
+      {id:'condiciones', label:'Condiciones', tipo:'textarea', valor:p.condiciones || '', placeholder:'Plazo de pago, crédito, si prestan neveras.'},
       {id:'notas', label:'Notas', tipo:'textarea', valor:p.notas || ''}
-    ],
+    ].concat((p.pedidos || []).length ? [{id:'pedidos', label:'Pedidos', tipo:'registros', claves:[['texto','Qué se pidió']], valor:p.pedidos}] : []),
     onGuardar: function(v){
       var doc = Object.assign({}, v, {actualizado:ahora()});
       if (v.lista !== (p.lista || 'por_pedir')) doc.listaFecha = ahora();
@@ -2162,6 +2218,22 @@ function modalProveedor(p){
       }
     },
     onBorrar: nueva ? null : function(){ aPapelera('proveedores', p.id); }
+  });
+}
+function modalPedido(p){
+  abrirForm({
+    etiqueta:'Nuevo pedido', titulo:p.nombre, textoGuardar:'Registrar pedido',
+    campos:[
+      {id:'texto', label:'¿Qué se pidió?', tipo:'textarea', valor:'', requerido:true, placeholder:'Ej.: 2 pacas de Club Colombia, 24 galletas'},
+      {id:'llega', label:'¿Cuándo llega?', tipo:'date', ancho:'medio', valor:''},
+      {id:'valor', label:'Valor del pedido', tipo:'pesos', ancho:'medio', valor:''},
+      {tipo:'info', html:'<span>Queda en la ficha de ' + esc(p.nombre) + ' como «en camino» hasta que marquen que llegó.' + (p.vidaUtil ? ' Al recibirlo, anoten la fecha de vencimiento: este producto dura ' + esc(p.vidaUtil) + '.' : '') + '</span>'}
+    ],
+    onGuardar: function(v){
+      var x = {fecha:ahora(), por:S.yo || '', texto:v.texto, llega:v.llega, valor:v.valor, llego:''};
+      cambiar('proveedores', p.id, {pedidos:(p.pedidos || []).concat([x]), actualizado:ahora()});
+      registrar('le hizo un pedido a ' + p.nombre);
+    }
   });
 }
 function modalCotizacion(c){
@@ -2479,6 +2551,14 @@ var ACC = {
   'obj-sumar': function(el){ var o = buscar('objetivos', el.dataset.id); if (o) cambiar('objetivos', o.id, {actual:Math.max(0, (Number(o.actual) || 0) + Number(el.dataset.n))}); },
   'nuevo-proveedor': function(){ modalProveedor(null); },
   'editar-proveedor': function(el){ var p = buscar('proveedores', el.dataset.id); if (p) modalProveedor(p); },
+  'nuevo-pedido': function(el){ var p = buscar('proveedores', el.dataset.id); if (p) modalPedido(p); },
+  'pedido-llego': function(el){
+    var p = buscar('proveedores', el.dataset.id), i = Number(el.dataset.i); if (!p || !(p.pedidos || [])[i]) return;
+    var ps = p.pedidos.map(function(x, j){ return j === i ? Object.assign({}, x, {llego:ahora()}) : x; });
+    cambiar('proveedores', p.id, {pedidos:ps, actualizado:ahora()});
+    registrar('recibió el pedido de ' + p.nombre);
+    if (p.vidaUtil) avisar('Anoten la fecha de vencimiento: lo de ' + p.nombre + ' dura ' + p.vidaUtil + '.');
+  },
   'nueva-cotizacion': function(){ modalCotizacion(null); },
   'editar-cotizacion': function(el){ var c = buscar('cotizaciones', el.dataset.id); if (c) modalCotizacion(c); },
   'nuevo-producto': function(){ modalProducto(null); },
