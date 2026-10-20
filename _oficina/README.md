@@ -8,7 +8,9 @@ La oficina compartida está en claude.ai:
 
 https://claude.ai/artifact/7JRogiZ5KaNFzfb7QSRP59
 
-Ahí todo lo que se anota queda guardado en una base de datos compartida y se actualiza en vivo para los dos socios. Para que Sebastián entre, Simón la comparte desde el menú **Compartir** de la página (Sebastián tiene que estar en la misma organización de Claude).
+Ahí todo lo que se anota queda guardado en una base de datos compartida y se actualiza en vivo para los dos socios.
+
+**Para que los dos puedan editar:** con el acceso «Cualquiera con el enlace», quien no es de la organización de Simón en Claude solo puede mirar. Simón entra a **Compartir**, invita a Sebastián con su correo como **Editor** y apaga el acceso con enlace. Sebastián la abre con su cuenta de claude.ai de ese correo, desde la app de Claude o desde Chrome o Safari (no desde el navegador de WhatsApp). Si una vista no puede guardar, la oficina lo dice con un aviso rojo arriba.
 
 Si abren este `index.html` directo desde el repositorio, funciona como copia local: guarda solo en ese navegador y no ve lo de la oficina compartida.
 
@@ -16,14 +18,26 @@ Si abren este `index.html` directo desde el repositorio, funciona como copia loc
 
 | Sala | Para qué |
 | --- | --- |
-| Inicio | Al llegar: saludo, foco del día, cuenta regresiva a la reunión, lo pendiente de hoy, el norte y las metas, los recordatorios, la ruta, lo último que pasó y el parqueadero. |
-| Tablero | La ruta a la primera venta (5 etapas) y todas las tareas en Por hacer · En curso · Hecho. Cada tarea con responsable, día, pasos, sus avances y, al cumplirla, cómo se cumplió. |
+| Inicio | Al llegar: saludo, foco del día, cuenta regresiva a la reunión, lo pendiente de hoy, el norte y las metas, los recordatorios, las tareas por área, lo último que pasó y el parqueadero. |
+| Tablero | Todas las tareas en Por hacer · En curso · Hecho, con las áreas arriba para filtrar. Cada tarea con área, responsable, día, pasos, sus avances y, al cumplirla, cómo se cumplió. |
 | Semana | Un foco por día y las tareas de cada día. Las tareas sin día quedan abajo para programarlas. |
-| Reunión de las 6 | La reunión diaria en cuatro bloques: lo cumplido (10 min), foco de hoy (30), decisiones (10) y compromisos para mañana (10). Guarda notas, decisiones y actas. |
-| Proveedores y precios | Lista de precios 2026 e IVA por proveedor, cotizaciones de estanterías comparadas contra el proveedor actual y la lista de precios con el margen de cada producto. |
-| Comercial | Unidades y empresas de administración por etapa: por contactar → contactado → reunión → presentación → consejo → firmado. Cada contacto queda registrado con su próximo paso. |
+| Reunión de las 6 | La reunión diaria en cuatro bloques: lo cumplido, lo avanzado y lo atrasado (10 min), el foco y las tareas de hoy (30), decisiones (10) y compromisos para mañana (10). Guarda notas, decisiones y actas. |
+| Finanzas y proveedores | Las tareas abiertas del área Financiero y legal, la lista de precios 2026 e IVA por proveedor, las cotizaciones de estanterías y la lista de precios con el margen de cada producto. |
+| Comercial | Las tareas abiertas del área Comercial y las unidades y empresas de administración por etapa: por contactar → contactado → reunión → presentación → consejo → firmado. Cada contacto queda registrado con su próximo paso. |
 | Libreta | Notas compartidas que se guardan solas: modelo de negocio, objeciones, guion de llamada, preguntas para financieros y proveedores. |
+| Caja fuerte | NIT, accesos, contraseñas, bancos y contactos de clientes y proveedores, cifrados con una clave que solo tienen los dos socios. |
 | Historial | La papelera (lo borrado se guarda 30 días y se puede restaurar), los cambios del día que se pueden deshacer y todos los movimientos. |
+
+## Áreas
+
+Cada tarea va en un área: **Comercial**, **Financiero y legal**, **Operación** o **Publicidad y redes**. Las áreas se crean, se renombran y se ordenan desde el Tablero. Las tareas comerciales también salen en la sala Comercial y las financieras en Finanzas y proveedores, así no hay que buscarlas en dos partes.
+
+## Caja fuerte
+
+- Todo lo que se guarda se cifra en el navegador (AES-GCM de 256 bits, con la llave sacada de la clave con PBKDF2-SHA-256 y 310.000 vueltas). En la base de datos solo queda texto cifrado: sin la clave nadie lo lee, tampoco Claude.
+- La clave la eligen los dos al crear la caja (mínimo 10 caracteres) y se puede cambiar desde la misma sala. **Si se olvida, lo guardado no se recupera.**
+- Se cierra sola al salir de la sala o tras 10 minutos sin uso. Lo de la caja no sale en el buscador ni en el historial de cambios.
+- Las claves no se escriben en ninguna otra parte de la oficina ni se le mandan a Claude por chat.
 
 ## Lo que se empieza y no se termina
 
@@ -41,8 +55,8 @@ Con **Registrar avance** se anota qué se hizo, qué falta, qué día se sigue y
 ## Nada se pierde y todo se edita
 
 - **Deshacer:** después de cada cambio sale un aviso con el botón «Deshacer». También está en la barra lateral y con Ctrl + Z (Cmd + Z en Mac). Los cambios del día se pueden deshacer uno a uno, del más reciente al más viejo.
-- **Papelera:** lo que se borra (tareas, notas, decisiones, ideas, recordatorios, proveedores, cotizaciones, productos, prospectos, metas, etapas, focos) queda 30 días en Historial › Papelera para restaurarlo.
-- **Todo se edita:** tareas, avances, decisiones, ideas del parqueadero (también las descartadas), recordatorios (también los hechos), el historial de contactos de cada prospecto y el orden de las etapas de la ruta.
+- **Papelera:** lo que se borra (tareas, notas, decisiones, ideas, recordatorios, proveedores, cotizaciones, productos, prospectos, metas, áreas, focos) queda 30 días en Historial › Papelera para restaurarlo.
+- **Todo se edita:** tareas, avances, decisiones, ideas del parqueadero (también las descartadas), recordatorios (también los hechos), el historial de contactos de cada prospecto y las áreas con su orden.
 - **Buscar:** el botón Buscar (o Ctrl + K) encuentra cualquier cosa de la oficina y la abre.
 - **Volver:** arriba de cada sala hay un botón para volver a la sala anterior; «Inicio» siempre lleva a la entrada.
 - **Copia de seguridad:** en Historial se descarga una copia completa (.json) o las tareas en Excel (.csv). La información vive en la oficina de claude.ai, no en la conversación con Claude.

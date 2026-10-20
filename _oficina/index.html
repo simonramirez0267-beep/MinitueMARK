@@ -552,6 +552,35 @@ mark{background:var(--azul-tenue);color:var(--azul-profundo);border-radius:4px;p
 .registro-cab .enlace{font-size:12px}
 .campo .reg-texto{width:100%;min-height:0;padding:8px 10px;border:1px solid var(--linea);border-radius:10px;background:var(--superficie);font-size:14px;resize:vertical}
 
+/* ---------- áreas ---------- */
+.areas{display:flex;flex-direction:column;gap:14px}
+.areas li{display:flex;flex-direction:column;gap:6px}
+.area-btn{display:flex;justify-content:space-between;gap:10px;align-items:baseline;background:none;border:0;padding:0;cursor:pointer;text-align:left;width:100%}
+.area-btn b{font-weight:600;font-size:15px}
+.area-btn span{font-size:13px;color:var(--tinta-suave);white-space:nowrap}
+.area-btn:hover b{color:var(--azul-profundo);text-decoration:underline;text-underline-offset:3px}
+.rh-mas{border-style:dashed;justify-content:center;align-items:center;color:var(--tinta-suave);cursor:pointer;font-weight:500;background:transparent;font-size:14px}
+.rh-mas:hover{border-color:var(--azul-brillante);color:var(--azul-profundo)}
+
+[data-panel^="area-"] .chip-etapa{display:none}
+
+/* ---------- caja fuerte ---------- */
+.caja-llave{max-width:580px}
+.caja-form{display:flex;flex-direction:column;gap:12px}
+.caja-aviso{font-size:13px;color:var(--alerta);background:var(--alerta-tenue);border-radius:var(--r-s);padding:10px 12px}
+.caja-barra{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.caja-barra input{flex:1;min-width:200px;max-width:420px}
+.caja-grupo{display:flex;flex-direction:column;gap:10px}
+.caja-grupo > h2{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave)}
+.secretos{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.secreto{background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-m);padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.secreto h3{font-size:16px;overflow-wrap:anywhere}
+.dato-s{display:flex;align-items:baseline;gap:10px;font-size:14px;min-width:0}
+.dato-s > span:first-child{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta-suave);width:72px;flex:none}
+.dato-s code{font-family:inherit;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;flex:1;min-width:0}
+.dato-s .enlace{font-size:12px;flex:none}
+.secreto-pie{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--tinta-suave)}
+
 /* ---------- modo pantalla de la reunión ---------- */
 .modo-pantalla .lado{display:none}
 .modo-pantalla .app{grid-template-columns:minmax(0,1fr)}
@@ -592,9 +621,10 @@ var SALAS = [
   ['tablero','Tablero'],
   ['semana','Semana'],
   ['reunion','Reunión de las 6'],
-  ['proveedores','Proveedores y precios'],
+  ['proveedores','Finanzas y proveedores'],
   ['comercial','Comercial'],
   ['libreta','Libreta'],
+  ['caja','Caja fuerte'],
   ['historial','Historial']
 ];
 var SALA_IDS = SALAS.map(function(s){ return s[0]; });
@@ -621,8 +651,8 @@ var REGLAS = [
   ['Lo cumplido se causa.','Una línea sobre cómo se cumplió, con datos.'],
   ['Lo decidido no se reabre','sin un dato nuevo.']
 ];
-var COLS = ['config','etapas','tareas','semana','reuniones','decisiones','parqueadero','objetivos','recordatorios','proveedores','cotizaciones','productos','prospectos','libreta','papelera'];
-var TIPOS = {tareas:'Tarea', decisiones:'Decisión', parqueadero:'Idea', recordatorios:'Recordatorio', proveedores:'Proveedor', cotizaciones:'Cotización', productos:'Producto', prospectos:'Prospecto', libreta:'Nota', objetivos:'Meta', etapas:'Etapa', semana:'Foco del día', reuniones:'Reunión'};
+var COLS = ['config','etapas','tareas','semana','reuniones','decisiones','parqueadero','objetivos','recordatorios','proveedores','cotizaciones','productos','prospectos','libreta','papelera','caja'];
+var TIPOS = {tareas:'Tarea', decisiones:'Decisión', parqueadero:'Idea', recordatorios:'Recordatorio', proveedores:'Proveedor', cotizaciones:'Cotización', productos:'Producto', prospectos:'Prospecto', libreta:'Nota', objetivos:'Meta', etapas:'Área', semana:'Foco del día', reuniones:'Reunión'};
 
 function svg(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
 var ICON = {
@@ -641,6 +671,7 @@ var ICON = {
   der: svg('<path d="m9 6 6 6-6 6"/>'),
   lapiz: svg('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>'),
   bandera: svg('<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>'),
+  caja: svg('<rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.3" fill="currentColor"/>'),
   historial: svg('<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/>'),
   deshacer: svg('<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>'),
   buscar: svg('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>'),
@@ -796,6 +827,8 @@ function conectarVivo(db){
     S.actividad = snap.docs.map(function(doc){ return Object.assign({id:doc.id}, doc.data()); });
     pedirRender();
   }, caida);
+  db.doc('acceso/visita').set({en:ahora()}).catch(function(e){ if (e && e.code === 'invalid_argument') marcarSoloLectura(); });
+  window.claude.use('user').then(function(u){ return u ? u.can('data.write') : null; }).then(function(r){ if (r === false) marcarSoloLectura(); }).catch(function(){});
   // la actividad se guarda 60 días; lo más viejo se borra para no llenar la base
   var limite = new Date(Date.now() - 60 * 864e5).toISOString();
   db.collection('actividad').where('fecha', '<', limite).limit(100).get().then(function(snap){
@@ -820,11 +853,11 @@ function refrescarLocal(){
 }
 
 function escribir(op, c, id, data){
-  if (U.grupo && !U.deshaciendo && c !== 'actividad') anotarPrevio(c, id);
+  if (U.grupo && !U.deshaciendo && c !== 'actividad' && c !== 'caja' && c !== 'acceso') anotarPrevio(c, id);
   if (B.db) {
     var ref = B.db.collection(c).doc(id);
     var p = op === 'set' ? ref.set(data) : op === 'update' ? ref.update(data) : ref.delete();
-    return p.then(function(){ return true; }, function(e){ avisar(mensajeError(e), 'alerta'); return false; });
+    return p.then(function(){ return true; }, function(e){ if (e && e.code === 'invalid_argument') marcarSoloLectura(); avisar(mensajeError(e), 'alerta'); return false; });
   }
   if (S.modo !== 'local') { avisar('La oficina aún se está abriendo. Intenta de nuevo en un momento.', 'alerta'); return Promise.resolve(false); }
   var col = B.local[c] || (B.local[c] = {});
@@ -840,11 +873,14 @@ function cambiar(c, id, patch){ return escribir('update', c, id, patch); }
 function borrar(c, id){ return escribir('delete', c, id); }
 function buscar(c, id){ return S.d[c].find(function(x){ return x.id === id; }); }
 function guardarDoc(c, id, patch){ return buscar(c, id) ? cambiar(c, id, patch) : escribir('set', c, id, patch); }
+// quien abre la oficina sin cuenta o con permiso de solo ver, puede leer pero no guardar
+function marcarSoloLectura(){ if (!S.soloLectura) { S.soloLectura = true; pedirRender(); } }
 function mensajeError(e){
   var c = e && e.code;
   if (c === 'quota_exceeded') return 'La oficina llegó a su límite de registros. Borren cosas que ya no sirvan para seguir creando.';
   if (c === 'resource_exhausted') return 'Muchos cambios seguidos. Espera unos segundos y vuelve a intentar.';
   if (c === 'revoked' || c === 'not_granted') return 'Esta vista ya no puede guardar en la oficina. Recarga la página.';
+  if (c === 'invalid_argument') return 'No se guardó: esta vista no tiene permiso para editar. Mira el aviso rojo de arriba.';
   return 'No se pudo guardar. Revisa la conexión y vuelve a intentar.';
 }
 function registrar(texto){ crear('actividad', {texto:texto, por:S.yo || '', fecha:ahora()}); }
@@ -942,8 +978,7 @@ function valorObjetivo(o){
 var AUTO_TXT = {
   firmados:'Se cuenta solo: prospectos en «Firmado» (sala Comercial).',
   contactados:'Se cuenta solo: prospectos que ya pasaron de «Por contactar» (sala Comercial).',
-  listas:'Se cuenta solo: distribuidores con la lista 2026 «Recibida» (sala Proveedores).',
-  ruta:'Se cuenta solo: etapas de la ruta marcadas como cumplidas (Tablero).'
+  listas:'Se cuenta solo: distribuidores con la lista 2026 «Recibida» (sala Finanzas y proveedores).'
 };
 
 // ---------- piezas comunes ----------
@@ -954,7 +989,8 @@ function avatar(r, mini){
   return s ? '<span class="avatar av-' + r + '" title="' + esc(s.completo) + '">' + s.ini + '</span>' : '';
 }
 function avatarPor(por){ return SOCIOS[por] ? avatar(por) : '<span class="avatar av-marca" title="MinuteMark"><img src="img/mm-isotipo.png" alt=""></span>'; }
-function chipEtapa(e){ return '<span class="chip chip-etapa">' + e.n + ' · ' + esc(e.titulo) + '</span>'; }
+function chipEtapa(e){ return '<span class="chip chip-etapa">' + esc(e.titulo) + '</span>'; }
+function opcionesAreas(vacio){ return [['', vacio]].concat(etapas().map(function(e){ return [e.id, e.titulo]; })); }
 function botonCheck(t){
   var h = t.estado === 'hecho';
   return '<button class="check' + (h ? ' on' : '') + '" data-accion="' + (h ? 'reabrir' : 'completar') + '" data-id="' + esc(t.id) + '" title="' + (h ? 'Reabrir' : 'Marcar como hecha') + '" aria-label="' + (h ? 'Reabrir' : 'Marcar como hecha') + ': ' + esc(t.titulo) + '">' + ICON.check + '</button>';
@@ -982,7 +1018,7 @@ function filaTarea(t, extra){
 }
 function filaIdea(i){
   return '<li class="idea"><p><button class="fila-titulo" style="font-weight:400" data-accion="editar-idea" data-id="' + esc(i.id) + '">' + esc(i.texto) + '</button></p><div class="idea-pie"><span>' + (SOCIOS[i.por] ? SOCIOS[i.por].nombre + ' · ' : '') + haceCuanto(i.creada) + '</span>' +
-    '<span class="idea-acc"><button class="enlace" data-accion="idea-a-ruta" data-id="' + esc(i.id) + '">Llevar a la ruta</button><button class="enlace enlace-suave" data-accion="idea-descartar" data-id="' + esc(i.id) + '">Descartar</button></span></div></li>';
+    '<span class="idea-acc"><button class="enlace" data-accion="idea-a-ruta" data-id="' + esc(i.id) + '">Volverla tarea</button><button class="enlace enlace-suave" data-accion="idea-descartar" data-id="' + esc(i.id) + '">Descartar</button></span></div></li>';
 }
 function ideasDescartadas(){
   var ds = S.d.parqueadero.filter(function(i){ return i.estado === 'descartada'; });
@@ -1018,6 +1054,7 @@ function franjas(){
   var h = '';
   if (listo() && correoAtrasado()) h += '<p class="franja alerta" role="alert">Los correos de la oficina no salen desde ' + (config().ultimoCorreo ? haceCuanto(config().ultimoCorreo) : 'hace rato') + ' · Si no les llegó el último, avísenle a Claude en la conversación de la oficina.</p>';
   if (S.error) h += '<p class="franja alerta" role="alert">' + esc(S.error) + '</p>';
+  if (S.soloLectura) h += '<div class="franja alerta" role="alert"><span><b>Esta vista no puede guardar cambios.</b> Pasa cuando la oficina se abre por el enlace público o sin sesión: se puede mirar, pero no editar. Para arreglarlo, Simón entra a Compartir, invita a Sebastián con su correo como Editor y apaga el acceso con enlace. Después Sebastián la abre con su cuenta de claude.ai de ese correo, desde la app de Claude o desde Chrome o Safari (no desde el navegador de WhatsApp).</span></div>';
   if (S.modo === 'local') h += '<p class="franja">Copia local: lo que anotes aquí queda solo en este navegador.' + (OFICINA_URL ? ' <a class="enlace" href="' + esc(OFICINA_URL) + '" target="_blank" rel="noopener">Abrir la oficina compartida</a>' : '') + '</p>';
   return h;
 }
@@ -1031,6 +1068,7 @@ function vistaSala(){
     case 'comercial': return vistaComercial();
     case 'libreta': return vistaLibreta();
     case 'historial': return vistaHistorial();
+    case 'caja': return vistaCaja();
     default: return vistaRecepcion();
   }
 }
@@ -1212,13 +1250,13 @@ function filaObjetivo(o){
   '</li>';
 }
 function panelRuta(){
-  var es = etapas(), cumplidas = es.filter(function(e){ return e.cumplida; }).length;
-  return '<section class="panel p-ruta" data-panel="ruta"><header class="panel-cab"><div><span class="etiqueta">Ruta a la primera venta</span><h2>' + cumplidas + ' de ' + es.length + ' etapas</h2></div></header>' +
-    (es.length ? '<ol class="ruta-v">' + es.map(function(e){
-      var p = progresoEtapa(e.id), st = estadoEtapa(e, p);
-      return '<li class="rv ' + st + '"><span class="paso-num">' + (e.cumplida ? ICON.check : e.n) + '</span><div><button class="rv-titulo" data-accion="ver-etapa" data-id="' + esc(e.id) + '">' + esc(e.titulo) + '</button><span class="rv-meta">' + (p.total ? tareasTxt(p) : 'Sin tareas') + (st === 'en-curso' ? ' · en curso' : st === 'cumplida' ? ' · cumplida' : '') + '</span></div></li>';
-    }).join('') + '<li class="rv rv-final"><span class="paso-num">' + ICON.bandera + '</span><div><b>Primera venta</b><span class="rv-meta">El contrato firmado con la primera unidad.</span></div></li></ol>'
-    : '<p class="vacio">La ruta aún no tiene etapas. Créenlas en el Tablero.</p>') + '</section>';
+  var es = etapas(), abiertas = S.d.tareas.filter(function(t){ return t.estado !== 'hecho'; }).length;
+  return '<section class="panel p-ruta" data-panel="ruta"><header class="panel-cab"><div><span class="etiqueta">Por área</span><h2>' + abiertas + (abiertas === 1 ? ' tarea abierta' : ' tareas abiertas') + '</h2></div></header>' +
+    (es.length ? '<ul class="areas">' + es.map(function(e){
+      var p = progresoEtapa(e.id), ab = p.total - p.hechas;
+      return '<li><button class="area-btn" data-accion="ver-etapa" data-id="' + esc(e.id) + '"><b>' + esc(e.titulo) + '</b><span>' + (ab ? ab + (ab === 1 ? ' abierta' : ' abiertas') : 'Al día') + (p.hechas ? ' · ' + p.hechas + (p.hechas === 1 ? ' hecha' : ' hechas') : '') + '</span></button>' +
+        '<div class="barra"><i style="width:' + (p.total ? Math.round(p.hechas / p.total * 100) : 0) + '%"></i></div></li>';
+    }).join('') + '</ul>' : '<p class="vacio">Aún no hay áreas. Créenlas en el Tablero.</p>') + '</section>';
 }
 function panelActividad(){
   var a = S.actividad.slice(0, 10);
@@ -1247,13 +1285,13 @@ function vistaTablero(){
   function col(e){ return ts.filter(function(t){ return (t.estado || 'pendiente') === e; }); }
   var hechas = col('hecho').sort(function(a, b){ return (b.hechaEn || '').localeCompare(a.hechaEn || ''); });
   var sinResp = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && !t.responsable; }).length;
-  return cabecera('Tablero', 'La ruta y las tareas', 'Una etapa lleva a la siguiente. Cada tarea con responsable y día; cuando se cumple, cómo se cumplió.',
+  return cabecera('Tablero', 'Todas las tareas', 'Organizadas por área. Cada una con responsable y día; cuando se cumple, cómo se cumplió.',
       '<button class="btn btn-primario" data-accion="nueva-tarea">' + ICON.mas + 'Nueva tarea</button>') +
-    '<ol class="ruta-h" style="--n:' + Math.max(es.length, 1) + '" aria-label="Ruta a la primera venta">' + es.map(pasoRuta).join('') +
-      '<li class="rh rh-final"><span class="paso-num">' + ICON.bandera + '</span><b>Primera venta</b><button class="enlace" style="color:var(--sobre-azul-acento)" data-accion="nueva-etapa">Agregar etapa</button></li></ol>' +
+    '<ol class="ruta-h" style="--n:' + Math.max(es.length, 1) + '" aria-label="Áreas">' + es.map(pasoRuta).join('') +
+      '<li class="rh rh-mas" data-accion="nueva-etapa" role="button" tabindex="0">' + ICON.mas.replace('<svg', '<svg style="width:18px;height:18px"') + 'Área</li></ol>' +
     (sinResp ? '<p class="aviso-linea"><span class="chip chip-alerta">' + sinResp + ' sin responsable</span>Asígnenlas en la próxima reunión: si no tiene dueño, no es un compromiso.</p>' : '') +
     '<div class="filtros"><div class="filtro"><span class="filtro-label">Responsable</span>' + seg('filtro-resp', [['todos','Todos'],['simon','Simón'],['sebastian','Sebastián'],['ambos','Ambos'],['sin','Sin responsable']], F.resp) + '</div>' +
-    '<div class="filtro"><label class="filtro-label" for="filtro-etapa">Etapa</label><select id="filtro-etapa" data-cambio="filtro-etapa" data-vivo>' + opciones([['todas','Todas']].concat(es.map(function(e){ return [e.id, e.n + ' · ' + e.titulo]; }), [['sin','Sin etapa']]), F.etapa) + '</select></div></div>' +
+    '<div class="filtro"><label class="filtro-label" for="filtro-etapa">Área</label><select id="filtro-etapa" data-cambio="filtro-etapa" data-vivo>' + opciones([['todas','Todas']].concat(es.map(function(e){ return [e.id, e.titulo]; }), [['sin','Sin área']]), F.etapa) + '</select></div></div>' +
     '<div class="kanban" id="kanban" data-scroll>' +
       columna('pendiente', 'Por hacer', col('pendiente').sort(ordenTareas)) +
       columna('en_curso', 'En curso', col('en_curso').sort(ordenTareas)) +
@@ -1261,11 +1299,11 @@ function vistaTablero(){
     '</div>';
 }
 function pasoRuta(e){
-  var p = progresoEtapa(e.id), st = estadoEtapa(e, p), sel = S.filtro.etapa === e.id;
-  return '<li class="rh ' + st + (sel ? ' sel' : '') + '"><button class="rh-btn" data-accion="filtrar-etapa" data-id="' + esc(e.id) + '" aria-pressed="' + sel + '" title="Ver solo las tareas de esta etapa">' +
-    '<span class="paso-num">' + (e.cumplida ? ICON.check : e.n) + '</span><span class="rh-txt"><b>' + esc(e.titulo) + '</b><small>' + (e.cumplida ? 'Cumplida' : p.total ? tareasTxt(p) : 'Sin tareas') + '</small></span></button>' +
-    '<div class="barra"><i style="width:' + (e.cumplida ? 100 : p.total ? Math.round(p.hechas / p.total * 100) : 0) + '%"></i></div>' +
-    '<button class="enlace" data-accion="editar-etapa" data-id="' + esc(e.id) + '">Ver la etapa</button></li>';
+  var p = progresoEtapa(e.id), sel = S.filtro.etapa === e.id, ab = p.total - p.hechas;
+  return '<li class="rh' + (sel ? ' sel' : '') + '"><button class="rh-btn" data-accion="filtrar-etapa" data-id="' + esc(e.id) + '" aria-pressed="' + sel + '" title="Ver solo las tareas de esta área">' +
+    '<span class="rh-txt"><b>' + esc(e.titulo) + '</b><small>' + (p.total ? (ab ? ab + (ab === 1 ? ' abierta' : ' abiertas') : 'Al día') + ' · ' + p.hechas + (p.hechas === 1 ? ' hecha' : ' hechas') : 'Sin tareas') + '</small></span></button>' +
+    '<div class="barra"><i style="width:' + (p.total ? Math.round(p.hechas / p.total * 100) : 0) + '%"></i></div>' +
+    '<button class="enlace" data-accion="editar-etapa" data-id="' + esc(e.id) + '">Editar el área</button></li>';
 }
 function columna(estado, titulo, lista){
   var max = estado === 'hecho' && !S.verHechas ? 12 : Infinity;
@@ -1313,7 +1351,7 @@ function diaHTML(f){
   var r = buscar('reuniones', f);
   return '<section class="dia' + (esHoy ? ' es-hoy' : '') + (f < hoy() ? ' es-pasado' : '') + '" aria-label="' + fechaLarga(f) + '">' +
     '<header class="dia-cab"><span class="dia-nombre">' + DIAS[d.getDay()] + '</span><span class="dia-num">' + d.getDate() + '</span>' + (esHoy ? '<span class="chip chip-hoy">Hoy</span>' : '') + '</header>' +
-    '<button class="foco' + (tf ? '' : ' foco-vacio') + '" data-accion="editar-foco" data-fecha="' + f + '"><span class="foco-et">Foco' + (e ? ' · etapa ' + e.n : '') + '</span><b>' + (tf ? esc(tf) : 'Sin definir') + '</b></button>' +
+    '<button class="foco' + (tf ? '' : ' foco-vacio') + '" data-accion="editar-foco" data-fecha="' + f + '"><span class="foco-et">Foco' + (e && e.titulo !== tf ? ' · ' + esc(e.titulo) : '') + '</span><b>' + (tf ? esc(tf) : 'Sin definir') + '</b></button>' +
     '<ul class="dia-tareas">' + ts.map(function(t){ return '<li class="mini' + (t.estado === 'hecho' ? ' es-hecha' : '') + '">' + botonCheck(t) + '<button class="mini-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button>' + avatar(t.responsable, true) + '</li>'; }).join('') + '</ul>' +
     '<footer class="dia-pie"><button class="enlace" data-accion="nueva-tarea" data-dia="' + f + '">' + ICON.mas + 'Tarea</button>' + (r && r.fin ? '<button class="enlace enlace-suave" data-accion="ver-reunion" data-fecha="' + f + '">Acta</button>' : '') + '</footer></section>';
 }
@@ -1332,12 +1370,12 @@ function vistaReunion(){
   var fo = focoDe(f), tf = textoFoco(fo), man = sumarDias(f, 1), foM = focoDe(man);
   var desde = desdeUltimaReunion(f), hasta = esHoy ? null : (r.fin || new Date(desdeISO(sumarDias(f, 1)).getTime()).toISOString());
   var cumplidas = S.d.tareas.filter(function(t){ return t.estado === 'hecho' && t.hechaEn && t.hechaEn >= desde && (!hasta || t.hechaEn <= hasta); }).sort(function(a, b){ return (a.hechaEn || '').localeCompare(b.hechaEn || ''); });
-  // bloque 2: lo del foco; bloque 1: lo que se avanzó sin terminar y lo comprometido que sigue abierto
-  var delFoco = fo && fo.etapa ? S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.etapa === fo.etapa; }).sort(ordenTareas) : [];
+  // bloque 2: las tareas de este día; bloque 1: lo que se avanzó sin terminar y lo atrasado
+  var delFoco = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.dia === f; }).sort(ordenTareas);
   var enFoco = {}; delFoco.forEach(function(t){ enFoco[t.id] = true; });
   var avanzadas = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && !enFoco[t.id] && (t.avances || []).some(function(a){ return a.fecha >= desde && (!hasta || a.fecha <= hasta); }); }).sort(ordenTareas);
   var yaVistas = {}; avanzadas.forEach(function(t){ yaVistas[t.id] = true; });
-  var abiertas = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.dia && t.dia <= f && !enFoco[t.id] && !yaVistas[t.id]; }).sort(ordenTareas);
+  var abiertas = S.d.tareas.filter(function(t){ return t.estado !== 'hecho' && t.dia && t.dia < f && !enFoco[t.id] && !yaVistas[t.id]; }).sort(ordenTareas);
   var decisiones = S.d.decisiones.filter(function(d){ return d.reunion === f; }).sort(function(a, b){ return (a.fecha || '').localeCompare(b.fecha || ''); });
   var compromisos = S.d.tareas.filter(function(t){ return t.origen === f; }).sort(ordenTareas);
   var ideas = ideasParqueadas();
@@ -1361,14 +1399,14 @@ function vistaReunion(){
     (avanzadas.length ? '<div class="sub"><h3>Avanzado, sin terminar · ' + avanzadas.length + '</h3><ul class="lista-tareas">' + avanzadas.map(function(t){
       return filaTarea(t, linkAvance(t) + (t.dia && t.dia <= f ? '<button class="enlace enlace-suave" data-accion="pasar-dia" data-id="' + esc(t.id) + '" data-dia="' + man + '">Pasar a ' + fechaCorta(man) + '</button>' : ''));
     }).join('') + '</ul></div>' : '') +
-    '<div class="sub"><h3>Comprometido y abierto · ' + abiertas.length + '</h3>' +
+    '<div class="sub"><h3>Atrasado y abierto · ' + abiertas.length + '</h3>' +
       (abiertas.length ? '<ul class="lista-tareas">' + abiertas.map(function(t){
         return filaTarea(t, linkAvance(t) + '<button class="enlace enlace-suave" data-accion="pasar-dia" data-id="' + esc(t.id) + '" data-dia="' + man + '">Pasar a ' + fechaCorta(man) + '</button>');
       }).join('') + '</ul><p class="panel-ayuda">Para cada una: ¿qué pasó? Si se avanzó, registren el avance; si ya no aplica, bórrenla.</p>' : '<p class="vacio">No quedó nada abierto de los días anteriores.</p>') + '</div>';
 
-  var b2 = (tf ? '<div class="foco-hoy">' + (fo.etapa && etapa(fo.etapa) ? '<span class="chip chip-etapa">Etapa ' + etapa(fo.etapa).n + '</span>' : '') + '<b>' + esc(tf) + '</b>' + (fo.nota ? '<p>' + esc(fo.nota) + '</p>' : '') + '</div>'
+  var b2 = (tf ? '<div class="foco-hoy">' + (fo.etapa && etapa(fo.etapa) && etapa(fo.etapa).titulo !== tf ? chipEtapa(etapa(fo.etapa)) : '') + '<b>' + esc(tf) + '</b>' + (fo.nota ? '<p>' + esc(fo.nota) + '</p>' : '') + '</div>'
       : '<p class="franja alerta">Este día no tiene foco. <button class="enlace" data-accion="editar-foco" data-fecha="' + f + '">Definirlo ahora</button></p>') +
-    (delFoco.length ? '<div class="sub"><h3>Tareas del foco · ' + delFoco.length + '</h3><ul class="lista-tareas">' + delFoco.map(function(t){ return filaTarea(t, linkAvance(t)); }).join('') + '</ul>' +
+    (delFoco.length ? '<div class="sub"><h3>Tareas ' + (esHoy ? 'de hoy' : 'de ese día') + ' · ' + delFoco.length + '</h3><ul class="lista-tareas">' + delFoco.map(function(t){ return filaTarea(t, linkAvance(t)); }).join('') + '</ul>' +
       '<p class="panel-ayuda">Si al final del bloque una tarea no quedó terminada, registren el avance: qué se hizo, qué falta y cuándo se sigue.</p></div>' : '') +
     '<div class="sub"><label class="sr" for="reunion-notas">Notas del foco</label><textarea class="notas-reunion" id="reunion-notas" data-vivo data-guardar="reunion-notas" data-id="' + f + '" placeholder="Notas del foco: datos, cifras, lo que se habló. Lo que no sea del foco, al parqueadero.">' + esc(r.notas || '') + '</textarea></div>';
 
@@ -1384,7 +1422,7 @@ function vistaReunion(){
       '<label class="sr" for="comp-dia-' + f + '">Día</label><input class="campo-input" id="comp-dia-' + f + '" name="dia" type="date" value="' + man + '">' +
       '<button class="btn btn-primario btn-sm" type="submit">Comprometer</button></form>' +
     '<div class="sub"><h3>Foco de mañana · ' + fechaCorta(man) + '</h3>' +
-      (textoFoco(foM) ? '<div class="foco-hoy">' + (foM.etapa && etapa(foM.etapa) ? '<span class="chip chip-etapa">Etapa ' + etapa(foM.etapa).n + '</span>' : '') + '<b>' + esc(textoFoco(foM)) + '</b><button class="enlace" data-accion="editar-foco" data-fecha="' + man + '">Cambiar</button></div>'
+      (textoFoco(foM) ? '<div class="foco-hoy">' + (foM.etapa && etapa(foM.etapa) && etapa(foM.etapa).titulo !== textoFoco(foM) ? chipEtapa(etapa(foM.etapa)) : '') + '<b>' + esc(textoFoco(foM)) + '</b><button class="enlace" data-accion="editar-foco" data-fecha="' + man + '">Cambiar</button></div>'
         : '<p class="franja alerta">Falta el foco de mañana. <button class="enlace" data-accion="editar-foco" data-fecha="' + man + '">Definirlo</button></p>') + '</div>';
 
   var actas = fechas.length ? '<ul class="actas">' + fechas.slice(0, 12).map(function(x){
@@ -1410,7 +1448,18 @@ function vistaReunion(){
     '</aside></div>';
 }
 
-// ---------- sala: proveedores y precios ----------
+// tareas abiertas de un área, dentro de la sala que le corresponde
+function panelTareasArea(areaId, etq, vacio){
+  var a = etapa(areaId); if (!a) return '';
+  var ts = S.d.tareas.filter(function(t){ return t.etapa === areaId && t.estado !== 'hecho'; }).sort(ordenTareas);
+  var hechas = S.d.tareas.filter(function(t){ return t.etapa === areaId && t.estado === 'hecho'; }).length;
+  return '<section class="panel" data-panel="area-' + esc(areaId) + '"><header class="panel-cab"><div><span class="etiqueta">' + etq + '</span><h2>' + (ts.length ? ts.length + (ts.length === 1 ? ' tarea abierta' : ' tareas abiertas') : 'Al día') + '</h2></div>' +
+    '<div class="panel-herr"><button class="btn btn-linea btn-sm" data-accion="nueva-tarea" data-etapa="' + esc(areaId) + '">' + ICON.mas + 'Tarea</button></div></header>' +
+    (ts.length ? '<ul class="lista-tareas">' + ts.slice(0, 5).map(function(t){ return filaTarea(t, (t.dia && t.dia >= hoy() ? '<span class="chip chip-neutro">' + fechaCorta(t.dia) + '</span>' : '') + linkAvance(t)); }).join('') + '</ul>' : '<p class="vacio">' + vacio + '</p>') +
+    (ts.length > 5 || hechas ? '<button class="enlace mostrar-mas" data-accion="ver-etapa" data-id="' + esc(areaId) + '">' + (ts.length > 5 ? 'Ver las ' + ts.length + ' abiertas' + (hechas ? ' y las ' + hechas + (hechas === 1 ? ' hecha' : ' hechas') : '') : 'Ver también las ' + hechas + (hechas === 1 ? ' hecha' : ' hechas')) + ' en el Tablero</button>' : '') + '</section>';
+}
+
+// ---------- sala: finanzas y proveedores ----------
 function vistaProveedores(){
   var tab = ['proveedores','estanterias','precios'].indexOf(S.provTab) >= 0 ? S.provTab : 'proveedores';
   var t = {
@@ -1418,7 +1467,8 @@ function vistaProveedores(){
     estanterias:['Estanterías', 'Cotizaciones para comparar contra el proveedor actual. Gana la más barata que cumpla las medidas.', '<button class="btn btn-primario" data-accion="nueva-cotizacion">' + ICON.mas + 'Cotización</button>'],
     precios:['Lista de precios', 'Costo, IVA y precio de venta de cada producto. El margen se calcula solo.', '<button class="btn btn-primario" data-accion="nuevo-producto">' + ICON.mas + 'Producto</button>']
   }[tab];
-  return cabecera('Proveedores y precios', t[0], t[1], t[2]) +
+  return cabecera('Finanzas y proveedores', t[0], t[1], t[2]) +
+    panelTareasArea('a-financiero', 'Tareas financieras', 'No hay tareas financieras abiertas.') +
     seg('prov-tab', [['proveedores','Proveedores'],['estanterias','Estanterías'],['precios','Lista de precios']], tab, 'pestanas') +
     (tab === 'estanterias' ? vistaEstanterias() : tab === 'precios' ? vistaPrecios() : vistaListaProveedores());
 }
@@ -1498,6 +1548,7 @@ function vistaComercial(){
   S.d.prospectos.forEach(function(p){ (p.contactos || []).forEach(function(c){ if ((c.fecha || '').slice(0, 10) >= lunes) contactosSemana++; }); });
   return cabecera('Comercial', 'Unidades y administraciones', 'Cada contacto queda registrado con su próximo paso y fecha. Sin próximo paso, el prospecto se enfría.',
       '<button class="btn btn-primario" data-accion="nuevo-prospecto">' + ICON.mas + 'Prospecto</button>') +
+    panelTareasArea('a-comercial', 'Tareas comerciales', 'No hay tareas comerciales abiertas.') +
     '<div class="resumen"><div class="dato"><b>' + contactosSemana + '</b><span>Contactos esta semana</span></div>' +
       '<div class="dato"><b>' + S.d.prospectos.filter(function(p){ return p.etapa === 'reunion' || p.etapa === 'presentacion' || p.etapa === 'consejo'; }).length + '</b><span>En reunión, presentación o consejo</span></div>' +
       '<div class="dato"><b>' + S.d.prospectos.filter(function(p){ return p.etapa === 'firmado'; }).length + '</b><span>Firmados</span></div>' +
@@ -1591,10 +1642,10 @@ function respaldo(){
 }
 function csvTareas(){
   var resp = {simon:'Simón', sebastian:'Sebastián', ambos:'Ambos'};
-  var filas = [['Tarea','Estado','Responsable','Etapa','Día','Fecha límite','Último avance','Qué falta','Cómo se cumplió','Cumplida el']];
+  var filas = [['Tarea','Estado','Responsable','Área','Día','Fecha límite','Último avance','Qué falta','Cómo se cumplió','Cumplida el']];
   S.d.tareas.slice().sort(ordenTareas).forEach(function(t){
     var ua = ultimoAvance(t) || {}, e = etapa(t.etapa), est = ESTADOS.find(function(x){ return x[0] === t.estado; });
-    filas.push([t.titulo, est ? est[1] : '', resp[t.responsable] || 'Sin responsable', e ? e.n + '. ' + e.titulo : '', t.dia || '', t.plazo || '', ua.texto || '', ua.falta || '', t.resultado || '', t.hechaEn ? fechaISO(new Date(t.hechaEn)) : '']);
+    filas.push([t.titulo, est ? est[1] : '', resp[t.responsable] || 'Sin responsable', e ? e.titulo : '', t.dia || '', t.plazo || '', ua.texto || '', ua.falta || '', t.resultado || '', t.hechaEn ? fechaISO(new Date(t.hechaEn)) : '']);
   });
   return '\ufeff' + filas.map(function(f){ return f.map(function(x){ return '"' + String(x == null ? '' : x).replace(/"/g, '""') + '"'; }).join(';'); }).join('\r\n');
 }
@@ -1606,6 +1657,171 @@ function descargar(nombre, contenido){
     if (!d) { avisar('Desde este equipo no se pueden descargar archivos de la oficina.', 'alerta'); return; }
     return d.save({filename:nombre, data:contenido}).then(function(){ avisar('Copia descargada: ' + nombre); }, function(e){ if (!e || e.code !== 'declined') avisar('No se pudo descargar la copia. Intenta de nuevo.', 'alerta'); });
   }).catch(function(){ avisar('No se pudo descargar la copia. Intenta de nuevo.', 'alerta'); });
+}
+
+// ---------- sala: caja fuerte ----------
+// Todo se cifra en el navegador (AES-GCM con una llave sacada de la clave con PBKDF2).
+// En la base solo queda el texto cifrado: sin la clave nadie lo puede leer, tampoco Claude.
+var CAJA = {clave:null, datos:null, version:'', abierta:false, error:'', ver:{}, filtro:'', ultimo:0, ocupado:false};
+var CAJA_ITER = 310000;
+var TIPOS_CAJA = [['empresa','Empresa'],['acceso','Accesos y contraseñas'],['banco','Bancos y pagos'],['contacto','Contactos: clientes y proveedores'],['otro','Otros']];
+function b64(u8){ var t = ''; for (var i = 0; i < u8.length; i += 0x8000) t += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(t); }
+function deb64(t){ var b = atob(t), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+function cajaDoc(){ return buscar('caja', 'fuerte'); }
+function cajaSemilla(){ var x = buscar('caja', 'semilla'); return (x && x.entradas) || []; }
+function derivar(frase, sal, iter){
+  return crypto.subtle.importKey('raw', new TextEncoder().encode(frase.normalize('NFC')), 'PBKDF2', false, ['deriveKey']).then(function(base){
+    return crypto.subtle.deriveKey({name:'PBKDF2', salt:sal, iterations:iter || CAJA_ITER, hash:'SHA-256'}, base, {name:'AES-GCM', length:256}, false, ['encrypt', 'decrypt']);
+  });
+}
+function cifrar(clave, obj){
+  var iv = crypto.getRandomValues(new Uint8Array(12));
+  return crypto.subtle.encrypt({name:'AES-GCM', iv:iv}, clave, new TextEncoder().encode(JSON.stringify(obj))).then(function(ct){ return {iv:b64(iv), datos:b64(new Uint8Array(ct))}; });
+}
+function descifrar(clave, d){ return crypto.subtle.decrypt({name:'AES-GCM', iv:deb64(d.iv)}, clave, deb64(d.datos)).then(function(pt){ return JSON.parse(new TextDecoder().decode(pt)); }); }
+function cerrarCaja(msg){ CAJA.clave = null; CAJA.datos = null; CAJA.version = ''; CAJA.abierta = false; CAJA.ver = {}; CAJA.filtro = ''; CAJA.error = msg || ''; }
+function crearCaja(f1, f2){
+  if (f1.length < 10) { CAJA.error = 'La clave debe tener al menos 10 caracteres.'; return render(); }
+  if (f1 !== f2) { CAJA.error = 'Las dos claves no coinciden.'; return render(); }
+  CAJA.error = ''; CAJA.ocupado = true; render();
+  var sal = crypto.getRandomValues(new Uint8Array(16));
+  derivar(f1, sal).then(function(clave){
+    var datos = {entradas:cajaSemilla().map(function(e){ return Object.assign({id:nuevoId(), actualizado:ahora(), por:''}, e); })};
+    return cifrar(clave, datos).then(function(c){
+      return escribir('set', 'caja', 'fuerte', {v:1, iter:CAJA_ITER, sal:b64(sal), iv:c.iv, datos:c.datos, creada:ahora(), actualizado:ahora(), por:S.yo || ''}).then(function(ok){
+        if (!ok) throw new Error('no se guardó');
+        if (buscar('caja', 'semilla')) borrar('caja', 'semilla');
+        CAJA.clave = clave; CAJA.datos = datos; CAJA.version = c.iv; CAJA.abierta = true; CAJA.ultimo = Date.now();
+        registrar('creó la caja fuerte');
+        avisar('Caja fuerte creada. Ya está abierta.');
+      });
+    });
+  }).catch(function(){ CAJA.error = CAJA.error || 'No se pudo crear la caja. Intenten de nuevo.'; }).then(function(){ CAJA.ocupado = false; render(); });
+}
+function abrirCaja(frase){
+  var doc = cajaDoc(); if (!doc || !frase) return;
+  CAJA.error = ''; CAJA.ocupado = true; render();
+  derivar(frase, deb64(doc.sal), doc.iter).then(function(clave){
+    return descifrar(clave, doc).then(function(datos){ CAJA.clave = clave; CAJA.datos = datos; CAJA.version = doc.iv; CAJA.abierta = true; CAJA.ultimo = Date.now(); CAJA.filtro = ''; });
+  }).catch(function(){ CAJA.error = 'Esa no es la clave.'; }).then(function(){ CAJA.ocupado = false; render(); });
+}
+// cada cambio parte de la última versión guardada, para no pisar lo que el otro socio acaba de agregar
+function guardarCaja(mutar, mensaje, nuevaClave){
+  if (!CAJA.abierta || !CAJA.clave) return;
+  CAJA.ocupado = true;
+  var leer = B.db ? B.db.doc('caja/fuerte').get().then(function(x){ return x.exists ? x.data() : null; }) : Promise.resolve(cajaDoc());
+  leer.then(function(doc){
+    if (!doc) throw new Error('sin caja');
+    return descifrar(CAJA.clave, doc).then(function(datos){
+      mutar(datos);
+      var sal = nuevaClave ? b64(nuevaClave.sal) : doc.sal, llave = nuevaClave ? nuevaClave.clave : CAJA.clave;
+      return cifrar(llave, datos).then(function(c){
+        return escribir('set', 'caja', 'fuerte', {v:1, iter:CAJA_ITER, sal:sal, iv:c.iv, datos:c.datos, creada:doc.creada || ahora(), actualizado:ahora(), por:S.yo || ''}).then(function(ok){
+          if (!ok) throw new Error('no se guardó');
+          CAJA.datos = datos; CAJA.version = c.iv; CAJA.clave = llave;
+          registrar(nuevaClave ? 'cambió la clave de la caja fuerte' : 'actualizó la caja fuerte');
+          avisar(mensaje);
+        });
+      });
+    });
+  }).catch(function(){ avisar('No se pudo guardar en la caja fuerte. Ciérrenla, ábranla de nuevo e intenten otra vez.', 'alerta'); })
+    .then(function(){ CAJA.ocupado = false; CAJA.ultimo = Date.now(); pedirRender(); });
+}
+function revisarCajaRemota(doc){
+  if (CAJA.ocupado || !doc || doc.iv === CAJA.version) return;
+  CAJA.ocupado = true;
+  descifrar(CAJA.clave, doc).then(function(d){ CAJA.datos = d; CAJA.version = doc.iv; }, function(){ cerrarCaja('La clave de la caja cambió. Escriban la clave nueva.'); })
+    .then(function(){ CAJA.ocupado = false; pedirRender(); });
+}
+function vistaCaja(){
+  var doc = cajaDoc();
+  var der = CAJA.abierta ? '<div class="panel-herr"><button class="btn btn-primario btn-sm" data-accion="caja-nueva">' + ICON.mas + 'Agregar</button><button class="btn btn-linea btn-sm" data-accion="caja-cambiar">Cambiar la clave</button><button class="btn btn-linea btn-sm" data-accion="caja-cerrar">' + ICON.caja + 'Cerrar con llave</button></div>' : '';
+  var cab = cabecera('Caja fuerte', 'Lo importante, bajo llave', 'NIT, accesos, contraseñas, cuentas y contactos clave. Se guarda cifrado con una clave que solo ustedes dos conocen: sin ella, nadie puede leerlo, tampoco Claude.', der);
+  if (!(window.crypto && crypto.subtle)) return cab + '<p class="franja alerta">Este navegador no permite abrir la caja fuerte. Ábranla desde la app de Claude, Chrome o Safari.</p>';
+  if (!doc) return cab + cajaCrearHTML();
+  if (!CAJA.abierta) return cab + cajaAbrirHTML(doc);
+  revisarCajaRemota(doc);
+  return cab + cajaContenidoHTML();
+}
+function cajaCrearHTML(){
+  var sem = cajaSemilla();
+  return '<section class="panel caja-llave"><header class="panel-cab"><div><span class="etiqueta">Primera vez</span><h2>Elijan la clave de la caja</h2></div></header>' +
+    '<p class="panel-ayuda">Pónganse de acuerdo entre los dos. Que tenga al menos 10 caracteres: por ejemplo, cuatro palabras que solo ustedes entiendan. No la escriban en ninguna otra parte de la oficina ni se la manden a Claude.</p>' +
+    '<form class="caja-form" data-form="caja-crear" autocomplete="off">' +
+      '<div class="campo"><label for="caja-c1">Clave de la caja</label><input class="campo-input" id="caja-c1" type="password" autocomplete="new-password"></div>' +
+      '<div class="campo"><label for="caja-c2">Repítanla</label><input class="campo-input" id="caja-c2" type="password" autocomplete="new-password"></div>' +
+      '<p class="caja-aviso">Si se olvida esta clave, lo que guarden no se puede recuperar: nadie más la tiene.</p>' +
+      (CAJA.error ? '<p class="error" role="alert">' + esc(CAJA.error) + '</p>' : '') +
+      '<button class="btn btn-primario" type="submit"' + (CAJA.ocupado ? ' disabled' : '') + '>' + (CAJA.ocupado ? 'Creando…' : 'Crear la caja fuerte') + '</button></form>' +
+    (sem.length ? '<p class="panel-ayuda">Al crearla quedan adentro ' + sem.length + ' datos que ya estaban listos: ' + sem.map(function(e){ return esc(e.titulo); }).join(' y ') + '.</p>' : '') + '</section>';
+}
+function cajaAbrirHTML(doc){
+  return '<section class="panel caja-llave"><header class="panel-cab"><div><span class="etiqueta">Cerrada con llave</span><h2>Escriban la clave</h2></div></header>' +
+    '<form class="caja-form" data-form="caja-abrir" autocomplete="off">' +
+      '<div class="campo"><label for="caja-clave">Clave de la caja</label><input class="campo-input" id="caja-clave" type="password" autocomplete="current-password"></div>' +
+      (CAJA.error ? '<p class="error" role="alert">' + esc(CAJA.error) + '</p>' : '') +
+      '<button class="btn btn-primario" type="submit"' + (CAJA.ocupado ? ' disabled' : '') + '>' + (CAJA.ocupado ? 'Abriendo…' : 'Abrir la caja') + '</button></form>' +
+    '<p class="panel-ayuda">' + (doc.actualizado ? 'Último cambio ' + haceCuanto(doc.actualizado) + (SOCIOS[doc.por] ? ' por ' + SOCIOS[doc.por].nombre : '') + '. ' : '') + 'Se cierra sola al salir de esta sala o tras 10 minutos sin uso.</p></section>';
+}
+function cajaContenidoHTML(){
+  var todas = CAJA.datos.entradas || [], q = normal(CAJA.filtro.trim());
+  var ents = todas.slice().sort(function(a, b){ return (a.titulo || '').localeCompare(b.titulo || '', 'es'); });
+  if (q) ents = ents.filter(function(e){ return normal([e.titulo, e.usuario, e.telefono, e.correo, e.url, e.nota].join(' ')).indexOf(q) >= 0; });
+  var barra = '<div class="caja-barra"><label class="sr" for="caja-buscar">Buscar en la caja</label><input class="campo-input" id="caja-buscar" placeholder="Buscar en la caja" autocomplete="off"><span class="resultado">Abierta. Se cierra sola al salir de esta sala o tras 10 minutos sin uso.</span></div>';
+  if (!todas.length) return barra + '<p class="vacio">La caja está vacía. Agreguen el primer dato.</p>';
+  var grupos = TIPOS_CAJA.map(function(tp){
+    var lista = ents.filter(function(e){ return (e.tipo || 'otro') === tp[0]; });
+    return lista.length ? '<section class="caja-grupo"><h2>' + tp[1] + ' · ' + lista.length + '</h2><div class="secretos">' + lista.map(secretoHTML).join('') + '</div></section>' : '';
+  }).join('');
+  return barra + (grupos || '<p class="vacio">Nada con esa búsqueda.</p>');
+}
+function secretoHTML(e){
+  var filas = [], id = esc(e.id), etq = {acceso:'Usuario', banco:'Número', contacto:'Contacto'}[e.tipo] || 'Dato';
+  function copiar(k){ return '<button class="enlace" data-accion="caja-copiar" data-id="' + id + '" data-k="' + k + '">Copiar</button>'; }
+  function fila(etiqueta, valor, extra){ filas.push('<div class="dato-s"><span>' + etiqueta + '</span><code>' + valor + '</code>' + (extra || '') + '</div>'); }
+  if (e.usuario) fila(etq, esc(e.usuario), copiar('usuario'));
+  if (e.clave) fila('Clave', CAJA.ver[e.id] ? esc(e.clave) : '••••••••', '<button class="enlace" data-accion="caja-ver" data-id="' + id + '">' + (CAJA.ver[e.id] ? 'Ocultar' : 'Mostrar') + '</button>' + copiar('clave'));
+  if (e.telefono) fila('Teléfono', esc(e.telefono), copiar('telefono'));
+  if (e.correo) fila('Correo', esc(e.correo), copiar('correo'));
+  if (e.url) fila('Enlace', /^https?:\/\//i.test(e.url) ? '<a class="enlace" href="' + esc(e.url) + '" target="_blank" rel="noopener noreferrer">' + esc(e.url) + '</a>' : esc(e.url));
+  return '<article class="secreto"><h3>' + esc(e.titulo) + '</h3>' + filas.join('') + (e.nota ? '<p class="resultado">' + esc(e.nota) + '</p>' : '') +
+    '<div class="secreto-pie"><span>' + (e.actualizado ? 'Actualizado ' + haceCuanto(e.actualizado) + (SOCIOS[e.por] ? ' por ' + SOCIOS[e.por].nombre : '') : '') + '</span><button class="enlace" data-accion="caja-editar" data-id="' + id + '">Editar</button></div></article>';
+}
+function modalCaja(e){
+  var nueva = !e; e = e || {};
+  abrirForm({
+    etiqueta:'Caja fuerte', titulo: nueva ? 'Agregar a la caja' : e.titulo,
+    campos:[
+      {id:'tipo', label:'Tipo', tipo:'select', valor:e.tipo || 'acceso', opciones:TIPOS_CAJA},
+      {id:'titulo', label:'Nombre', valor:e.titulo || '', requerido:true, max:120, placeholder:'Ej.: Correo info@, Bancolombia, RUT, Asesor Postobón'},
+      {id:'usuario', label:'Usuario, número o dato', ancho:'medio', valor:e.usuario || '', max:200, crudo:true},
+      {id:'clave', label:'Contraseña o clave', tipo:'password', ancho:'medio', valor:e.clave || '', max:300, crudo:true},
+      {id:'telefono', label:'Teléfono', tipo:'tel', ancho:'medio', valor:e.telefono || '', max:60},
+      {id:'correo', label:'Correo', tipo:'email', ancho:'medio', valor:e.correo || '', max:120},
+      {id:'url', label:'Enlace (página de ingreso)', valor:e.url || '', max:300, placeholder:'https://…'},
+      {id:'nota', label:'Nota', tipo:'textarea', valor:e.nota || ''}
+    ],
+    onGuardar: function(v){
+      var idE = e.id || nuevoId();
+      guardarCaja(function(d){ d.entradas = (d.entradas || []).filter(function(x){ return x.id !== idE; }).concat([Object.assign({id:idE}, v, {actualizado:ahora(), por:S.yo || ''})]); }, nueva ? 'Guardado en la caja fuerte.' : 'Cambios guardados en la caja fuerte.');
+    },
+    onBorrar: nueva ? null : function(){ guardarCaja(function(d){ d.entradas = (d.entradas || []).filter(function(x){ return x.id !== e.id; }); }, 'Se borró de la caja fuerte.'); }
+  });
+}
+function modalCambiarClave(){
+  abrirForm({
+    etiqueta:'Caja fuerte', titulo:'Cambiar la clave', textoGuardar:'Cambiar la clave',
+    campos:[
+      {id:'c1', label:'Clave nueva', tipo:'password', valor:'', crudo:true},
+      {id:'c2', label:'Repítanla', tipo:'password', valor:'', crudo:true},
+      {tipo:'info', html:'<span>Al cambiarla, el otro socio tiene que usar la clave nueva. Avísenle antes.</span>'}
+    ],
+    validar: function(v){ if (v.c1.length < 10) return ['c1', 'Al menos 10 caracteres.']; if (v.c1 !== v.c2) return ['c2', 'Las dos claves no coinciden.']; },
+    onGuardar: function(v){
+      var sal = crypto.getRandomValues(new Uint8Array(16));
+      derivar(v.c1, sal).then(function(clave){ guardarCaja(function(){}, 'Clave cambiada. Avísale al otro socio.', {clave:clave, sal:sal}); });
+    }
+  });
 }
 
 // ---------- sala: historial y papelera ----------
@@ -1691,7 +1907,7 @@ function enviarModal(form){
     if (c.tipo === 'registros') { v[c.id] = M.reg[c.id]; return; }
     if (c.tipo === 'pasos') { v[c.id] = M.pasos.filter(function(p){ return p.t.trim(); }).map(function(p){ return {t:p.t.trim(), ok:p.ok}; }); return; }
     if (c.tipo === 'segment') { var r = form.querySelector('input[name="m-' + c.id + '"]:checked'); v[c.id] = r ? r.value : ''; }
-    else { var el = form.querySelector('#m-' + c.id); var x = el ? el.value : ''; v[c.id] = c.tipo === 'pesos' ? leerPesos(x) : c.tipo === 'number' ? (x === '' ? null : Number(x)) : String(x).trim(); }
+    else { var el = form.querySelector('#m-' + c.id); var x = el ? el.value : ''; v[c.id] = c.tipo === 'pesos' ? leerPesos(x) : c.tipo === 'number' ? (x === '' ? null : Number(x)) : c.crudo ? String(x) : String(x).trim(); }
     if (c.requerido && (v[c.id] === '' || v[c.id] === null) && !err) err = [c.id, 'Este campo es obligatorio.'];
   });
   if (!err && cfg.validar) err = cfg.validar(v);
@@ -1717,7 +1933,7 @@ function modalTarea(t, preset){
     campos: [
       {id:'titulo', label:'Tarea', valor:t.titulo || preset.titulo || '', requerido:true, max:200, placeholder:'Ej.: Pedir 3 cotizaciones de estanterías'},
       {id:'responsable', label:'Responsable', tipo:'segment', valor:nueva ? (preset.responsable != null ? preset.responsable : (S.yo || '')) : (t.responsable || ''), opciones:RESPONSABLES},
-      {id:'etapa', label:'Etapa de la ruta', tipo:'select', ancho:'medio', valor:nueva ? (preset.etapa || (focoDe(preset.dia || '') || {}).etapa || '') : (t.etapa || ''), opciones:[['','Sin etapa']].concat(es.map(function(e){ return [e.id, e.n + ' · ' + e.titulo]; }))},
+      {id:'etapa', label:'Área', tipo:'select', ancho:'medio', valor:nueva ? (preset.etapa || (focoDe(preset.dia || '') || {}).etapa || '') : (t.etapa || ''), opciones:opcionesAreas('Sin área')},
       {id:'dia', label:'Día en que se trabaja', tipo:'date', ancho:'medio', valor:nueva ? (preset.dia || '') : (t.dia || '')},
       {id:'plazo', label:'Fecha límite (opcional)', tipo:'date', ancho:'medio', valor:t.plazo || '', ayuda:'Si tiene plazo, la oficina y los correos empiezan a avisar antes.'},
       {id:'avisoDias', label:'Empezar a avisar', tipo:'select', ancho:'medio', valor:String(t.avisoDias || 7), opciones:AVISOS},
@@ -1735,7 +1951,7 @@ function modalTarea(t, preset){
         if (v.estado === 'hecho') { doc.hechaEn = ahora(); doc.hechaPor = S.yo || ''; }
         var nid = crear('tareas', doc);
         if (v.plazo) avisarCal('Tarea creada con fecha límite.', 'tareas', Object.assign({id:nid}, doc));
-        if (preset.idea) { cambiar('parqueadero', preset.idea, {estado:'a_ruta'}); registrar('llevó una idea del parqueadero a la ruta: «' + v.titulo + '»'); }
+        if (preset.idea) { cambiar('parqueadero', preset.idea, {estado:'a_ruta'}); registrar('volvió tarea una idea del parqueadero: «' + v.titulo + '»'); }
         else registrar('creó la tarea «' + v.titulo + '»');
       } else {
         var patch = Object.assign({}, v);
@@ -1811,7 +2027,7 @@ function modalIdea(i){
     etiqueta:'Parqueadero', titulo:'Editar la idea',
     campos:[
       {id:'texto', label:'La idea', tipo:'textarea', requerido:true, valor:i.texto || ''},
-      {id:'estado', label:'Estado', tipo:'segment', valor:i.estado || 'parqueada', opciones:[['parqueada','Parqueada'],['a_ruta','Ya está en la ruta'],['descartada','Descartada']]}
+      {id:'estado', label:'Estado', tipo:'segment', valor:i.estado || 'parqueada', opciones:[['parqueada','Parqueada'],['a_ruta','Ya es una tarea'],['descartada','Descartada']]}
     ],
     onGuardar: function(v){ cambiar('parqueadero', i.id, {texto:v.texto, estado:v.estado}); },
     onBorrar: function(){ aPapelera('parqueadero', i.id); }
@@ -1852,11 +2068,11 @@ function modalFoco(f){
   abrirForm({
     etiqueta:'Foco del día', titulo:fechaLarga(f).replace(/^./, function(c){ return c.toUpperCase(); }), deshacer:'Se cambió el foco del ' + fechaCorta(f),
     campos:[
-      {id:'etapa', label:'Etapa de la ruta', tipo:'select', valor:fo.etapa || '', opciones:[['','Ninguna etapa']].concat(es.map(function(e){ return [e.id, e.n + ' · ' + e.titulo]; }))},
-      {id:'foco', label:'En qué se enfocan', valor:fo.foco || '', max:120, placeholder:'Ej.: Cerrar el proveedor de estanterías', ayuda:'Si lo dejan vacío, se usa el nombre de la etapa.'},
+      {id:'etapa', label:'Área del día', tipo:'select', valor:fo.etapa || '', opciones:opcionesAreas('Ninguna área')},
+      {id:'foco', label:'En qué se enfocan', valor:fo.foco || '', max:120, placeholder:'Ej.: Reunión con los financieros', ayuda:'Si lo dejan vacío, se usa el nombre del área.'},
       {id:'nota', label:'Nota para el día', tipo:'textarea', valor:fo.nota || '', placeholder:'Lo que hay que tener presente ese día.'}
     ],
-    validar: function(v){ if (!v.foco && !v.etapa) return ['foco', 'Elijan una etapa o escriban el foco.']; },
+    validar: function(v){ if (!v.foco && !v.etapa) return ['foco', 'Elijan un área o escriban el foco.']; },
     onGuardar: function(v){
       var e = etapa(v.etapa), texto = v.foco || (e ? e.titulo : '');
       escribir('set', 'semana', f, {foco:texto, etapa:v.etapa, nota:v.nota});
@@ -1869,23 +2085,20 @@ function modalEtapa(e){
   var nueva = !e; e = e || {};
   var ts = nueva ? [] : S.d.tareas.filter(function(t){ return t.etapa === e.id; });
   abrirForm({
-    etiqueta: nueva ? 'Nueva etapa de la ruta' : 'Etapa ' + e.n + ' de la ruta', titulo: nueva ? 'Etapa ' + (etapas().length + 1) : e.titulo,
+    etiqueta: nueva ? 'Nueva área' : 'Área', titulo: nueva ? '¿Qué área agregamos?' : e.titulo,
     campos:[
-      {id:'titulo', label:'Nombre', valor:e.titulo || '', requerido:true, max:60},
-      {id:'meta', label:'Está cumplida cuando…', tipo:'textarea', valor:e.meta || '', placeholder:'El resultado concreto que cierra la etapa.'},
-      {id:'cumplida', label:'¿Cumplida?', tipo:'segment', valor:e.cumplida ? 'si' : 'no', opciones:[['no','Todavía no'],['si','Sí, cumplida']]}
-    ].concat(nueva ? [] : [{id:'n', label:'Posición en la ruta', tipo:'select', valor:String(e.n), opciones:etapas().map(function(x, i){ return [String(i + 1), (i + 1) + (x.id === e.id ? ' (donde está)' : ' · en lugar de ' + x.titulo)]; })}]).concat(nueva ? [] : [{tipo:'info', html: ts.length ? ts.map(function(t){ return '<span>' + (t.estado === 'hecho' ? '✓ ' : '· ') + esc(t.titulo) + '</span>'; }).join('') : '<span>Esta etapa aún no tiene tareas.</span>'}]),
+      {id:'titulo', label:'Nombre', valor:e.titulo || '', requerido:true, max:60, placeholder:'Ej.: Legal y trámites'},
+      {id:'meta', label:'Qué entra en esta área', tipo:'textarea', valor:e.meta || '', placeholder:'Para que los dos sepan dónde va cada tarea.'}
+    ].concat(nueva ? [] : [{id:'n', label:'Orden en la lista', tipo:'select', valor:String(e.n), opciones:etapas().map(function(x, i){ return [String(i + 1), (i + 1) + (x.id === e.id ? ' (donde está)' : ' · en lugar de ' + x.titulo)]; })}])
+     .concat(nueva ? [] : [{tipo:'info', html: ts.length ? ts.map(function(t){ return '<span>' + (t.estado === 'hecho' ? '✓ ' : '· ') + esc(t.titulo) + '</span>'; }).join('') : '<span>Esta área aún no tiene tareas.</span>'}]),
     onGuardar: function(v){
-      var cumplida = v.cumplida === 'si';
-      if (nueva) { crear('etapas', {n:etapas().length + 1, titulo:v.titulo, meta:v.meta, cumplida:cumplida}); registrar('agregó la etapa «' + v.titulo + '» a la ruta'); return; }
-      cambiar('etapas', e.id, {titulo:v.titulo, meta:v.meta, cumplida:cumplida, cumplidaEn:cumplida ? (e.cumplidaEn || ahora()) : ''});
+      if (nueva) { crear('etapas', {n:etapas().length + 1, titulo:v.titulo, meta:v.meta}); registrar('agregó el área «' + v.titulo + '»'); return; }
+      cambiar('etapas', e.id, {titulo:v.titulo, meta:v.meta});
       var pos = Number(v.n) || e.n, orden = etapas().filter(function(x){ return x.id !== e.id; });
       if (pos !== e.n) {
         orden.splice(pos - 1, 0, e);
         orden.forEach(function(x, i){ if (x.n !== i + 1) cambiar('etapas', x.id, {n:i + 1}); });
-        registrar('movió la etapa «' + v.titulo + '» a la posición ' + pos);
       }
-      if (cumplida && !e.cumplida) { registrar('marcó la etapa «' + v.titulo + '» como cumplida'); celebrar('Etapa cumplida.'); }
     },
     onBorrar: nueva || ts.length ? null : function(){ aPapelera('etapas', e.id); }
   });
@@ -2134,6 +2347,7 @@ function irA(s, sinHistorial){
   if (SALA_IDS.indexOf(s) < 0) return;
   if (!sinHistorial && S.sala !== s) { S.atras.push(S.sala); if (S.atras.length > 20) S.atras.shift(); }
   if (s !== 'reunion' && S.pantalla) salirPantalla();
+  if (s !== 'caja' && CAJA.abierta) cerrarCaja();
   S.sala = s;
   try { history.replaceState(null, '', '#' + s); } catch(e){}
   anunciar(); render();
@@ -2193,6 +2407,16 @@ var ACC = {
     desc('Se restauró «' + cortar(p.titulo, 50) + '»'); registrar('restauró de la papelera: «' + p.titulo + '»');
   },
   'borrar-definitivo': function(el){ if (armado(el)) borrar('papelera', el.dataset.id); },
+  'caja-nueva': function(){ modalCaja(null); },
+  'caja-editar': function(el){ var e = CAJA.datos && (CAJA.datos.entradas || []).find(function(x){ return x.id === el.dataset.id; }); if (e) modalCaja(e); },
+  'caja-cambiar': modalCambiarClave,
+  'caja-cerrar': function(){ cerrarCaja(); render(); },
+  'caja-ver': function(el){ CAJA.ver[el.dataset.id] = !CAJA.ver[el.dataset.id]; render(); },
+  'caja-copiar': function(el){
+    var e = CAJA.datos && (CAJA.datos.entradas || []).find(function(x){ return x.id === el.dataset.id; }); if (!e) return;
+    var falla = function(){ avisar('Desde aquí no se pudo copiar. Toca «Mostrar» y cópialo a mano.', 'alerta'); };
+    try { navigator.clipboard.writeText(e[el.dataset.k] || '').then(function(){ avisar('Copiado.'); }, falla); } catch(x){ falla(); }
+  },
   'reg-quitar': function(el){ if (!M) return; M.reg[el.dataset.campo].splice(Number(el.dataset.i), 1); $('#m-reg-' + el.dataset.campo).innerHTML = registrosHTML(el.dataset.campo); },
   'soy': function(el){ ponerYo(el.dataset.quien); },
   'cambiar-quien': modalQuien,
@@ -2285,6 +2509,8 @@ var CAMBIO = {
 };
 var FORM = {
   'modal': enviarModal,
+  'caja-crear': function(){ crearCaja($('#caja-c1').value, $('#caja-c2').value); },
+  'caja-abrir': function(){ abrirCaja($('#caja-clave').value); },
   'parquear': function(f){ var i = f.querySelector('input'), t = i.value.trim(); if (!t) return i.focus(); i.value = ''; parquear(t); },
   'decision': function(f){
     var i = f.querySelector('input'), t = i.value.trim(); if (!t) return i.focus();
@@ -2325,10 +2551,12 @@ document.addEventListener('input', function(e){
   if (el.classList && el.classList.contains('paso-texto') && M && M.pasos[Number(el.dataset.i)]) M.pasos[Number(el.dataset.i)].t = el.value;
   if (el.classList && el.classList.contains('reg-texto') && M && M.reg[el.dataset.campo] && M.reg[el.dataset.campo][Number(el.dataset.i)]) M.reg[el.dataset.campo][Number(el.dataset.i)][el.dataset.k] = el.value;
   if (el.id === 'buscar-q') $('#buscar-res').innerHTML = resultados(el.value);
+  if (el.id === 'caja-buscar') { CAJA.filtro = el.value; CAJA.ultimo = Date.now(); pedirRender(); }
 });
 document.addEventListener('focusout', function(e){ var el = e.target; if (el.dataset && el.dataset.guardar) guardarYa(el); });
 document.addEventListener('keydown', function(e){
   if (e.key === 'Enter' && e.target.id === 'm-paso-nuevo') { e.preventDefault(); ACC['paso-agregar'](); }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.getAttribute && e.target.getAttribute('role') === 'button' && e.target.dataset.accion) { e.preventDefault(); e.target.click(); }
   if (e.key === 'Enter' && e.target.id === 'buscar-q') { e.preventDefault(); var r = $('#buscar-res .res'); if (r) r.click(); }
   var mod = e.ctrlKey || e.metaKey, campo = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
   if (mod && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); abrirBuscar(); }
@@ -2377,7 +2605,9 @@ setInterval(function(){
   if (k !== S.tickClave) { S.tickClave = k; pedirRender(); }
   revisarRecordatorios();
   renderLado();
+  if (CAJA.abierta && Date.now() - CAJA.ultimo > 10 * 60e3) { cerrarCaja('Se cerró sola por 10 minutos sin uso.'); render(); }
 }, 20000);
+['click', 'keydown'].forEach(function(t){ document.addEventListener(t, function(){ if (CAJA.abierta) CAJA.ultimo = Date.now(); }, true); });
 
 iniciar();
 })();
