@@ -62,6 +62,7 @@ Cada tarea va en un área: **Comercial**, **Financiero y legal**, **Operación**
 - Solo la pueden leer el dueño y quienes tienen permiso de Editor (regla de la base de datos sobre `caja`); con el enlace público no se ve ni el texto cifrado.
 - Si Claude carga datos, quedan en `caja/semilla` y entran cifrados la próxima vez que un socio abre la caja; ahí mismo se borra la semilla.
 - Las claves no se escriben en ninguna otra parte de la oficina ni se le mandan a Claude por chat.
+- **Copia en Excel:** con la caja abierta, el botón «Copia en Excel» arma en el mismo equipo un .xlsx con una hoja por categoría (Empresa, Bancos, Proveedores, Accesos, Contactos, Otros) y un resumen. Se le puede poner contraseña (cifrado de Excel, se abre en Excel del computador o del celular). Las claves no pasan por ningún servidor; la descarga queda en el historial de la oficina.
 
 ## Pedidos a proveedores
 
@@ -105,6 +106,7 @@ manifest.webmanifest   Nombre, colores e íconos para instalarla en el celular
 sw.js                  Deja la app lista para abrir sin internet
 firestore.rules        Quién puede leer y escribir en la base
 herramientas/          firestore.py: lectura y escritura por REST para Claude y los correos
+vendor/                xlsx-populate 1.21.0 (MIT): arma y cifra la copia en Excel de la caja
 img/                   Logo, isotipo, poses de Mark e íconos de la app
 ```
 

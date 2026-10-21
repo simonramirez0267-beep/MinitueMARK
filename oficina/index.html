@@ -2023,7 +2023,7 @@ function revisarCajaRemota(doc){
 }
 function vistaCaja(){
   var doc = cajaDoc();
-  var der = CAJA.abierta ? '<div class="panel-herr"><button class="btn btn-primario btn-sm" data-accion="caja-nueva">' + ICON.mas + 'Agregar</button><button class="btn btn-linea btn-sm" data-accion="caja-cambiar">Cambiar la clave</button><button class="btn btn-linea btn-sm" data-accion="caja-cerrar">' + ICON.caja + 'Cerrar con llave</button></div>' : '';
+  var der = CAJA.abierta ? '<div class="panel-herr"><button class="btn btn-primario btn-sm" data-accion="caja-nueva">' + ICON.mas + 'Agregar</button><button class="btn btn-linea btn-sm" data-accion="caja-excel">Copia en Excel</button><button class="btn btn-linea btn-sm" data-accion="caja-cambiar">Cambiar la clave</button><button class="btn btn-linea btn-sm" data-accion="caja-cerrar">' + ICON.caja + 'Cerrar con llave</button></div>' : '';
   var cab = cabecera('Caja fuerte', 'Lo importante, bajo llave', 'NIT, accesos, contraseñas, cuentas y contactos clave. Se guarda cifrado con una clave que solo ustedes dos conocen: sin ella, nadie puede leerlo, tampoco Claude.', der);
   if (!(window.crypto && crypto.subtle)) return cab + '<p class="franja alerta">Este navegador no permite abrir la caja fuerte. Ábranla desde la app de Claude, Chrome o Safari.</p>';
   if (S.editor === false) return cab + '<p class="franja alerta">La caja fuerte solo la abren los socios con permiso de Editor. Pídele a Simón que te invite con tu correo como Editor y que apague el acceso con enlace.</p>';
@@ -2097,6 +2097,82 @@ function modalCaja(e){
     },
     onBorrar: nueva ? null : function(){ guardarCaja(function(d){ d.entradas = (d.entradas || []).filter(function(x){ return x.id !== e.id; }); }, 'Se borró de la caja fuerte.'); }
   });
+}
+// copia de la caja en Excel: se arma en este equipo con la caja abierta; las claves no pasan por ningún servidor
+function modalCajaExcel(){
+  abrirForm({
+    etiqueta:'Caja fuerte', titulo:'Copia en Excel', textoGuardar:'Descargar la copia',
+    campos:[
+      {tipo:'info', html:'<span>Un archivo con todo lo de la caja, una hoja por categoría. Trae las claves a la vista: guárdenlo en un solo lugar seguro y no lo manden por WhatsApp ni por correo.</span>'},
+      {id:'c1', label:'Contraseña del archivo', tipo:'password', ancho:'medio', valor:'', crudo:true, ayuda:'Excel la pide para abrirlo. Recomendado.'},
+      {id:'c2', label:'Repítela', tipo:'password', ancho:'medio', valor:'', crudo:true},
+      {tipo:'info', html:'<span>Si la dejan vacía, el archivo sale sin contraseña y lo puede leer cualquiera que lo tenga. Con contraseña se abre en Excel, en el computador o en el celular.</span>'}
+    ],
+    validar: function(v){
+      if (v.c1 && v.c1.length < 8) return ['c1', 'Al menos 8 caracteres.'];
+      if (v.c1 !== v.c2) return ['c2', 'Las dos contraseñas no coinciden.'];
+    },
+    onGuardar: function(v){ cajaExcel(v.c1); }
+  });
+}
+function cargarXlsx(){
+  if (window.XlsxPopulate) return Promise.resolve(window.XlsxPopulate);
+  return new Promise(function(ok, mal){
+    var sc = document.createElement('script'); sc.src = 'vendor/xlsx-populate.min.js';
+    sc.onload = function(){ window.XlsxPopulate ? ok(window.XlsxPopulate) : mal(new Error('sin librería')); };
+    sc.onerror = mal; document.head.appendChild(sc);
+  });
+}
+function cajaExcel(clave){
+  if (!CAJA.abierta || !CAJA.datos) return;
+  var ents = (CAJA.datos.entradas || []).slice().sort(function(a, b){ return (a.titulo || '').localeCompare(b.titulo || '', 'es'); });
+  var hoyTxt = fechaLarga(hoy()), cols = ['Nombre', 'Usuario o código', 'Contraseña', 'Teléfono', 'Correo', 'Enlace', 'Nota', 'Actualizado', 'Por'];
+  var anchos = [34, 26, 24, 18, 30, 34, 50, 14, 12];
+  avisar('Armando la copia…');
+  cargarXlsx().then(function(X){ return X.fromBlankAsync().then(function(wb){
+    var res = wb.sheet(0).name('Resumen');
+    res.cell('A1').value('Caja fuerte de MinuteMark').style({bold:true, fontSize:16, fontColor:'FF0051B9'});
+    res.cell('A2').value('Copia del ' + hoyTxt + ', hecha por ' + (SOCIOS[S.yo] ? SOCIOS[S.yo].completo : 'un socio') + '.');
+    res.cell('A3').value('Trae las claves a la vista. Guárdenla en un solo lugar seguro y no la manden por WhatsApp ni por correo.').style({fontColor:'FFB42318'});
+    res.cell('A5').value('Hoja').style({bold:true}); res.cell('B5').value('Datos').style({bold:true});
+    res.column('A').width(40); res.column('B').width(12);
+    var fila = 6;
+    TIPOS_CAJA.forEach(function(tp){
+      var lista = ents.filter(function(e){ return (e.tipo || 'otro') === tp[0]; });
+      if (!lista.length) return;
+      var nombre = {empresa:'Empresa', banco:'Bancos', proveedor:'Proveedores', acceso:'Accesos', contacto:'Contactos', otro:'Otros'}[tp[0]] || tp[1].slice(0, 31);
+      res.cell('A' + fila).value(nombre); res.cell('B' + fila).value(lista.length); fila++;
+      var h = wb.addSheet(nombre);
+      cols.forEach(function(c, i){ h.column(i + 1).width(anchos[i]); });
+      h.row(1).height(22);
+      h.range(1, 1, 1, cols.length).value([cols]).style({bold:true, fontColor:'FFFFFFFF', fill:'FF0051B9', verticalAlignment:'center'});
+      lista.forEach(function(e, i){
+        // todo va como texto: así no se pierden ceros a la izquierda (078367) ni se vuelven fechas
+        [e.titulo, e.usuario, e.clave, e.telefono, e.correo, e.url, e.nota, e.actualizado ? fechaISO(new Date(e.actualizado)) : '', SOCIOS[e.por] ? SOCIOS[e.por].nombre : '']
+          .forEach(function(x, j){ h.cell(i + 2, j + 1).value(String(x == null ? '' : x)).style({wrapText:j === 6, verticalAlignment:'top'}); });
+      });
+      h.freezePanes(1, 1);
+    });
+    // la librería deja rellenos vacíos (<fill/>) en los estilos nuevos; algunos lectores los rechazan
+    var rellenos = wb._styleSheet && wb._styleSheet._fillsNode;
+    if (rellenos) rellenos.children.forEach(function(f){ if (f.name === 'fill' && !f.children.length) f.children.push({name:'patternFill', attributes:{patternType:'none'}, children:[]}); });
+    return wb.outputAsync(clave ? {type:'blob', password:clave} : {type:'blob'});
+  }); }).then(function(blob){
+    guardarArchivo('MinuteMark-caja-fuerte-' + hoy() + '.xlsx', blob);
+    registrar('descargó una copia de la caja fuerte en Excel' + (clave ? ' con contraseña' : ' sin contraseña'));
+  }).catch(function(){ avisar('No se pudo armar la copia. Revisen la conexión y vuelvan a intentar.', 'alerta'); });
+}
+// en el celular abre el menú de compartir (Guardar en Archivos); en el computador, descarga normal
+function guardarArchivo(nombre, blob){
+  var f = null; try { f = new File([blob], nombre, {type:blob.type || 'application/octet-stream'}); } catch(e){}
+  var tactil = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+  if (f && tactil && navigator.canShare && navigator.canShare({files:[f]})) {
+    navigator.share({files:[f], title:nombre}).then(function(){ avisar('Copia lista: ' + nombre); }, function(){});
+    return;
+  }
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 60e3);
+  avisar('Copia descargada: ' + nombre);
 }
 function modalCambiarClave(){
   abrirForm({
@@ -2727,6 +2803,7 @@ var ACC = {
   'caja-nueva': function(){ modalCaja(null); },
   'caja-editar': function(el){ var e = CAJA.datos && (CAJA.datos.entradas || []).find(function(x){ return x.id === el.dataset.id; }); if (e) modalCaja(e); },
   'caja-cambiar': modalCambiarClave,
+  'caja-excel': modalCajaExcel,
   'caja-cerrar': function(){ cerrarCaja(); render(); },
   'caja-ver': function(el){ CAJA.ver[el.dataset.id] = !CAJA.ver[el.dataset.id]; render(); },
   'caja-copiar': function(el){
