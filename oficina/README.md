@@ -11,7 +11,7 @@ https://simonramirez0267-beep.github.io/MinitueMARK/oficina/
 - **iPhone:** abrirla en Safari › Compartir › «Agregar a inicio».
 - **Android:** abrirla en Chrome › menú › «Instalar app».
 
-Cada socio entra con su correo y una contraseña propia. La primera vez se crea la cuenta y llega un correo para confirmarla; después la sesión queda abierta en ese equipo.
+Cada socio entra con su correo y una contraseña propia. La primera vez se crea la cuenta y llega un correo para confirmarla; después la sesión queda abierta en ese equipo. Cuando alguien entra en un equipo, la app aprende los correos de los dos socios (solo en ese equipo): la próxima vez basta con tocar el nombre y escribir la contraseña.
 
 ## Cómo funciona
 

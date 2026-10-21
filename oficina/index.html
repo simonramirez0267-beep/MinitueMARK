@@ -622,6 +622,15 @@ body.con-entrada .app{display:none}
 .entrada-form .btn{justify-content:center}
 .entrada-pie{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font-size:14px}
 .entrada-ok{font-size:14px;color:var(--azul-profundo);background:var(--azul-tenue);border-radius:var(--r-s);padding:10px 12px}
+.entrada-quien{display:flex;flex-direction:column;gap:8px;min-width:0}
+.entrada-etq{font-size:14px;font-weight:500}
+.quien-opciones{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.quien-btn{display:flex;align-items:center;gap:10px;min-width:0;text-align:left;font:inherit;color:var(--tinta);background:var(--superficie);border:1px solid var(--linea);border-radius:var(--r-m);padding:12px;cursor:pointer}
+.quien-btn span{display:flex;flex-direction:column;min-width:0}
+.quien-btn b{font-weight:600}
+.quien-btn small{font-size:12px;color:var(--tinta-suave);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.quien-btn[aria-pressed="true"]{border-color:var(--azul-profundo);background:var(--azul-tenue);box-shadow:var(--anillo)}
+.quien-btn:focus-visible{outline:2px solid var(--azul-brillante);outline-offset:2px}
 
 /* ---------- modo pantalla de la reunión ---------- */
 .modo-pantalla .lado{display:none}
@@ -928,7 +937,9 @@ function envolverFirestore(F, fs){
 }
 // el socio sale del correo con que entró (config/oficina.correos)
 function asignarYo(){
-  var cs = config().correos || {}, correo = ((B.user && B.user.email) || '').toLowerCase();
+  var cs = config().correos || {}, correo = ((B.user && B.user.email) || '').toLowerCase(), guardados = {};
+  Object.keys(cs).forEach(function(k){ if (SOCIOS[k] && cs[k]) guardados[k] = String(cs[k]).toLowerCase(); });
+  if (Object.keys(guardados).length) LS.set('mm-oficina-correos', guardados);
   var q = Object.keys(cs).find(function(k){ return SOCIOS[k] && String(cs[k]).toLowerCase() === correo; });
   if (q && S.yo !== q) { S.yo = q; LS.set('mm-oficina-yo', q); anunciar(true); }
 }
@@ -957,7 +968,7 @@ function errorEntrada(e){ S.entrada.error = ERR_ENTRADA[e && e.code] || 'No se p
 function renderEntrada(forzar){
   var E = S.entrada || (S.entrada = {}), el = $('#entrada');
   document.body.classList.add('con-entrada'); el.hidden = false;
-  var clave = [S.auth, E.modo, E.error, E.ok, E.ocupado].join('|');
+  var clave = [S.auth, E.modo, E.error, E.ok, E.ocupado, E.quien, E.otro].join('|');
   if (!forzar && el.dataset.clave === clave) return;
   el.dataset.clave = clave;
   var correo = el.querySelector('#e-correo'), vCorreo = correo ? correo.value : (B.user && B.user.email) || LS.get('mm-oficina-correo', '');
@@ -971,21 +982,33 @@ function renderEntrada(forzar){
       '<button class="btn btn-primario" data-accion="entrada-verificado"' + (E.ocupado ? ' disabled' : '') + '>Ya lo confirmé</button><div class="entrada-pie"><button class="enlace" data-accion="entrada-reenviar">Reenviar el correo</button><button class="enlace" data-accion="salir-sesion">Usar otra cuenta</button></div></div>';
   else if (S.auth === 'sin-acceso') cuerpo = '<div class="entrada-form"><h2>Esta cuenta no es de un socio</h2><p>Entraste con <b>' + esc((B.user && B.user.email) || '') + '</b>. La oficina solo abre con el correo de Simón o el de Sebastián.</p><button class="btn btn-primario" data-accion="salir-sesion">Entrar con otra cuenta</button></div>';
   else {
-    var crear = E.modo === 'crear';
+    var crear = E.modo === 'crear', rec = LS.get('mm-oficina-correos', null) || {};
+    var quienes = Object.keys(rec).filter(function(k){ return SOCIOS[k]; }), elegir = !crear && !E.otro && quienes.length > 0;
+    var sel = elegir ? (E.quien || quienes.find(function(k){ return rec[k] === LS.get('mm-oficina-correo', ''); }) || '') : '';
+    // con los correos ya aprendidos en este equipo, basta con tocar el nombre
+    var campoCorreo = elegir
+      ? '<div class="entrada-quien" role="group" aria-label="¿Quién entra?"><span class="entrada-etq">¿Quién entra?</span><div class="quien-opciones">' + quienes.map(function(k){
+          return '<button type="button" class="quien-btn" data-accion="entrada-quien" data-q="' + k + '" aria-pressed="' + (k === sel) + '">' + avatar(k) + '<span><b>' + SOCIOS[k].nombre + '</b><small>' + esc(rec[k]) + '</small></span></button>';
+        }).join('') + '</div><input class="sr" id="e-correo" type="email" autocomplete="username" tabindex="-1" aria-hidden="true" readonly value="' + esc(sel ? rec[sel] : '') + '"></div>'
+      : '<div class="campo"><label for="e-correo">Correo</label><input class="campo-input" id="e-correo" type="email" autocomplete="username" inputmode="email" value="' + esc(vCorreo) + '"></div>';
     cuerpo = '<form class="entrada-form" data-form="' + (crear ? 'crear-cuenta' : 'entrar') + '" novalidate><h2>' + (crear ? 'Crea tu cuenta' : 'Entrar') + '</h2>' +
       (crear ? '<p>Solo la primera vez, con tu correo de socio. Después de crearla te llega un correo para confirmarla.</p>' : '') +
-      '<div class="campo"><label for="e-correo">Correo</label><input class="campo-input" id="e-correo" type="email" autocomplete="username" inputmode="email" value="' + esc(vCorreo) + '"></div>' +
+      campoCorreo +
       '<div class="campo"><label for="e-clave">Contraseña' + (crear ? ' (mínimo 8 caracteres)' : '') + '</label><input class="campo-input" id="e-clave" type="password" autocomplete="' + (crear ? 'new-password' : 'current-password') + '"></div>' +
       (crear ? '<div class="campo"><label for="e-clave2">Repítela</label><input class="campo-input" id="e-clave2" type="password" autocomplete="new-password"></div>' : '') +
       err + ok + '<button class="btn btn-primario" type="submit"' + (E.ocupado ? ' disabled' : '') + '>' + (E.ocupado ? 'Un momento…' : crear ? 'Crear mi cuenta' : 'Entrar') + '</button>' +
-      '<div class="entrada-pie"><button type="button" class="enlace" data-accion="entrada-modo">' + (crear ? 'Ya tengo cuenta' : 'Primera vez: crear mi cuenta') + '</button>' +
+      '<div class="entrada-pie">' + (elegir ? '<button type="button" class="enlace" data-accion="entrada-otro">Usar otro correo</button>'
+        : (!crear && quienes.length ? '<button type="button" class="enlace" data-accion="entrada-otro">Elegir mi nombre</button>' : '') +
+          '<button type="button" class="enlace" data-accion="entrada-modo">' + (crear ? 'Ya tengo cuenta' : 'Primera vez: crear mi cuenta') + '</button>') +
       (crear ? '' : '<button type="button" class="enlace" data-accion="entrada-olvide">Olvidé mi contraseña</button>') + '</div></form>';
   }
   el.innerHTML = '<div class="entrada-caja">' + cab + cuerpo + '</div>';
 }
 function datosEntrada(){ return {correo:($('#e-correo') || {}).value ? $('#e-correo').value.trim().toLowerCase() : '', clave:($('#e-clave') || {}).value || '', clave2:($('#e-clave2') || {}).value || ''}; }
 function entrar(){
-  var d = datosEntrada(); if (!d.correo || !d.clave) { S.entrada.error = 'Escribe el correo y la contraseña.'; return renderEntrada(true); }
+  var d = datosEntrada();
+  if (!d.correo) { S.entrada.error = $('.quien-btn') ? 'Toca tu nombre y escribe la contraseña.' : 'Escribe el correo y la contraseña.'; return renderEntrada(true); }
+  if (!d.clave) { S.entrada.error = 'Escribe la contraseña.'; return renderEntrada(true); }
   LS.set('mm-oficina-correo', d.correo); S.entrada.error = ''; S.entrada.ok = ''; S.entrada.ocupado = true; renderEntrada(true);
   B.F.signInWithEmailAndPassword(B.auth, d.correo, d.clave).catch(errorEntrada);
 }
@@ -2715,6 +2738,11 @@ var ACC = {
   'soy': function(el){ ponerYo(el.dataset.quien); },
   'cambiar-quien': modalQuien,
   'recargar': function(){ location.reload(); },
+  'entrada-quien': function(el){
+    S.entrada.quien = el.dataset.q; S.entrada.error = ''; S.entrada.ok = ''; renderEntrada(true);
+    var c = $('#e-clave'); if (c) c.focus();
+  },
+  'entrada-otro': function(){ S.entrada.otro = !S.entrada.otro; S.entrada.error = ''; S.entrada.ok = ''; renderEntrada(true); },
   'entrada-modo': function(){ S.entrada.modo = S.entrada.modo === 'crear' ? '' : 'crear'; S.entrada.error = ''; S.entrada.ok = ''; renderEntrada(true); },
   'entrada-olvide': function(){
     var c = datosEntrada().correo; if (!c) { S.entrada.error = 'Escribe tu correo y vuelve a tocar «Olvidé mi contraseña».'; return renderEntrada(true); }
