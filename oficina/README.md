@@ -18,7 +18,8 @@ Cada socio entra con su correo y una contraseña propia. La primera vez se crea 
 - Los datos viven en Firebase (Firestore, de Google). Lo que anota un socio le aparece al otro al instante.
 - Sin internet se puede seguir trabajando: lo que se anota queda en el celular y se sube solo cuando vuelve la conexión.
 - Solo entran los dos correos de los socios, ya confirmados (`firestore.rules`). Un correo distinto ve «Esta cuenta no es de un socio».
-- Claude entra con una cuenta robot para los correos diarios y para cargar información (`herramientas/firestore.py`). Puede leer y escribir todo menos la Caja fuerte; en la caja solo deja datos nuevos, que entran cifrados cuando un socio la abre.
+- Si los socios lo autorizan, Claude entra con una cuenta robot (`simonramirez0267+claude@gmail.com`) para los correos diarios y para cargar información (`herramientas/firestore.py`). Las reglas ya la contemplan: puede leer y escribir todo menos la Caja fuerte, y en la caja solo deja datos nuevos, que entran cifrados cuando un socio la abre. Esa cuenta la crea Simón en Firebase › Authentication › Usuarios.
+- Para pasar datos de la oficina anterior, o de cualquier copia, Historial › «Pasar datos de una copia (.json)». Con la oficina vacía, el botón sale también arriba.
 
 ## Puesta en marcha (una sola vez)
 
@@ -27,7 +28,13 @@ Cada socio entra con su correo y una contraseña propia. La primera vez se crea 
 3. Firestore Database › Crear base de datos, en modo de producción.
 4. Firestore Database › Reglas: pegar `firestore.rules` con los correos de los socios y el del robot en lugar de `CORREO_SIMON`, `CORREO_SEBASTIAN` y `CORREO_ROBOT`, y publicar.
 
-Si se abre este `index.html` sin configuración de Firebase, funciona como copia local: guarda solo en ese navegador. Dentro de claude.ai usa la base de datos del artifact (la versión anterior de la oficina).
+Si se abre este `index.html` sin configuración de Firebase, funciona como copia local: guarda solo en ese navegador.
+
+## Seguridad
+
+- La Caja fuerte se cifra en el equipo con AES-GCM de 256 bits; la llave sale de la clave con PBKDF2-SHA-256 y 600.000 vueltas (lo que recomienda OWASP). Una caja con menos vueltas se actualiza sola la próxima vez que se abre. Las claves nuevas de la caja piden mínimo 14 caracteres.
+- La página solo carga código, estilos y conexiones de la oficina, Firebase y Google Fonts (Content-Security-Policy).
+- No hay ninguna clave en el código: la configuración de Firebase es pública por diseño; lo que protege los datos son las cuentas y las reglas.
 
 ## Salas
 

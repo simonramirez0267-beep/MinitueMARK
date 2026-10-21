@@ -1,5 +1,21 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Oficina MinuteMark</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- Solo se cargan código, estilos y conexiones de los orígenes de la oficina, Firebase y Google Fonts -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-src https://minutemark-oficina.firebaseapp.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0051B9">
+<title>Oficina MinuteMark</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="img/icono-192.png">
+<link rel="apple-touch-icon" href="img/icono-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MinuteMark">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
@@ -616,6 +632,8 @@ body.con-entrada .app{display:none}
 .salir-pantalla{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:max(14px,env(safe-area-inset-right,0px));z-index:40;box-shadow:var(--sombra)}
 </style>
 
+</head>
+<body>
 <div class="entrada" id="entrada" hidden></div>
 <div class="app">
   <aside class="lado" id="lado">
@@ -637,10 +655,17 @@ body.con-entrada .app{display:none}
 'use strict';
 
 // Link de la oficina compartida. La copia local lo muestra en su aviso; los correos y el calendario lo citan.
-var OFICINA_URL = 'https://claude.ai/artifact/7JRogiZ5KaNFzfb7QSRP59';
+var OFICINA_URL = 'https://simonramirez0267-beep.github.io/MinitueMARK/oficina/';
 // Proyecto de Firebase de la app propia (se ve en la consola de Firebase › Configuración del proyecto).
 // Con esto lleno, la oficina abierta fuera de claude.ai guarda en Firestore y pide entrar con correo y contraseña.
-var FIREBASE = null;
+var FIREBASE = {
+  apiKey:'AIzaSyBHU-d2fOiFem1XHSMEWX6cXbBJUsZWexY',
+  authDomain:'minutemark-oficina.firebaseapp.com',
+  projectId:'minutemark-oficina',
+  storageBucket:'minutemark-oficina.firebasestorage.app',
+  messagingSenderId:'167900162765',
+  appId:'1:167900162765:web:c1ab95d553253993ba9784'
+};
 var FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
 
 var SOCIOS = {
@@ -851,9 +876,6 @@ function iniciar(){
 
 // ---------- app propia: Firebase (Firestore en tiempo real, sin conexión y con cuenta de cada socio) ----------
 function prepararApp(){
-  document.head.insertAdjacentHTML('beforeend', '<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0051B9">' +
-    '<link rel="apple-touch-icon" href="img/icono-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">' +
-    '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="MinuteMark"><meta name="robots" content="noindex">');
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(function(){});
   ['online', 'offline'].forEach(function(t){ window.addEventListener(t, function(){ if (S.modo === 'nube') pedirRender(); }); });
 }
@@ -864,6 +886,7 @@ function iniciarNube(){
     try { B.fs = F.initializeFirestore(app, {localCache:F.persistentLocalCache({tabManager:F.persistentMultipleTabManager()}), ignoreUndefinedProperties:true}); }
     catch(e){ B.fs = F.initializeFirestore(app, {ignoreUndefinedProperties:true}); }
     B.auth = F.getAuth(app);
+    B.auth.languageCode = 'es';
     F.onAuthStateChanged(B.auth, function(u){
       B.user = u; S.entrada.ocupado = false;
       if (!u) S.auth = 'fuera';
@@ -1234,6 +1257,7 @@ function franjas(){
   if (S.modo === 'nube' && navigator.onLine === false) h += '<p class="franja">Sin conexión. Lo que anotes se guarda en este celular y se sube solo cuando vuelva el internet.</p>';
   if (S.soloLectura && S.modo === 'nube') h += '<p class="franja alerta" role="alert"><b>Esta cuenta no puede guardar en la oficina.</b> Cierra sesión y entra con tu correo de socio.</p>';
   else if (S.soloLectura) h += '<div class="franja alerta" role="alert"><span><b>Esta vista no puede guardar cambios.</b> Pasa cuando la oficina se abre por el enlace público o sin sesión: se puede mirar, pero no editar. Para arreglarlo, Simón entra a Compartir, invita a Sebastián con su correo como Editor y apaga el acceso con enlace. Después Sebastián la abre con su cuenta de claude.ai de ese correo, desde la app de Claude o desde Chrome o Safari (no desde el navegador de WhatsApp).</span></div>';
+  if (S.modo === 'nube' && listo() && !buscar('config', 'oficina')) h += '<div class="franja"><span><b>La oficina está vacía.</b> Si vienen de la oficina en Claude, pasen los datos con el archivo de la copia.</span>' + botonImportar() + '</div>';
   if (S.modo === 'local') h += '<p class="franja">Copia local: lo que anotes aquí queda solo en este navegador.' + (OFICINA_URL ? ' <a class="enlace" href="' + esc(OFICINA_URL) + '" target="_blank" rel="noopener">Abrir la oficina compartida</a>' : '') + '</p>';
   return h;
 }
@@ -1839,6 +1863,25 @@ function respaldo(){
   data.colecciones.actividad = S.actividad;
   return JSON.stringify(data, null, 2);
 }
+function importarCopia(archivo){
+  var lector = new FileReader();
+  lector.onload = function(){
+    var data = null; try { data = JSON.parse(lector.result); } catch(e){}
+    var cols = data && data.colecciones;
+    if (!cols) return avisar('Ese archivo no es una copia de la oficina.', 'alerta');
+    var docs = [];
+    COLS.concat('actividad').forEach(function(c){ (cols[c] || []).forEach(function(d){ if (d && d.id) docs.push([c, d]); }); });
+    if (!docs.length) return avisar('La copia está vacía.', 'alerta');
+    if (buscar('config', 'oficina') && !confirm('La oficina ya tiene datos. ¿Reemplazar con los de la copia? Lo que tenga el mismo nombre se sobrescribe.')) return;
+    Promise.all(docs.map(function(x){ var d = Object.assign({}, x[1]); delete d.id; return escribir('set', x[0], x[1].id, d); })).then(function(r){
+      var ok = r.filter(Boolean).length;
+      registrar('pasó a la oficina ' + ok + ' datos de la copia del ' + (data.exportado ? fechaCorta(fechaISO(new Date(data.exportado))) : 'archivo'));
+      avisar(ok === docs.length ? 'Listo: se pasaron ' + ok + ' datos.' : 'Se pasaron ' + ok + ' de ' + docs.length + ' datos. Intenten de nuevo con el mismo archivo.', ok === docs.length ? '' : 'alerta');
+    });
+  };
+  lector.readAsText(archivo);
+}
+function botonImportar(){ return '<label class="btn btn-linea btn-sm" for="importar-copia">Pasar datos de una copia (.json)</label><input type="file" id="importar-copia" accept="application/json,.json" data-cambio="importar" hidden>'; }
 function csvTareas(){
   var resp = {simon:'Simón', sebastian:'Sebastián', ambos:'Ambos'};
   var filas = [['Tarea','Estado','Responsable','Área','Día','Fecha límite','Último avance','Qué falta','Cómo se cumplió','Cumplida el']];
@@ -1862,7 +1905,8 @@ function descargar(nombre, contenido){
 // Todo se cifra en el navegador (AES-GCM con una llave sacada de la clave con PBKDF2).
 // En la base solo queda el texto cifrado: sin la clave nadie lo puede leer, tampoco Claude.
 var CAJA = {clave:null, datos:null, version:'', abierta:false, error:'', ver:{}, filtro:'', ultimo:0, ocupado:false};
-var CAJA_ITER = 310000;
+var CAJA_ITER = 600000;
+var CAJA_MIN = 14;
 var TIPOS_CAJA = [['empresa','Empresa'],['banco','Bancos y pagos'],['proveedor','Proveedores: códigos y accesos'],['acceso','Accesos y contraseñas'],['contacto','Contactos: clientes y proveedores'],['otro','Otros']];
 function b64(u8){ var t = ''; for (var i = 0; i < u8.length; i += 0x8000) t += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(t); }
 function deb64(t){ var b = atob(t), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
@@ -1880,7 +1924,7 @@ function cifrar(clave, obj){
 function descifrar(clave, d){ return crypto.subtle.decrypt({name:'AES-GCM', iv:deb64(d.iv)}, clave, deb64(d.datos)).then(function(pt){ return JSON.parse(new TextDecoder().decode(pt)); }); }
 function cerrarCaja(msg){ CAJA.clave = null; CAJA.datos = null; CAJA.version = ''; CAJA.abierta = false; CAJA.ver = {}; CAJA.filtro = ''; CAJA.error = msg || ''; }
 function crearCaja(f1, f2){
-  if (f1.length < 10) { CAJA.error = 'La clave debe tener al menos 10 caracteres.'; return render(); }
+  if (f1.length < CAJA_MIN) { CAJA.error = 'La clave debe tener al menos ' + CAJA_MIN + ' caracteres. Lo mejor: cuatro o cinco palabras al azar.'; return render(); }
   if (f1 !== f2) { CAJA.error = 'Las dos claves no coinciden.'; return render(); }
   CAJA.error = ''; CAJA.ocupado = true; render();
   var sal = crypto.getRandomValues(new Uint8Array(16));
@@ -1902,7 +1946,13 @@ function abrirCaja(frase){
   CAJA.error = ''; CAJA.ocupado = true; render();
   derivar(frase, deb64(doc.sal), doc.iter).then(function(clave){
     return descifrar(clave, doc).then(function(datos){ CAJA.clave = clave; CAJA.datos = datos; CAJA.version = doc.iv; CAJA.abierta = true; CAJA.ultimo = Date.now(); CAJA.filtro = ''; });
-  }).catch(function(){ CAJA.error = 'Esa no es la clave.'; }).then(function(){ CAJA.ocupado = false; render(); });
+  }).then(function(){
+    CAJA.ocupado = false;
+    if ((doc.iter || 0) >= CAJA_ITER) return;
+    // la misma clave, con la protección de ahora: sal nueva y más vueltas
+    var sal = crypto.getRandomValues(new Uint8Array(16));
+    return derivar(frase, sal).then(function(clave){ guardarCaja(function(){}, 'La caja quedó con la protección nueva. La clave sigue siendo la misma.', {clave:clave, sal:sal, mejora:true}); });
+  }, function(){ CAJA.error = 'Esa no es la clave.'; CAJA.ocupado = false; }).then(function(){ render(); });
 }
 // cada cambio parte de la última versión guardada, para no pisar lo que el otro socio acaba de agregar
 function guardarCaja(mutar, mensaje, nuevaClave, luego){
@@ -1915,10 +1965,11 @@ function guardarCaja(mutar, mensaje, nuevaClave, luego){
       mutar(datos);
       var sal = nuevaClave ? b64(nuevaClave.sal) : doc.sal, llave = nuevaClave ? nuevaClave.clave : CAJA.clave;
       return cifrar(llave, datos).then(function(c){
-        return escribir('set', 'caja', 'fuerte', {v:1, iter:CAJA_ITER, sal:sal, iv:c.iv, datos:c.datos, creada:doc.creada || ahora(), actualizado:ahora(), por:S.yo || ''}).then(function(ok){
+        // las vueltas van con la sal: si la llave no cambia, se guardan las mismas con que se sacó
+        return escribir('set', 'caja', 'fuerte', {v:1, iter:nuevaClave ? CAJA_ITER : (doc.iter || CAJA_ITER), sal:sal, iv:c.iv, datos:c.datos, creada:doc.creada || ahora(), actualizado:ahora(), por:S.yo || ''}).then(function(ok){
           if (!ok) throw new Error('no se guardó');
           CAJA.datos = datos; CAJA.version = c.iv; CAJA.clave = llave;
-          registrar(nuevaClave ? 'cambió la clave de la caja fuerte' : 'actualizó la caja fuerte');
+          registrar(nuevaClave && !nuevaClave.mejora ? 'cambió la clave de la caja fuerte' : 'actualizó la caja fuerte');
           avisar(mensaje);
           if (luego) luego();
         });
@@ -1962,7 +2013,7 @@ function vistaCaja(){
 function cajaCrearHTML(){
   var sem = cajaSemilla();
   return '<section class="panel caja-llave"><header class="panel-cab"><div><span class="etiqueta">Primera vez</span><h2>Elijan la clave de la caja</h2></div></header>' +
-    '<p class="panel-ayuda">Pónganse de acuerdo entre los dos. Que tenga al menos 10 caracteres: por ejemplo, cuatro palabras que solo ustedes entiendan. No la escriban en ninguna otra parte de la oficina ni se la manden a Claude.</p>' +
+    '<p class="panel-ayuda">Pónganse de acuerdo entre los dos. Que tenga al menos 14 caracteres. Lo más seguro: cinco palabras al azar, como «tortuga lámpara río cobre nube», que no usen en ningún otro lado. No la escriban en ninguna otra parte de la oficina ni se la manden a Claude.</p>' +
     '<form class="caja-form" data-form="caja-crear" autocomplete="off">' +
       '<div class="campo"><label for="caja-c1">Clave de la caja</label><input class="campo-input" id="caja-c1" type="password" autocomplete="new-password"></div>' +
       '<div class="campo"><label for="caja-c2">Repítanla</label><input class="campo-input" id="caja-c2" type="password" autocomplete="new-password"></div>' +
@@ -2032,7 +2083,7 @@ function modalCambiarClave(){
       {id:'c2', label:'Repítanla', tipo:'password', valor:'', crudo:true},
       {tipo:'info', html:'<span>Al cambiarla, el otro socio tiene que usar la clave nueva. Avísenle antes.</span>'}
     ],
-    validar: function(v){ if (v.c1.length < 10) return ['c1', 'Al menos 10 caracteres.']; if (v.c1 !== v.c2) return ['c2', 'Las dos claves no coinciden.']; },
+    validar: function(v){ if (v.c1.length < CAJA_MIN) return ['c1', 'Al menos ' + CAJA_MIN + ' caracteres. Lo mejor: cinco palabras al azar.']; if (v.c1 !== v.c2) return ['c2', 'Las dos claves no coinciden.']; },
     onGuardar: function(v){
       var sal = crypto.getRandomValues(new Uint8Array(16));
       derivar(v.c1, sal).then(function(clave){ guardarCaja(function(){}, 'Clave cambiada. Avísale al otro socio.', {clave:clave, sal:sal}); });
@@ -2046,9 +2097,9 @@ function vistaHistorial(){
   var ult = U.pila[U.pila.length - 1];
   return cabecera('Historial', 'Lo que pasó y lo que se borró', 'Casi todo se puede deshacer o recuperar. Lo que se borra se guarda 30 días en la papelera.',
       ult ? '<button class="btn btn-linea" data-accion="deshacer">' + ICON.deshacer + 'Deshacer el último cambio</button>' : '') +
-    '<section class="panel" data-panel="h-respaldo"><header class="panel-cab"><div><span class="etiqueta">Dónde vive la información</span><h2>En la oficina, no en la conversación con Claude</h2></div></header>' +
-      '<p class="panel-ayuda">Todo lo que anotan queda guardado en esta página de claude.ai, aunque se borre la conversación con Claude. Para tener una copia propia, descárguenla de vez en cuando (por ejemplo, cada viernes).</p>' +
-      '<div class="panel-herr"><button class="btn btn-linea btn-sm" data-accion="respaldo-json">Descargar copia completa (.json)</button><button class="btn btn-linea btn-sm" data-accion="respaldo-csv">Tareas en Excel (.csv)</button></div></section>' +
+    '<section class="panel" data-panel="h-respaldo"><header class="panel-cab"><div><span class="etiqueta">Dónde vive la información</span><h2>' + (S.modo === 'nube' ? 'En la base de la oficina, con copia en cada equipo' : 'En la oficina, no en la conversación con Claude') + '</h2></div></header>' +
+      '<p class="panel-ayuda">' + (S.modo === 'nube' ? 'Todo queda guardado en Firebase (Google) y en cada celular donde abren la oficina. La Caja fuerte viaja y se guarda cifrada. Para tener una copia propia, descárguenla de vez en cuando (por ejemplo, cada viernes).' : 'Todo lo que anotan queda guardado en esta página de claude.ai, aunque se borre la conversación con Claude. Para tener una copia propia, descárguenla de vez en cuando (por ejemplo, cada viernes).') + '</p>' +
+      '<div class="panel-herr"><button class="btn btn-linea btn-sm" data-accion="respaldo-json">Descargar copia completa (.json)</button><button class="btn btn-linea btn-sm" data-accion="respaldo-csv">Tareas en Excel (.csv)</button>' + (S.modo === 'nube' ? botonImportar() : '') + '</div></section>' +
     '<div class="historial">' +
       '<section class="panel" data-panel="h-papelera"><header class="panel-cab"><div><span class="etiqueta">Papelera</span><h2>' + (pap.length ? pap.length + (pap.length === 1 ? ' cosa borrada' : ' cosas borradas') : 'Vacía') + '</h2></div></header>' +
         (pap.length ? '<ul class="lista-tareas">' + pap.map(function(p){
@@ -2768,6 +2819,7 @@ var ACC = {
   'paso-quitar': function(el){ if (!M) return; M.pasos.splice(Number(el.dataset.i), 1); $('#m-pasos-lista').innerHTML = pasosHTML(); }
 };
 var CAMBIO = {
+  'importar': function(el){ var f = el.files && el.files[0]; el.value = ''; if (f) importarCopia(f); },
   'filtro-etapa': function(el){ S.filtro.etapa = el.value; LS.set('mm-oficina-filtro', S.filtro); render(); },
   'programar': function(el){ var t = tarea(el.dataset.id); if (t && el.value) { cambiar('tareas', t.id, {dia:el.value}); } },
   'reunion-fecha': function(el){ S.reunionFecha = el.value === hoy() ? null : el.value; render(); },
