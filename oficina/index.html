@@ -1,4 +1,4 @@
-<title>Oficina MinuteMark</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Oficina MinuteMark</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -590,6 +590,23 @@ mark{background:var(--azul-tenue);color:var(--azul-profundo);border-radius:4px;p
 .dato-s .enlace{font-size:12px;flex:none}
 .secreto-pie{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--tinta-suave)}
 
+/* ---------- entrada (app propia con Firebase) ---------- */
+.entrada{position:fixed;inset:0;z-index:60;background:var(--degradado);color:var(--sobre-azul);overflow:auto;display:flex;justify-content:center;align-items:center;
+  padding:max(24px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(24px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+body.con-entrada .app{display:none}
+.entrada-caja{width:100%;max-width:420px;display:flex;flex-direction:column;gap:18px}
+.entrada-marca{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.entrada-marca img:first-child{width:190px;height:auto}
+.entrada-marca .mark{width:96px;margin-bottom:-6px}
+.entrada h1{font-size:30px;line-height:1.1;font-weight:700;letter-spacing:-.01em}
+.entrada-sub{color:var(--sobre-azul-suave);font-size:15px;line-height:1.5}
+.entrada-form{display:flex;flex-direction:column;gap:12px;background:var(--superficie);color:var(--tinta);border-radius:var(--r-l);padding:22px;box-shadow:var(--sombra-modal)}
+.entrada-form h2{font-size:20px}
+.entrada-form p{font-size:14px;color:var(--tinta-suave);line-height:1.5}
+.entrada-form .btn{justify-content:center}
+.entrada-pie{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;font-size:14px}
+.entrada-ok{font-size:14px;color:var(--azul-profundo);background:var(--azul-tenue);border-radius:var(--r-s);padding:10px 12px}
+
 /* ---------- modo pantalla de la reunión ---------- */
 .modo-pantalla .lado{display:none}
 .modo-pantalla .app{grid-template-columns:minmax(0,1fr)}
@@ -599,6 +616,7 @@ mark{background:var(--azul-tenue);color:var(--azul-profundo);border-radius:4px;p
 .salir-pantalla{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:max(14px,env(safe-area-inset-right,0px));z-index:40;box-shadow:var(--sombra)}
 </style>
 
+<div class="entrada" id="entrada" hidden></div>
 <div class="app">
   <aside class="lado" id="lado">
     <div class="lado-marca">
@@ -618,8 +636,12 @@ mark{background:var(--azul-tenue);color:var(--azul-profundo);border-radius:4px;p
 (function(){
 'use strict';
 
-// Link de la oficina compartida en claude.ai. La copia local (abierta desde el repositorio) lo muestra en su aviso.
+// Link de la oficina compartida. La copia local lo muestra en su aviso; los correos y el calendario lo citan.
 var OFICINA_URL = 'https://claude.ai/artifact/7JRogiZ5KaNFzfb7QSRP59';
+// Proyecto de Firebase de la app propia (se ve en la consola de Firebase › Configuración del proyecto).
+// Con esto lleno, la oficina abierta fuera de claude.ai guarda en Firestore y pide entrar con correo y contraseña.
+var FIREBASE = null;
+var FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
 
 var SOCIOS = {
   simon:{nombre:'Simón', completo:'Simón Ramírez', ini:'SR', rol:'Dirección comercial'},
@@ -754,7 +776,8 @@ var S = {
 COLS.forEach(function(c){ S.d[c] = []; });
 if (S.yo && !SOCIOS[S.yo]) S.yo = null;
 function salaInicial(){ var h = (location.hash || '').slice(1); return SALA_IDS.indexOf(h) >= 0 ? h : 'recepcion'; }
-function listo(){ return S.modo === 'local' || (S.modo === 'vivo' && COLS.every(function(c){ return S.recibidas[c]; })); }
+function listo(){ return S.modo === 'local' || ((S.modo === 'vivo' || S.modo === 'nube') && COLS.every(function(c){ return S.recibidas[c]; })); }
+function enClaude(){ return !!(window.claude && typeof window.claude.use === 'function'); }
 
 // ---------- datos: base compartida (claude.ai) o copia local ----------
 var B = { db:null, room:null, local:{} };
@@ -813,8 +836,10 @@ function limpiarPapelera(){
 }
 
 function iniciar(){
+  var usar = enClaude();
+  if (!usar) prepararApp();
+  if (!usar && FIREBASE) return iniciarNube();
   render();
-  var usar = window.claude && typeof window.claude.use === 'function';
   var p = usar ? window.claude.use('db').catch(function(){ return null; }) : Promise.resolve(null);
   p.then(function(db){
     if (db) { B.db = db; S.modo = 'vivo'; conectarVivo(db); }
@@ -824,11 +849,138 @@ function iniciar(){
   if (usar) conectarSala();
 }
 
+// ---------- app propia: Firebase (Firestore en tiempo real, sin conexión y con cuenta de cada socio) ----------
+function prepararApp(){
+  document.head.insertAdjacentHTML('beforeend', '<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0051B9">' +
+    '<link rel="apple-touch-icon" href="img/icono-180.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">' +
+    '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="MinuteMark"><meta name="robots" content="noindex">');
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(function(){});
+  ['online', 'offline'].forEach(function(t){ window.addEventListener(t, function(){ if (S.modo === 'nube') pedirRender(); }); });
+}
+function iniciarNube(){
+  S.modo = 'nube'; S.auth = 'cargando'; S.entrada = {}; render();
+  Promise.all(['firebase-app.js', 'firebase-auth.js', 'firebase-firestore.js'].map(function(f){ return import(FIREBASE_SDK + f); })).then(function(m){
+    var F = B.F = Object.assign({}, m[0], m[1], m[2]), app = F.initializeApp(FIREBASE);
+    try { B.fs = F.initializeFirestore(app, {localCache:F.persistentLocalCache({tabManager:F.persistentMultipleTabManager()}), ignoreUndefinedProperties:true}); }
+    catch(e){ B.fs = F.initializeFirestore(app, {ignoreUndefinedProperties:true}); }
+    B.auth = F.getAuth(app);
+    F.onAuthStateChanged(B.auth, function(u){
+      B.user = u; S.entrada.ocupado = false;
+      if (!u) S.auth = 'fuera';
+      else if (!u.emailVerified) S.auth = 'verificar';
+      else return entrarNube();
+      render();
+    });
+  }).catch(function(){ S.auth = 'sin-red'; render(); });
+}
+function entrarNube(){
+  S.auth = 'dentro'; S.entrada = {};
+  if (!B.db) { B.db = envolverFirestore(B.F, B.fs); conectarVivo(B.db); conectarPresenciaNube(B.db); }
+  render();
+}
+// la misma forma que el db de claude.ai (collection, doc, where, orderBy, limit, onSnapshot, get, set, update, delete)
+function envolverFirestore(F, fs){
+  function foto(s){ return {docs:s.docs.map(function(d){ return {id:d.id, exists:true, data:function(){ return d.data(); }}; })}; }
+  function refDoc(r){
+    return {
+      set: function(d){ return F.setDoc(r, d); },
+      update: function(d){ return F.updateDoc(r, d); },
+      delete: function(){ return F.deleteDoc(r); },
+      get: function(){ return F.getDoc(r).then(function(x){ return {exists:x.exists(), data:function(){ return x.data(); }}; }); }
+    };
+  }
+  function consulta(base, filtros){
+    function q(){ return filtros.length ? F.query.apply(null, [base].concat(filtros)) : base; }
+    function mas(f){ return consulta(base, filtros.concat([f])); }
+    return {
+      where: function(a, o, b){ return mas(F.where(a, o, b)); },
+      orderBy: function(a, d){ return mas(F.orderBy(a, d)); },
+      limit: function(n){ return mas(F.limit(n)); },
+      onSnapshot: function(cb, err){ return F.onSnapshot(q(), function(s){ cb(foto(s)); }, err); },
+      get: function(){ return F.getDocs(q()).then(foto); },
+      doc: function(id){ return refDoc(F.doc(base, id)); }
+    };
+  }
+  return {collection:function(c){ return consulta(F.collection(fs, c), []); }, doc:function(p){ return refDoc(F.doc(fs, p)); }};
+}
+// el socio sale del correo con que entró (config/oficina.correos)
+function asignarYo(){
+  var cs = config().correos || {}, correo = ((B.user && B.user.email) || '').toLowerCase();
+  var q = Object.keys(cs).find(function(k){ return SOCIOS[k] && String(cs[k]).toLowerCase() === correo; });
+  if (q && S.yo !== q) { S.yo = q; LS.set('mm-oficina-yo', q); anunciar(true); }
+}
+function conectarPresenciaNube(db){
+  db.collection('presencia').onSnapshot(function(s){ B.pres = s.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); }); calcularPresentes(); }, function(){});
+  setInterval(function(){ if (document.visibilityState === 'visible') anunciar(true); calcularPresentes(); }, 60e3);
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'visible') anunciar(true);
+    else if (S.yo) db.doc('presencia/' + S.yo).set({sala:'', nota:'', en:''}).catch(function(){});
+  });
+}
+function calcularPresentes(){
+  var lim = Date.now() - 150e3;
+  S.presentes = (B.pres || []).filter(function(p){ return SOCIOS[p.id] && Date.parse(p.en || '') > lim; })
+    .map(function(p){ return {kind:'viewer', peer:p.id, isMe:p.id === S.yo, presence:{quien:p.id, sala:p.sala, nota:p.nota}}; });
+  renderLado();
+}
+function hayPresencia(){ return !!B.room || S.modo === 'nube'; }
+var ERR_ENTRADA = {
+  'auth/invalid-credential':'Correo o contraseña incorrectos.', 'auth/wrong-password':'Correo o contraseña incorrectos.', 'auth/user-not-found':'Correo o contraseña incorrectos.',
+  'auth/invalid-email':'Revisa el correo: parece que está mal escrito.', 'auth/email-already-in-use':'Ese correo ya tiene cuenta. Entra con tu contraseña.',
+  'auth/weak-password':'La contraseña debe tener al menos 8 caracteres.', 'auth/too-many-requests':'Demasiados intentos. Espera unos minutos y vuelve a intentar.',
+  'auth/network-request-failed':'Sin conexión. Revisa el internet y vuelve a intentar.', 'auth/missing-password':'Escribe la contraseña.'
+};
+function errorEntrada(e){ S.entrada.error = ERR_ENTRADA[e && e.code] || 'No se pudo. Intenta de nuevo.'; S.entrada.ocupado = false; renderEntrada(true); }
+function renderEntrada(forzar){
+  var E = S.entrada || (S.entrada = {}), el = $('#entrada');
+  document.body.classList.add('con-entrada'); el.hidden = false;
+  var clave = [S.auth, E.modo, E.error, E.ok, E.ocupado].join('|');
+  if (!forzar && el.dataset.clave === clave) return;
+  el.dataset.clave = clave;
+  var correo = el.querySelector('#e-correo'), vCorreo = correo ? correo.value : (B.user && B.user.email) || LS.get('mm-oficina-correo', '');
+  var cab = '<div class="entrada-marca"><img src="img/mm-logo-white.png" alt="MinuteMark" width="720" height="188"><img class="mark" src="img/mark-02-saludo.webp" alt="" width="200" height="200"></div>' +
+    '<div><h1>Oficina de socios</h1><p class="entrada-sub">Lo de Simón y Sebastián, en tiempo real y en el bolsillo.</p></div>';
+  var err = E.error ? '<p class="error" role="alert">' + esc(E.error) + '</p>' : '', ok = E.ok ? '<p class="entrada-ok" role="status">' + esc(E.ok) + '</p>' : '';
+  var cuerpo;
+  if (S.auth === 'cargando') cuerpo = '<div class="entrada-form"><p>Abriendo la oficina…</p></div>';
+  else if (S.auth === 'sin-red') cuerpo = '<div class="entrada-form"><h2>Sin conexión</h2><p>La primera vez que se abre la oficina en un equipo se necesita internet. Conéctate y vuelve a intentar.</p><button class="btn btn-primario" data-accion="recargar">Intentar de nuevo</button></div>';
+  else if (S.auth === 'verificar') cuerpo = '<div class="entrada-form"><h2>Confirma tu correo</h2><p>Te mandamos un correo a <b>' + esc(B.user.email) + '</b> para confirmar que es tuyo. Ábrelo, toca el enlace y vuelve aquí. Si no aparece, mira en spam.</p>' + err + ok +
+      '<button class="btn btn-primario" data-accion="entrada-verificado"' + (E.ocupado ? ' disabled' : '') + '>Ya lo confirmé</button><div class="entrada-pie"><button class="enlace" data-accion="entrada-reenviar">Reenviar el correo</button><button class="enlace" data-accion="salir-sesion">Usar otra cuenta</button></div></div>';
+  else if (S.auth === 'sin-acceso') cuerpo = '<div class="entrada-form"><h2>Esta cuenta no es de un socio</h2><p>Entraste con <b>' + esc((B.user && B.user.email) || '') + '</b>. La oficina solo abre con el correo de Simón o el de Sebastián.</p><button class="btn btn-primario" data-accion="salir-sesion">Entrar con otra cuenta</button></div>';
+  else {
+    var crear = E.modo === 'crear';
+    cuerpo = '<form class="entrada-form" data-form="' + (crear ? 'crear-cuenta' : 'entrar') + '" novalidate><h2>' + (crear ? 'Crea tu cuenta' : 'Entrar') + '</h2>' +
+      (crear ? '<p>Solo la primera vez, con tu correo de socio. Después de crearla te llega un correo para confirmarla.</p>' : '') +
+      '<div class="campo"><label for="e-correo">Correo</label><input class="campo-input" id="e-correo" type="email" autocomplete="username" inputmode="email" value="' + esc(vCorreo) + '"></div>' +
+      '<div class="campo"><label for="e-clave">Contraseña' + (crear ? ' (mínimo 8 caracteres)' : '') + '</label><input class="campo-input" id="e-clave" type="password" autocomplete="' + (crear ? 'new-password' : 'current-password') + '"></div>' +
+      (crear ? '<div class="campo"><label for="e-clave2">Repítela</label><input class="campo-input" id="e-clave2" type="password" autocomplete="new-password"></div>' : '') +
+      err + ok + '<button class="btn btn-primario" type="submit"' + (E.ocupado ? ' disabled' : '') + '>' + (E.ocupado ? 'Un momento…' : crear ? 'Crear mi cuenta' : 'Entrar') + '</button>' +
+      '<div class="entrada-pie"><button type="button" class="enlace" data-accion="entrada-modo">' + (crear ? 'Ya tengo cuenta' : 'Primera vez: crear mi cuenta') + '</button>' +
+      (crear ? '' : '<button type="button" class="enlace" data-accion="entrada-olvide">Olvidé mi contraseña</button>') + '</div></form>';
+  }
+  el.innerHTML = '<div class="entrada-caja">' + cab + cuerpo + '</div>';
+}
+function datosEntrada(){ return {correo:($('#e-correo') || {}).value ? $('#e-correo').value.trim().toLowerCase() : '', clave:($('#e-clave') || {}).value || '', clave2:($('#e-clave2') || {}).value || ''}; }
+function entrar(){
+  var d = datosEntrada(); if (!d.correo || !d.clave) { S.entrada.error = 'Escribe el correo y la contraseña.'; return renderEntrada(true); }
+  LS.set('mm-oficina-correo', d.correo); S.entrada.error = ''; S.entrada.ok = ''; S.entrada.ocupado = true; renderEntrada(true);
+  B.F.signInWithEmailAndPassword(B.auth, d.correo, d.clave).catch(errorEntrada);
+}
+function crearCuenta(){
+  var d = datosEntrada();
+  if (!d.correo) { S.entrada.error = 'Escribe tu correo.'; return renderEntrada(true); }
+  if (d.clave.length < 8) { S.entrada.error = 'La contraseña debe tener al menos 8 caracteres.'; return renderEntrada(true); }
+  if (d.clave !== d.clave2) { S.entrada.error = 'Las dos contraseñas no coinciden.'; return renderEntrada(true); }
+  LS.set('mm-oficina-correo', d.correo); S.entrada.error = ''; S.entrada.ocupado = true; renderEntrada(true);
+  B.F.createUserWithEmailAndPassword(B.auth, d.correo, d.clave).then(function(c){ return B.F.sendEmailVerification(c.user); }).catch(errorEntrada);
+}
+
 function conectarVivo(db){
   COLS.forEach(function(c){
     db.collection(c).onSnapshot(function(snap){
       S.d[c] = snap.docs.map(function(doc){ return Object.assign({id:doc.id}, doc.data()); });
       S.recibidas[c] = true;
+      if (c === 'config' && S.modo === 'nube') asignarYo();
       pedirRender();
     }, caida);
   });
@@ -836,19 +988,24 @@ function conectarVivo(db){
     S.actividad = snap.docs.map(function(doc){ return Object.assign({id:doc.id}, doc.data()); });
     pedirRender();
   }, caida);
-  db.doc('acceso/visita').set({en:ahora()}).catch(function(e){ if (e && e.code === 'invalid_argument') marcarSoloLectura(); });
-  window.claude.use('user').then(function(u){
-    if (!u) return;
-    u.can('data.write').then(function(r){ if (r === false) marcarSoloLectura(); }).catch(function(){});
-    u.canEdit().then(function(r){ S.editor = r; pedirRender(); }).catch(function(){});
-  }).catch(function(){});
+  if (S.modo === 'vivo') conectarPermisos(db);
   // la actividad se guarda 60 días; lo más viejo se borra para no llenar la base
   var limite = new Date(Date.now() - 60 * 864e5).toISOString();
   db.collection('actividad').where('fecha', '<', limite).limit(100).get().then(function(snap){
     snap.docs.forEach(function(doc){ db.collection('actividad').doc(doc.id).delete().catch(function(){}); });
   }).catch(function(){});
 }
+// claude.ai: quien abre con permiso de solo ver puede leer pero no guardar
+function conectarPermisos(db){
+  db.doc('acceso/visita').set({en:ahora()}).catch(function(e){ if (e && e.code === 'invalid_argument') marcarSoloLectura(); });
+  window.claude.use('user').then(function(u){
+    if (!u) return;
+    u.can('data.write').then(function(r){ if (r === false) marcarSoloLectura(); }).catch(function(){});
+    u.canEdit().then(function(r){ S.editor = r; pedirRender(); }).catch(function(){});
+  }).catch(function(){});
+}
 function caida(err){
+  if (S.modo === 'nube' && err && err.code === 'permission-denied') { S.auth = 'sin-acceso'; return render(); }
   S.error = err && err.code === 'revoked'
     ? 'Esta vista perdió el acceso a la oficina. Recarga la página.'
     : 'Se perdió la conexión con la oficina. Recarga la página para volver a ver los cambios en vivo.';
@@ -870,7 +1027,7 @@ function escribir(op, c, id, data){
   if (B.db) {
     var ref = B.db.collection(c).doc(id);
     var p = op === 'set' ? ref.set(data) : op === 'update' ? ref.update(data) : ref.delete();
-    return p.then(function(){ return true; }, function(e){ if (e && e.code === 'invalid_argument') marcarSoloLectura(); avisar(mensajeError(e), 'alerta'); return false; });
+    return p.then(function(){ return true; }, function(e){ if (e && (e.code === 'invalid_argument' || e.code === 'permission-denied')) marcarSoloLectura(); avisar(mensajeError(e), 'alerta'); return false; });
   }
   if (S.modo !== 'local') { avisar('La oficina aún se está abriendo. Intenta de nuevo en un momento.', 'alerta'); return Promise.resolve(false); }
   var col = B.local[c] || (B.local[c] = {});
@@ -893,7 +1050,7 @@ function mensajeError(e){
   if (c === 'quota_exceeded') return 'La oficina llegó a su límite de registros. Borren cosas que ya no sirvan para seguir creando.';
   if (c === 'resource_exhausted') return 'Muchos cambios seguidos. Espera unos segundos y vuelve a intentar.';
   if (c === 'revoked' || c === 'not_granted') return 'Esta vista ya no puede guardar en la oficina. Recarga la página.';
-  if (c === 'invalid_argument') return 'No se guardó: esta vista no tiene permiso para editar. Mira el aviso rojo de arriba.';
+  if (c === 'invalid_argument' || c === 'permission-denied') return 'No se guardó: esta vista no tiene permiso para editar. Mira el aviso rojo de arriba.';
   return 'No se pudo guardar. Revisa la conexión y vuelve a intentar.';
 }
 function registrar(texto){ crear('actividad', {texto:texto, por:S.yo || '', fecha:ahora()}); }
@@ -907,9 +1064,14 @@ function conectarSala(){
     room.onPeers(function(ch){ S.presentes = ch.peers; renderLado(); }, function(){});
   }).catch(function(){});
 }
-function anunciar(){
-  if (!B.room) return;
-  B.room.presence({quien:S.yo || '', sala:S.sala, nota:S.sala === 'libreta' ? (S.notaSel || '') : ''}).catch(function(){});
+function anunciar(forzar){
+  var p = {quien:S.yo || '', sala:S.sala, nota:S.sala === 'libreta' ? (S.notaSel || '') : ''};
+  if (B.room) { B.room.presence(p).catch(function(){}); return; }
+  if (S.modo !== 'nube' || !B.db || !S.yo) return;
+  var k = p.sala + '|' + p.nota;
+  if (!forzar && B.presK === k) return;
+  B.presK = k;
+  B.db.doc('presencia/' + S.yo).set({sala:p.sala, nota:p.nota, en:ahora()}).catch(function(){});
 }
 
 // ---------- derivados ----------
@@ -1049,6 +1211,8 @@ var renderPendiente = false;
 function pedirRender(){ if (renderPendiente) return; renderPendiente = true; requestAnimationFrame(function(){ renderPendiente = false; render(); }); }
 
 function render(){
+  if (S.modo === 'nube' && S.auth !== 'dentro') return renderEntrada();
+  if (document.body.classList.contains('con-entrada')) { document.body.classList.remove('con-entrada'); $('#entrada').hidden = true; $('#entrada').innerHTML = ''; $('#entrada').dataset.clave = ''; }
   renderLado();
   var sala = $('#sala'), g = capturar(sala);
   var atras = S.atras.length ? SALAS.find(function(x){ return x[0] === S.atras[S.atras.length - 1]; }) : null;
@@ -1067,7 +1231,9 @@ function franjas(){
   var h = '';
   if (listo() && correoAtrasado()) h += '<p class="franja alerta" role="alert">Los correos de la oficina no salen desde ' + (config().ultimoCorreo ? haceCuanto(config().ultimoCorreo) : 'hace rato') + ' · Si no les llegó el último, avísenle a Claude en la conversación de la oficina.</p>';
   if (S.error) h += '<p class="franja alerta" role="alert">' + esc(S.error) + '</p>';
-  if (S.soloLectura) h += '<div class="franja alerta" role="alert"><span><b>Esta vista no puede guardar cambios.</b> Pasa cuando la oficina se abre por el enlace público o sin sesión: se puede mirar, pero no editar. Para arreglarlo, Simón entra a Compartir, invita a Sebastián con su correo como Editor y apaga el acceso con enlace. Después Sebastián la abre con su cuenta de claude.ai de ese correo, desde la app de Claude o desde Chrome o Safari (no desde el navegador de WhatsApp).</span></div>';
+  if (S.modo === 'nube' && navigator.onLine === false) h += '<p class="franja">Sin conexión. Lo que anotes se guarda en este celular y se sube solo cuando vuelva el internet.</p>';
+  if (S.soloLectura && S.modo === 'nube') h += '<p class="franja alerta" role="alert"><b>Esta cuenta no puede guardar en la oficina.</b> Cierra sesión y entra con tu correo de socio.</p>';
+  else if (S.soloLectura) h += '<div class="franja alerta" role="alert"><span><b>Esta vista no puede guardar cambios.</b> Pasa cuando la oficina se abre por el enlace público o sin sesión: se puede mirar, pero no editar. Para arreglarlo, Simón entra a Compartir, invita a Sebastián con su correo como Editor y apaga el acceso con enlace. Después Sebastián la abre con su cuenta de claude.ai de ese correo, desde la app de Claude o desde Chrome o Safari (no desde el navegador de WhatsApp).</span></div>';
   if (S.modo === 'local') h += '<p class="franja">Copia local: lo que anotes aquí queda solo en este navegador.' + (OFICINA_URL ? ' <a class="enlace" href="' + esc(OFICINA_URL) + '" target="_blank" rel="noopener">Abrir la oficina compartida</a>' : '') + '</p>';
   return h;
 }
@@ -1123,7 +1289,7 @@ function renderLado(){
     '<button class="btn btn-sm btn-parquear" data-accion="parquear" title="Parquear una idea">' + ICON.parquear.replace('<svg', '<svg style="width:18px;height:18px"') + '<span>Parquear una idea</span></button>';
 }
 function presentesHTML(){
-  if (!B.room || !S.presentes.length) return '';
+  if (!hayPresencia() || !S.presentes.length) return '';
   var vistos = {}, orden = [];
   S.presentes.forEach(function(p){
     if (p.kind !== 'viewer') return;
@@ -1613,7 +1779,7 @@ function tarjetaProspecto(p){
 function vistaLibreta(){
   var notas = S.d.libreta.slice().sort(function(a, b){ return (a.orden || 99) - (b.orden || 99) || (a.titulo || '').localeCompare(b.titulo || '', 'es'); });
   var sel = notas.find(function(n){ return n.id === S.notaSel; }) || notas[0];
-  var otros = sel && B.room ? S.presentes.filter(function(p){ return !p.isMe && p.presence && p.presence.sala === 'libreta' && p.presence.nota === sel.id && SOCIOS[p.presence.quien]; }) : [];
+  var otros = sel && hayPresencia() ? S.presentes.filter(function(p){ return !p.isMe && p.presence && p.presence.sala === 'libreta' && p.presence.nota === sel.id && SOCIOS[p.presence.quien]; }) : [];
   return cabecera('Libreta', 'Lo que no puede quedar en el aire', 'Guiones, respuestas, preguntas y todo lo que se habla y se necesita después. Se guarda solo mientras escriben.',
       '<button class="btn btn-primario" data-accion="nueva-nota">' + ICON.mas + 'Nota</button>') +
     (notas.length ? '<div class="libreta"><nav class="notas-lista" aria-label="Notas">' + notas.map(function(n){
@@ -2336,6 +2502,11 @@ function modalContacto(p){
   });
 }
 function modalQuien(){
+  if (S.modo === 'nube') return abrirForm({
+    etiqueta:'Tu sesión', titulo:SOCIOS[S.yo] ? SOCIOS[S.yo].completo : 'Sesión', textoGuardar:'Cerrar sesión', sinFoco:true,
+    campos:[{tipo:'info', html:'<span>Entraste con <b>' + esc((B.user && B.user.email) || '') + '</b>. La sesión queda abierta en este equipo hasta que la cierres.</span>'}],
+    onGuardar: function(){ B.F.signOut(B.auth).then(function(){ location.reload(); }); }
+  });
   abrirForm({
     etiqueta:'Esta oficina', titulo:'¿Quién eres?', textoGuardar:'Listo', sinFoco:true,
     campos:[{id:'quien', label:'Socio', tipo:'segment', valor:S.yo || '', opciones:[['simon','Simón Ramírez'],['sebastian','Sebastián Ortiz']]},
@@ -2492,6 +2663,22 @@ var ACC = {
   'reg-quitar': function(el){ if (!M) return; M.reg[el.dataset.campo].splice(Number(el.dataset.i), 1); $('#m-reg-' + el.dataset.campo).innerHTML = registrosHTML(el.dataset.campo); },
   'soy': function(el){ ponerYo(el.dataset.quien); },
   'cambiar-quien': modalQuien,
+  'recargar': function(){ location.reload(); },
+  'entrada-modo': function(){ S.entrada.modo = S.entrada.modo === 'crear' ? '' : 'crear'; S.entrada.error = ''; S.entrada.ok = ''; renderEntrada(true); },
+  'entrada-olvide': function(){
+    var c = datosEntrada().correo; if (!c) { S.entrada.error = 'Escribe tu correo y vuelve a tocar «Olvidé mi contraseña».'; return renderEntrada(true); }
+    B.F.sendPasswordResetEmail(B.auth, c).then(function(){ S.entrada.error = ''; S.entrada.ok = 'Listo: te mandamos un correo a ' + c + ' para cambiar la contraseña.'; renderEntrada(true); }, errorEntrada);
+  },
+  'entrada-verificado': function(){
+    S.entrada.ocupado = true; renderEntrada(true);
+    B.user.reload().then(function(){ return B.user.getIdToken(true); }).then(function(){
+      S.entrada.ocupado = false;
+      if (B.user.emailVerified) return entrarNube();
+      S.entrada.error = 'Todavía no aparece confirmado. Abre el enlace del correo y vuelve a tocar el botón.'; renderEntrada(true);
+    }).catch(errorEntrada);
+  },
+  'entrada-reenviar': function(){ B.F.sendEmailVerification(B.user).then(function(){ S.entrada.error = ''; S.entrada.ok = 'Te lo volvimos a mandar.'; renderEntrada(true); }, errorEntrada); },
+  'salir-sesion': function(){ B.F.signOut(B.auth).then(function(){ location.reload(); }); },
   'parquear': modalParquear,
   'ajustes': modalAjustes,
   'nueva-tarea': function(el){ modalTarea(null, {dia:el.dataset.dia || '', estado:el.dataset.estado || '', etapa:el.dataset.etapa || (S.sala === 'tablero' && S.filtro.etapa !== 'todas' && S.filtro.etapa !== 'sin' ? S.filtro.etapa : '')}); },
@@ -2589,6 +2776,8 @@ var CAMBIO = {
 };
 var FORM = {
   'modal': enviarModal,
+  'entrar': entrar,
+  'crear-cuenta': crearCuenta,
   'caja-crear': function(){ crearCaja($('#caja-c1').value, $('#caja-c2').value); },
   'caja-abrir': function(){ abrirCaja($('#caja-clave').value); },
   'parquear': function(f){ var i = f.querySelector('input'), t = i.value.trim(); if (!t) return i.focus(); i.value = ''; parquear(t); },
@@ -2692,3 +2881,4 @@ setInterval(function(){
 iniciar();
 })();
 </script>
+</body></html>

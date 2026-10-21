@@ -1,18 +1,33 @@
 # Oficina MinuteMark
 
-Herramienta interna de los socios. No es parte de la landing: vive en esta carpeta, no usa ni cambia ningún archivo de la landing, y GitHub Pages no la publica (Pages deja por fuera las carpetas que empiezan con `_`).
+Herramienta interna de los socios. No es parte de la landing: vive en esta carpeta y no usa ni cambia ningún archivo de la landing. GitHub Pages la publica en `/oficina/`, pero sin cuenta de socio no se ve ningún dato.
 
 ## Dónde se usa
 
-La oficina compartida está en claude.ai:
+Es una app propia que se instala en el celular:
 
-https://claude.ai/artifact/7JRogiZ5KaNFzfb7QSRP59
+https://simonramirez0267-beep.github.io/MinitueMARK/oficina/
 
-Ahí todo lo que se anota queda guardado en una base de datos compartida y se actualiza en vivo para los dos socios.
+- **iPhone:** abrirla en Safari › Compartir › «Agregar a inicio».
+- **Android:** abrirla en Chrome › menú › «Instalar app».
 
-**Para que los dos puedan editar:** con el acceso «Cualquiera con el enlace», quien no es de la organización de Simón en Claude solo puede mirar. Simón entra a **Compartir**, invita a Sebastián con su correo como **Editor** y apaga el acceso con enlace. Sebastián la abre con su cuenta de claude.ai de ese correo, desde la app de Claude o desde Chrome o Safari (no desde el navegador de WhatsApp). Si una vista no puede guardar, la oficina lo dice con un aviso rojo arriba.
+Cada socio entra con su correo y una contraseña propia. La primera vez se crea la cuenta y llega un correo para confirmarla; después la sesión queda abierta en ese equipo.
 
-Si abren este `index.html` directo desde el repositorio, funciona como copia local: guarda solo en ese navegador y no ve lo de la oficina compartida.
+## Cómo funciona
+
+- Los datos viven en Firebase (Firestore, de Google). Lo que anota un socio le aparece al otro al instante.
+- Sin internet se puede seguir trabajando: lo que se anota queda en el celular y se sube solo cuando vuelve la conexión.
+- Solo entran los dos correos de los socios, ya confirmados (`firestore.rules`). Un correo distinto ve «Esta cuenta no es de un socio».
+- Claude entra con una cuenta robot para los correos diarios y para cargar información (`herramientas/firestore.py`). Puede leer y escribir todo menos la Caja fuerte; en la caja solo deja datos nuevos, que entran cifrados cuando un socio la abre.
+
+## Puesta en marcha (una sola vez)
+
+1. En [console.firebase.google.com](https://console.firebase.google.com) crear el proyecto y agregarle una app web. Su configuración (`firebaseConfig`) va en `FIREBASE`, dentro de `index.html`.
+2. Authentication › Método de acceso › habilitar «Correo electrónico/contraseña». En Configuración › Dominios autorizados, agregar `simonramirez0267-beep.github.io`.
+3. Firestore Database › Crear base de datos, en modo de producción.
+4. Firestore Database › Reglas: pegar `firestore.rules` con los correos de los socios y el del robot en lugar de `CORREO_SIMON`, `CORREO_SEBASTIAN` y `CORREO_ROBOT`, y publicar.
+
+Si se abre este `index.html` sin configuración de Firebase, funciona como copia local: guarda solo en ese navegador. Dentro de claude.ai usa la base de datos del artifact (la versión anterior de la oficina).
 
 ## Salas
 
@@ -53,7 +68,7 @@ Con **Registrar avance** se anota qué se hizo, qué falta, qué día se sigue y
 
 - **Día** es cuándo se trabaja una tarea; **fecha límite** es cuándo tiene que estar lista. Con fecha límite, la tarea muestra «Vence en N días», «Vence mañana», «Vence hoy» o «Venció hace N días», y la oficina avisa en pantalla cuando faltan 1 día o menos.
 - Los **recordatorios** tienen día, hora opcional y para quién son (Simón, Sebastián o ambos). Con la oficina abierta salen en pantalla a su hora.
-- **Correos diarios** a cada socio, con lo suyo y lo de los dos: 6:56 a.m. y 5:20 p.m. (hora de Medellín). Los envía Claude desde la conversación de la oficina, con el Gmail de Simón.
+- **Correos diarios** a cada socio, con lo suyo y lo de los dos: 6:56 a.m. y 5:20 p.m. (hora de Medellín). Los envía Claude desde la conversación de la oficina, con el Gmail de Simón, leyendo la base con la cuenta robot.
 - **Cómo insisten las fechas límite:** desde el día de aviso (7 días antes por defecto; puede ser 3, 14 o 30) la tarea sale en «Plazos que se acercan» del correo de la mañana. A 3 días o menos pasa a «Urgente», arriba de los dos correos del día. El día que vence, el asunto dice «Vence hoy». Si se vence, sigue saliendo como «Venció hace N días» hasta que se marque como hecha. Los recordatorios vencidos también se repiten cada mañana hasta marcarlos.
 - **Google Calendar (lo más confiable):** cada recordatorio y cada fecha límite tiene el botón «Agregar al calendario». Abre Google Calendar con la fecha, la hora y el otro socio invitado; se guarda y listo. Desde ahí los avisos al celular y al correo los manda Google, aunque nadie abra la oficina ni Claude. Los correos de los socios están en Ajustes (el lápiz del Norte).
 - **Control:** cada envío deja la hora en la oficina («Último envío»). Si pasan más de 15 horas sin correo, la oficina muestra un aviso en rojo.
@@ -65,7 +80,7 @@ Con **Registrar avance** se anota qué se hizo, qué falta, qué día se sigue y
 - **Todo se edita:** tareas, avances, decisiones, ideas del parqueadero (también las descartadas), recordatorios (también los hechos), el historial de contactos de cada prospecto y las áreas con su orden.
 - **Buscar:** el botón Buscar (o Ctrl + K) encuentra cualquier cosa de la oficina y la abre.
 - **Volver:** arriba de cada sala hay un botón para volver a la sala anterior; «Inicio» siempre lleva a la entrada.
-- **Copia de seguridad:** en Historial se descarga una copia completa (.json) o las tareas en Excel (.csv). La información vive en la oficina de claude.ai, no en la conversación con Claude.
+- **Copia de seguridad:** en Historial se descarga una copia completa (.json) o las tareas en Excel (.csv). La información vive en Firebase, no en la conversación con Claude.
 - **Vista tranquila:** cada panel se oculta o se muestra con la flecha de su esquina, y cada socio ve la oficina como la dejó. En la Reunión de las 6, «Modo pantalla» oculta la barra lateral, agranda todo y, con la reunión en curso, deja abierto solo el bloque del momento.
 
 ## Reglas de la oficina
@@ -78,8 +93,12 @@ Con **Registrar avance** se anota qué se hizo, qué falta, qué día se sigue y
 ## Archivos
 
 ```
-index.html   La oficina completa (HTML, CSS y JavaScript, sin dependencias)
-img/         Logo, isotipo y tres poses de Mark, tomados del Design System de MinuteMark
+index.html             La oficina completa (HTML, CSS y JavaScript; Firebase se carga desde gstatic)
+manifest.webmanifest   Nombre, colores e íconos para instalarla en el celular
+sw.js                  Deja la app lista para abrir sin internet
+firestore.rules        Quién puede leer y escribir en la base
+herramientas/          firestore.py: lectura y escritura por REST para Claude y los correos
+img/                   Logo, isotipo, poses de Mark e íconos de la app
 ```
 
-Para cambiar algo, se edita `index.html` y se vuelve a publicar en el mismo link desde Claude. Los datos no se pierden al publicar una versión nueva.
+Para cambiar algo, se edita `index.html` y se sube a la rama `main`: GitHub Pages publica la versión nueva en un par de minutos y la app la toma al abrirse con internet. Los datos no se pierden al publicar.
