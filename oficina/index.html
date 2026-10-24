@@ -416,6 +416,13 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azul-bri
 .form-compromiso{display:grid;grid-template-columns:minmax(0,1fr) 150px 150px auto;gap:8px}
 @media(max-width:760px){.form-compromiso{grid-template-columns:1fr 1fr}.form-compromiso input[name="titulo"],.form-compromiso button{grid-column:1/-1}}
 .notas-reunion{width:100%;min-height:130px;resize:vertical;padding:12px 14px;border:1px solid var(--linea);border-radius:var(--r-s);background:var(--fondo);line-height:1.5}
+.cierre{margin-bottom:22px}
+.cierre-texto{white-space:pre-wrap;font-size:15px;line-height:1.55;background:var(--fondo);border-radius:var(--r-s);padding:12px 14px;overflow-wrap:anywhere}
+.cierre-sub{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-suave);margin-top:4px}
+.registro-claude{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.registro-claude li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45}
+.registro-claude li > span:nth-child(2){flex:1;min-width:0;overflow-wrap:anywhere}
+.registro-claude .chip{flex:none}
 .actas{display:flex;flex-direction:column}
 .acta{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--linea);font-size:14px}
 .acta:first-child{border-top:0}
@@ -1608,9 +1615,10 @@ function vistaReunion(){
   var fechas = S.d.reuniones.map(function(x){ return x.id; }).filter(function(x){ return x !== hoy(); }).sort().reverse();
 
   var botones = '<button class="btn btn-linea-clara btn-sm" data-accion="pantalla">' + (S.pantalla ? 'Salir del modo pantalla' : 'Modo pantalla') + '</button>';
-  if (esHoy && !r.inicio) botones = '<button class="btn btn-blanco btn-sm" data-accion="reunion-iniciar">Iniciar reunión</button>' + botones;
-  else if (r.inicio && !r.fin) botones = '<button class="btn btn-blanco btn-sm" data-accion="reunion-cerrar" data-fecha="' + f + '">Cerrar reunión</button>' + botones;
-  else if (r.fin) botones = '<span class="chip chip-blanco">Cerrada · ' + haceCuanto(r.fin) + '</span><button class="btn btn-linea-clara btn-sm" data-accion="reunion-reabrir" data-fecha="' + f + '">Reabrir</button>' + botones;
+  if (r.resumen) botones = '<span class="chip chip-blanco">Cerrada · ' + haceCuanto(r.fin || r.resumenEn) + '</span>' + botones;
+  else botones = (esHoy && !r.inicio ? '<button class="btn btn-linea-clara btn-sm" data-accion="reunion-iniciar">Iniciar reunión</button>' : '') +
+    (r.fin ? '<span class="chip chip-blanco">Cerrada · ' + haceCuanto(r.fin) + '</span>' : '') +
+    '<button class="btn btn-blanco btn-sm" data-accion="reunion-finalizar" data-fecha="' + f + '">' + (esHoy && !r.fin ? 'Finalizar la reunión' : 'Escribir el resumen') + '</button>' + botones;
 
   function bloque(b, contenido){
     var st = actual ? (actual.n === b.n ? ' activo' : actual.n > b.n ? ' pasado' : '') : (e.fase === 'curso' && !actual ? ' pasado' : '');
@@ -1653,7 +1661,8 @@ function vistaReunion(){
 
   var actas = fechas.length ? '<ul class="actas">' + fechas.slice(0, 12).map(function(x){
     var nd = S.d.decisiones.filter(function(d){ return d.reunion === x; }).length, nc = S.d.tareas.filter(function(t){ return t.origen === x; }).length;
-    return '<li class="acta"><button class="enlace" data-accion="ver-reunion" data-fecha="' + x + '">' + fechaCorta(x) + '</button><span>' + nd + (nd === 1 ? ' decisión' : ' decisiones') + ' · ' + nc + (nc === 1 ? ' compromiso' : ' compromisos') + '</span></li>';
+    var rx = buscar('reuniones', x) || {};
+    return '<li class="acta"><button class="enlace" data-accion="ver-reunion" data-fecha="' + x + '">' + fechaCorta(x) + '</button><span>' + (rx.resumen ? 'Con resumen · ' : '') + nd + (nd === 1 ? ' decisión' : ' decisiones') + ' · ' + nc + (nc === 1 ? ' compromiso' : ' compromisos') + '</span></li>';
   }).join('') + '</ul>' : '<p class="vacio">Las reuniones pasadas aparecen aquí.</p>';
 
   return '<section class="banda">' +
@@ -1664,6 +1673,7 @@ function vistaReunion(){
       '</div></div>' +
       '<img class="mark mark-reunion" src="img/mark-08-senalando.webp" alt="" width="400" height="309">' +
     '</section>' +
+    (r.resumen ? panelCierre(f, r) : esHoy ? '<p class="franja">Al terminar, toquen <b>Finalizar la reunión</b> y escriban lo que se hizo. Claude lo registra en cada tarea: avances, lo cumplido, lo nuevo y las decisiones.</p>' : '') +
     '<div class="reunion"><div class="reunion-agenda' + (actual ? ' con-activo' : '') + '">' + bloque(BLOQUES[0], b1) + bloque(BLOQUES[1], b2) + bloque(BLOQUES[2], b3) + bloque(BLOQUES[3], b4) + '</div>' +
     '<aside class="reunion-lado">' +
       '<section class="panel" data-panel="r-parq"><header class="panel-cab"><div><span class="etiqueta">Parqueadero</span><h2>' + ideas.length + (ideas.length === 1 ? ' idea' : ' ideas') + '</h2></div></header>' +
@@ -1672,6 +1682,45 @@ function vistaReunion(){
       '<section class="panel" data-panel="r-actas"><header class="panel-cab"><div><span class="etiqueta">Actas</span><h2>Reuniones pasadas</h2></div></header>' + actas +
         '<button class="enlace mostrar-mas" data-accion="ajustes">Cambiar la hora de la reunión</button></section>' +
     '</aside></div>';
+}
+
+// el cierre del día: lo que escribieron los socios y lo que Claude registró en la oficina
+var ETQ_CIERRE = {avance:['chip-curso','Avance'], hecha:['chip-etapa','Cumplida'], nueva:['chip-neutro','Nueva tarea'], decision:['chip-etapa','Decisión'], fecha:['chip-neutro','Nueva fecha'], nota:['chip-neutro','Nota']};
+function panelCierre(f, r){
+  var p = r.proceso || {}, items = p.items || [];
+  var estado = p.estado === 'listo' ? '<span class="chip chip-curso">Registrado por Claude ' + haceCuanto(p.en) + '</span>'
+    : p.estado === 'error' ? '<span class="chip chip-alerta">Claude no pudo leerlo</span>'
+    : '<span class="chip chip-neutro">Claude lo está leyendo</span>';
+  var lista = items.map(function(it){
+    var e = ETQ_CIERRE[it.tipo] || ETQ_CIERRE.nota, t = it.tareaId && tarea(it.tareaId);
+    return '<li><span class="chip ' + e[0] + '">' + e[1] + '</span><span>' + (it.titulo ? '<b>' + esc(it.titulo) + '</b>' + (it.texto ? '. ' : '') : '') + esc(it.texto || '') + '</span>' +
+      (t ? '<button class="enlace" data-accion="editar-tarea" data-id="' + esc(t.id) + '">Ver</button>' : '') + '</li>';
+  }).join('');
+  var cuerpo = p.estado === 'listo' ? (lista ? '<h3 class="cierre-sub">Lo que quedó registrado</h3><ul class="registro-claude">' + lista + '</ul>' : '<p class="vacio">No había nada para registrar en las tareas.</p>') + (p.nota ? '<p class="panel-ayuda">' + esc(p.nota) + '</p>' : '')
+    : p.estado === 'error' ? '<p class="panel-ayuda">' + esc(p.error || 'Toquen «Editar» y guarden de nuevo para que lo vuelva a intentar.') + '</p>'
+    : '<p class="panel-ayuda">Queda registrado esta misma noche: avances en cada tarea, lo cumplido, lo nuevo, las decisiones y los cambios de fecha. Lo verán aquí.</p>';
+  return '<section class="panel cierre" data-panel="r-cierre"><header class="panel-cab"><div><span class="etiqueta">Cierre del día' + (SOCIOS[r.resumenPor] ? ' · ' + SOCIOS[r.resumenPor].nombre : '') + '</span><h2>Lo que se hizo</h2></div>' +
+    '<div class="panel-herr">' + estado + '<button class="btn btn-linea btn-sm" data-accion="reunion-finalizar" data-fecha="' + f + '">Editar</button></div></header>' +
+    '<p class="cierre-texto">' + esc(r.resumen) + '</p>' + cuerpo + '</section>';
+}
+function modalFinalizar(f){
+  var r = buscar('reuniones', f) || {}, man = sumarDias(f, 1), sinFoco = !textoFoco(focoDe(man)), editar = !!r.resumen;
+  abrirForm({
+    etiqueta:'Reunión · ' + fechaCorta(f), titulo: editar ? 'Editar el resumen' : '¿Qué se hizo hoy?', textoGuardar: editar ? 'Guardar el resumen' : 'Finalizar la reunión',
+    campos:[
+      {id:'resumen', label:'Lo que se hizo, se habló y se decidió', tipo:'textarea', filas:10, requerido:true, valor:r.resumen || r.notas || '',
+        placeholder:'Escríbanlo como lo dirían. Por ejemplo:\nCambiamos el guion de las llamadas y ya lo masterizamos.\nAvanzamos en la presentación; falta presentarla a alguien de afuera.\nDecidimos sacar la tarjeta con Bancolombia.\nSalió algo nuevo: cotizar neveras con Nutresa el martes, Simón.'}
+    ].concat(sinFoco ? [{id:'focoManana', label:'Foco de mañana (' + fechaCorta(man) + ')', valor:'', max:120, placeholder:'Ej.: Llamadas a administraciones'}] : []).concat([
+      {tipo:'info', html:'<span>Una idea por línea ayuda. Claude lo lee y lo deja registrado donde va: avances en cada tarea, lo cumplido, tareas nuevas, decisiones y cambios de fecha. Queda listo esta misma noche y lo ven en el resumen de la reunión. También actualiza la «Memoria de MinuteMark» en la Libreta.</span>'}
+    ]),
+    onGuardar: function(v){
+      guardarDoc('reuniones', f, {fecha:f, fin:r.fin || ahora(), resumen:v.resumen, resumenPor:S.yo || '', resumenEn:ahora(),
+        proceso:{estado:'pendiente', pedido:ahora(), previo:(r.proceso && r.proceso.items) || (r.proceso && r.proceso.previo) || [], items:[]}});
+      if (v.focoManana) escribir('set', 'semana', man, {foco:v.focoManana, etapa:'', nota:''});
+      registrar(editar ? 'editó el resumen de la reunión del ' + fechaCorta(f) : 'cerró la reunión y dejó el resumen del día');
+      celebrar(editar ? 'Resumen guardado. Claude lo vuelve a leer.' : 'Reunión cerrada. Claude ya tiene el resumen.');
+    }
+  });
 }
 
 // tareas abiertas de un área, dentro de la sala que le corresponde
@@ -1865,7 +1914,7 @@ function resultados(q){
   mirar('cotizaciones', 'Cotización', function(x){ return x.proveedor; }, function(x){ return [x.proveedor, x.contacto, x.incluye, x.notas]; }, 'editar-cotizacion');
   mirar('productos', 'Producto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.categoria, x.proveedor, x.notas]; }, 'editar-producto');
   mirar('prospectos', 'Prospecto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.contacto, x.telefono, x.zona, x.proximo, x.notas].concat((x.contactos || []).map(function(c){ return c.nota; })); }, 'editar-prospecto');
-  mirar('reuniones', 'Reunión', function(x){ return 'Reunión del ' + fechaLarga(x.id); }, function(x){ return [x.notas]; }, 'ver-reunion', true);
+  mirar('reuniones', 'Reunión', function(x){ return 'Reunión del ' + fechaLarga(x.id); }, function(x){ return [x.notas, x.resumen].concat(((x.proceso || {}).items || []).map(function(i){ return i.texto; })); }, 'ver-reunion', true);
   mirar('semana', 'Foco', function(x){ return 'Foco del ' + fechaLarga(x.id) + ': ' + (x.foco || ''); }, function(x){ return [x.foco, x.nota]; }, 'editar-foco', true);
   if (!res.length) return '<p class="vacio">Nada con «' + esc(q.trim()) + '».</p>';
   return res.slice(0, 40).join('') + (res.length > 40 ? '<p class="vacio">Y ' + (res.length - 40) + ' resultados más. Afina la búsqueda.</p>' : '');
@@ -2769,7 +2818,7 @@ function moverProspecto(id, etapaNueva){
 var DESC = {
   'reabrir':'Se reabrió la tarea', 'mover-tarea':'Se movió la tarea', 'pasar-dia':'Se pasó la tarea de día', 'recordatorio-hecho':'Se marcó el recordatorio como hecho',
   'recordatorio-reabrir':'El recordatorio volvió a pendiente', 'idea-descartar':'Se descartó la idea', 'idea-recuperar':'La idea volvió al parqueadero', 'obj-sumar':'Se cambió la meta',
-  'seg':'Se cambió la lista de precios', 'reunion-iniciar':'Se inició la reunión', 'reunion-cerrar':'Se cerró la reunión', 'reunion-reabrir':'Se reabrió la reunión',
+  'seg':'Se cambió la lista de precios', 'reunion-iniciar':'Se inició la reunión', 
   'avanzar-prospecto':'Se avanzó el prospecto', 'marcar-calendario':'Quedó marcado como agregado al calendario', 'nueva-nota':'Se creó una nota', 'borrar-nota':'Se borró la nota', 'restaurar':'Se restauró', 'borrar-definitivo':'Se borró para siempre'
 };
 var ACC = {
@@ -2877,15 +2926,7 @@ var ACC = {
   'semana-mover': function(el){ var n = Number(el.dataset.n); S.semana = n ? sumarDias(S.semana || lunesDe(hoy()), n) : null; render(); },
   'ver-reunion': function(el){ if ($('#modal').open) cerrarModal(); S.reunionFecha = el.dataset.fecha === hoy() ? null : el.dataset.fecha; irA('reunion'); },
   'reunion-iniciar': function(){ var f = hoy(); guardarDoc('reuniones', f, {fecha:f, inicio:ahora(), fin:''}); registrar('inició la reunión de ' + nombreReunion()); },
-  'reunion-cerrar': function(el){
-    var f = el.dataset.fecha, man = sumarDias(f, 1);
-    if (!textoFoco(focoDe(man))) { avisar('Antes de cerrar, definan el foco de mañana.'); return modalFoco(man); }
-    var nd = S.d.decisiones.filter(function(d){ return d.reunion === f; }).length, nc = S.d.tareas.filter(function(t){ return t.origen === f; }).length;
-    cambiar('reuniones', f, {fin:ahora()});
-    registrar('cerró la reunión con ' + nd + (nd === 1 ? ' decisión' : ' decisiones') + ' y ' + nc + (nc === 1 ? ' compromiso' : ' compromisos'));
-    celebrar('Reunión cerrada. Mañana: ' + textoFoco(focoDe(man)) + '.');
-  },
-  'reunion-reabrir': function(el){ cambiar('reuniones', el.dataset.fecha, {fin:''}); },
+  'reunion-finalizar': function(el){ modalFinalizar(el.dataset.fecha || hoy()); },
 
   'idea-a-ruta': function(el){ var i = buscar('parqueadero', el.dataset.id); if (i) modalTarea(null, {titulo:i.texto, idea:i.id}); },
   'idea-descartar': function(el){ cambiar('parqueadero', el.dataset.id, {estado:'descartada'}); },

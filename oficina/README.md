@@ -43,7 +43,7 @@ Si se abre este `index.html` sin configuración de Firebase, funciona como copia
 | Inicio | Al llegar: saludo, foco del día, cuenta regresiva a la reunión, lo pendiente de hoy, el norte y las metas, los recordatorios, las tareas por área, lo último que pasó y el parqueadero. |
 | Tablero | Todas las tareas en Por hacer · En curso · Hecho, con las áreas arriba para filtrar. Cada tarea con área, responsable, día, pasos, sus avances y, al cumplirla, cómo se cumplió. |
 | Semana | Un foco por día y las tareas de cada día. Las tareas sin día quedan abajo para programarlas. |
-| Reunión de las 6 | La reunión diaria en cuatro bloques: lo cumplido, lo avanzado y lo atrasado (10 min), el foco y las tareas de hoy (30), decisiones (10) y compromisos para mañana (10). Guarda notas, decisiones y actas. |
+| Reunión de las 6 | La reunión diaria en cuatro bloques: lo cumplido, lo avanzado y lo atrasado (10 min), el foco y las tareas de hoy (30), decisiones (10) y compromisos para mañana (10). Guarda notas, decisiones y actas. Se cierra con «Finalizar la reunión»: el resumen del día que Claude lee y registra. |
 | Finanzas y proveedores | Las tareas abiertas del área Financiero y legal; la ficha de cada proveedor (cómo se pide, entrega, cuánto dura el producto, pedido mínimo, si cambian lo que se vence, lista 2026 e IVA) con sus pedidos; las cotizaciones de estanterías y la lista de precios con el margen de cada producto. |
 | Comercial | Las tareas abiertas del área Comercial y las unidades y empresas de administración por etapa: por contactar → contactado → reunión → presentación → consejo → firmado. Cada contacto queda registrado con su próximo paso. |
 | Libreta | Notas compartidas que se guardan solas: modelo de negocio, objeciones, guion de llamada, preguntas para financieros y proveedores. |
@@ -63,6 +63,10 @@ Cada tarea va en un área: **Comercial**, **Financiero y legal**, **Operación**
 - Si Claude carga datos, quedan en `caja/semilla` y entran cifrados la próxima vez que un socio abre la caja; ahí mismo se borra la semilla.
 - Las claves no se escriben en ninguna otra parte de la oficina ni se le mandan a Claude por chat.
 - **Copia en Excel:** con la caja abierta, el botón «Copia en Excel» arma en el mismo equipo un .xlsx con una hoja por categoría (Empresa, Bancos, Proveedores, Accesos, Contactos, Otros) y un resumen. Se le puede poner contraseña (cifrado de Excel, se abre en Excel del computador o del celular). Las claves no pasan por ningún servidor; la descarga queda en el historial de la oficina.
+
+## Cierre de la reunión y memoria
+
+«Finalizar la reunión» abre un panel para escribir, como se diría, qué se hizo, qué se habló, qué se decidió y qué salió nuevo. La oficina lo guarda en `reuniones/<fecha>` como pendiente. Claude lo lee esa noche (7:47, 8:47 y 9:47 p.m., y si queda algo, antes del correo de la mañana) siguiendo `herramientas/PROCESAR_REUNION.md`, y registra cada idea donde va: avances en cada tarea, tareas cumplidas, tareas nuevas, decisiones y cambios de fecha. En el acta del día queda la lista de lo que registró, con enlace a cada tarea. También mantiene al día la nota «Memoria de MinuteMark» de la Libreta: dónde está la empresa, cómo va cada área, las decisiones vigentes, lo aprendido y una bitácora de las reuniones.
 
 ## Pedidos a proveedores
 
