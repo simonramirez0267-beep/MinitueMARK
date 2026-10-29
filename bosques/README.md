@@ -9,6 +9,7 @@ Es una carpeta independiente: no usa nada de la landing ni de la oficina, y ella
 - Propuesta: https://simonramirez0267-beep.github.io/MinitueMARK/bosques/
 - Recorrido 3D: https://simonramirez0267-beep.github.io/MinitueMARK/bosques/3d/
 - PDF: https://simonramirez0267-beep.github.io/MinitueMARK/bosques/MinuteMark-Propuesta-Bosques-de-la-Cascada.pdf
+- Video del recorrido (68 s): https://simonramirez0267-beep.github.io/MinitueMARK/bosques/MinuteMark-Bosques-recorrido-3D.mp4
 
 Las páginas no se indexan en buscadores (`noindex`): solo las ve quien tenga el link.
 
@@ -21,4 +22,5 @@ img/            Fotomontajes (antes, después y versión en alta para descargar)
 og.jpg          Imagen que se ve al compartir el link (WhatsApp, correo)
 favicon.png     Ícono de la pestaña
 MinuteMark-Propuesta-Bosques-de-la-Cascada.pdf   La propuesta en PDF, 7 páginas A4
+MinuteMark-Bosques-recorrido-3D.mp4              Video del recorrido 3D, 68 s, 1280×720
 ```
