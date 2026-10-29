@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MinuteMark · Propuesta Bosques de la Cascada</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Fotomontajes sobre fotos reales del parqueadero de la Torre 1, con las medidas de cada sitio y recorrido en 3D.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://simonramirez0267-beep.github.io/MinitueMARK/bosques/">
+<meta property="og:title" content="Así se vería MinuteMark en Bosques de la Cascada">
+<meta property="og:description" content="Fotomontajes sobre fotos reales del parqueadero de la Torre 1, con las medidas de cada sitio y recorrido en 3D.">
+<meta property="og:image" content="https://simonramirez0267-beep.github.io/MinitueMARK/bosques/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="https://simonramirez0267-beep.github.io/MinitueMARK/favicon.png">
+<style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: propuesta para comité; selector de ubicaciones, antes/después a la izquierda, planta + ficha a la derecha, comparativo al final */
+:root{
+  --fondo:#F4F7FB;
+  --hoja:#FFFFFF;
+  --tinta:#0A1B33;
+  --tinta-2:#54657F;
+  --linea:#DCE3EC;
+  --azul:#0051B9;
+  --azul-b:#008CFF;
+  --hielo:#E8F1FF;
+  --ladrillo:#B8573A;
+  --amarillo:#E8B400;
+  --alerta:#C2410C;
+  --alerta-fondo:#FFF4EC;
+  --bien:#0E8F50;
+  --f:"Outfit","Poppins","Myriad Pro",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --fondo:#0B1424;--hoja:#111E33;--tinta:#F3F7FD;--tinta-2:#A9BBD6;--linea:#24344F;--azul:#4C8DFF;--azul-b:#5FB2FF;--hielo:#16284A;--ladrillo:#E07A5A;--amarillo:#F2C230;--alerta:#FB923C;--alerta-fondo:#2A1A10;--bien:#34D399;color-scheme:dark}}
+:root[data-theme="dark"]{--fondo:#0B1424;--hoja:#111E33;--tinta:#F3F7FD;--tinta-2:#A9BBD6;--linea:#24344F;--azul:#4C8DFF;--azul-b:#5FB2FF;--hielo:#16284A;--ladrillo:#E07A5A;--amarillo:#F2C230;--alerta:#FB923C;--alerta-fondo:#2A1A10;--bien:#34D399;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--fondo);color:var(--tinta);font-family:var(--f);line-height:1.5;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--azul-b);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+.cab{padding-block:22px 6px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.cab img{height:26px;width:auto}
+.logo-claro{display:block}.logo-oscuro{display:none}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .logo-claro{display:none}:root:not([data-theme="light"]) .logo-oscuro{display:block}}
+:root[data-theme="dark"] .logo-claro{display:none}:root[data-theme="dark"] .logo-oscuro{display:block}
+.fecha{font-size:13px;color:var(--tinta-2)}
+
+.intro{padding-block:18px 18px;display:grid;gap:8px}
+.eyebrow{margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--azul);font-weight:600}
+h1{margin:0;font-size:clamp(28px,4.6vw,46px);line-height:1.06;font-weight:800;letter-spacing:-.01em;text-wrap:balance;max-width:20ch}
+.lead{margin:0;color:var(--tinta-2);font-size:16px;max-width:64ch}
+.ver3d{justify-self:start;display:inline-flex;align-items:center;gap:8px;background:#0051B9;color:#fff;text-decoration:none;border-radius:999px;padding:10px 18px;font-size:14px;font-weight:600;margin-top:4px}
+.ver3d:hover{background:#0067D6}
+
+.ubic{display:flex;gap:8px;flex-wrap:wrap;padding-block:6px 18px}
+.ub{display:flex;align-items:center;gap:10px;background:var(--hoja);border:1px solid var(--linea);border-radius:14px;padding:10px 14px;text-align:left;cursor:pointer;min-width:0}
+.ub:disabled{cursor:default;opacity:.6}
+.ub .n{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--hielo);color:var(--azul)}
+.ub b{display:block;font-size:14px;font-weight:600}
+.ub small{display:block;font-size:12px;color:var(--tinta-2)}
+.ub[aria-pressed="true"]{border-color:var(--azul);box-shadow:0 0 0 1px var(--azul) inset}
+.ub[aria-pressed="true"] .n{background:var(--azul);color:#fff}
+
+.grid{display:grid;gap:22px;grid-template-columns:1fr;padding-bottom:30px}
+@media (min-width:980px){.grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:start}}
+
+.visor{display:grid;gap:12px;min-width:0}
+.vistas{display:flex;gap:6px;flex-wrap:wrap}
+.vista{border:1px solid var(--linea);background:var(--hoja);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;color:var(--tinta-2)}
+.vista[aria-pressed="true"]{background:var(--tinta);color:var(--fondo);border-color:var(--tinta)}
+.ab{position:relative;border-radius:16px;overflow:hidden;background:var(--hoja);border:1px solid var(--linea);max-width:100%;user-select:none;-webkit-user-select:none;touch-action:pan-y;margin-inline:auto;width:100%}
+.ab img{display:block;width:100%;height:auto}
+.ab .despues{position:absolute;inset:0;clip-path:inset(0 0 0 var(--corte,45%))}
+.ab .despues img{width:100%;height:100%;object-fit:cover}
+.ab .barra{position:absolute;top:0;bottom:0;left:var(--corte,45%);width:2px;background:#fff;box-shadow:0 0 0 1px rgba(10,27,51,.25);pointer-events:none}
+.ab .tirador{position:absolute;top:50%;left:var(--corte,45%);transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(10,27,51,.3);display:grid;place-items:center;pointer-events:none;color:#0A1B33;font-size:18px;font-weight:700}
+.ab input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
+.ab .et{position:absolute;top:12px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;background:rgba(10,27,51,.72);color:#fff;border-radius:999px;padding:4px 10px;pointer-events:none}
+.ab .et.a{left:12px}.ab .et.d{right:12px;background:#0051B9}
+.pie{margin:0;font-size:14px;color:var(--tinta-2)}
+.pie b{color:var(--tinta);font-weight:600}
+.bajar{border:1px solid var(--linea);background:var(--hoja);border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer;justify-self:start}
+.bajar[hidden]{display:none}
+
+.lado{display:grid;gap:18px;min-width:0}
+.panel{background:var(--hoja);border:1px solid var(--linea);border-radius:16px;padding:16px;display:grid;gap:10px;min-width:0}
+.panel h2{margin:0;font-size:19px;font-weight:700;text-wrap:balance}
+.panel p{margin:0;font-size:14px;color:var(--tinta-2)}
+.planta{overflow-x:auto}
+.planta svg{display:block;width:100%;height:auto;min-width:420px}
+#mapa{min-width:640px}
+.planta text{font-family:var(--f)}
+.datos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (min-width:560px){.datos{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.dato{border:1px solid var(--linea);border-radius:12px;padding:10px 12px;display:grid;gap:2px;min-width:0}
+.dato span{font-size:12px;color:var(--tinta-2)}
+.dato b{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+ul.lista{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+ul.lista li{display:grid;grid-template-columns:20px 1fr;gap:8px;font-size:14px;align-items:start}
+ul.lista li::before{content:"";width:8px;height:8px;border-radius:50%;margin-top:7px;margin-left:4px;background:var(--azul)}
+ul.lista.resolver li::before{background:var(--alerta)}
+.resolver-box{background:var(--alerta-fondo);border-color:transparent}
+.nota{font-size:12px;color:var(--tinta-2);margin:0}
+
+.comp{padding-block:6px 30px;display:grid;gap:12px}
+.general{padding-bottom:18px}
+.reco{border-color:var(--azul);background:var(--hielo)}
+.reco p{color:var(--tinta);font-size:15px;max-width:80ch}
+.mk{cursor:pointer}
+.comp h2{margin:0;font-size:24px;font-weight:700}
+.tabla{overflow-x:auto;background:var(--hoja);border:1px solid var(--linea);border-radius:16px}
+table{border-collapse:collapse;width:100%;min-width:620px;font-size:14px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--linea);vertical-align:top}
+thead th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--tinta-2);font-weight:600}
+tbody th{font-weight:600;color:var(--tinta);white-space:nowrap}
+tr:last-child th,tr:last-child td{border-bottom:0}
+.chip{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600}
+.chip.bien{background:color-mix(in srgb,var(--bien) 14%,transparent);color:var(--bien)}
+.chip.ojo{background:color-mix(in srgb,var(--alerta) 14%,transparent);color:var(--alerta)}
+.chip.pend{background:var(--hielo);color:var(--tinta-2)}
+footer{border-top:1px solid var(--linea);padding-block:18px 32px;font-size:13px;color:var(--tinta-2)}
+footer p{margin:0;max-width:80ch}
+.aviso{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);background:var(--tinta);color:var(--fondo);border-radius:12px;padding:10px 14px;font-size:13px;max-width:calc(100% - 32px);z-index:5}
+</style>
+</head>
+<body>
+
+<header class="cab wrap">
+  <img class="logo-claro" src="img/mm-logo-color.png" alt="MinuteMark" width="720" height="188">
+  <img class="logo-oscuro" src="img/mm-logo-white.png" alt="MinuteMark" width="720" height="188">
+  <span class="fecha">Propuesta para el comité · octubre 2026</span>
+</header>
+
+<main>
+  <section class="intro wrap">
+    <p class="eyebrow">Urbanización Bosques de la Cascada · El Poblado</p>
+    <h1>Así se vería MinuteMark en su unidad</h1>
+    <p class="lead">Fotomontajes sobre fotos reales del parqueadero de la Torre 1, con las medidas de cada sitio. Elija una ubicación y deslice para ver el antes y el después.</p>
+    <a class="ver3d" href="3d/">Recorrer el punto en 3D</a>
+  </section>
+
+  <section class="general wrap" aria-labelledby="t-general">
+    <div class="panel">
+      <h2 id="t-general">Plano general · Torre 1, nivel del sótano 1</h2>
+      <div class="planta"><svg id="mapa" viewBox="0 0 900 330" role="img" aria-labelledby="mapa-desc"><title id="mapa-desc">Esquema del parqueadero de la Torre 1: visitantes 2 a la izquierda, dos bloques de celdas, el lobby con escaleras y ascensores en el centro y visitantes 1 a la derecha. Ubicación 1 en la esquina de visitantes 2; ubicación 2 en la celda 33, junto al lobby.</title></svg></div>
+      <p class="nota">Esquema según el croquis del sitio, sin escala exacta. Toque un número para ver esa ubicación.</p>
+    </div>
+  </section>
+
+  <nav class="ubic wrap" id="ubic" aria-label="Ubicaciones evaluadas"></nav>
+
+  <div class="grid wrap">
+    <section class="visor" aria-label="Antes y después">
+      <div class="vistas" id="vistas" role="group" aria-label="Vista"></div>
+      <div class="ab" id="ab">
+        <img id="imgAntes" alt="" width="1050" height="1400">
+        <div class="despues"><img id="imgDespues" alt="" width="1050" height="1400"></div>
+        <span class="barra" aria-hidden="true"></span>
+        <span class="tirador" aria-hidden="true">⇔</span>
+        <span class="et a">Hoy</span><span class="et d">Con MinuteMark</span>
+        <input id="corte" type="range" min="0" max="100" value="45" aria-label="Deslice para comparar el antes y el después">
+      </div>
+      <p class="pie" id="pie"></p>
+      <button class="bajar" id="bajar" type="button" hidden>Descargar esta imagen</button>
+    </section>
+
+    <aside class="lado">
+      <section class="panel" aria-labelledby="t-planta">
+        <h2 id="t-planta">Planta</h2>
+        <div class="planta">
+          <svg viewBox="0 0 640 560" role="img" aria-labelledby="planta-desc">
+            <title id="planta-desc">Planta de la ubicación con el punto MinuteMark y sus medidas.</title>
+            <defs>
+              <pattern id="rayas" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="var(--alerta)" stroke-width="2"/></pattern>
+              <pattern id="gris" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="10" stroke="var(--linea)" stroke-width="3"/></pattern>
+              <marker id="flecha" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--azul)"/></marker>
+              <marker id="tope" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="8" markerHeight="8" orient="auto"><line x1="5" y1="0" x2="5" y2="10" stroke="var(--tinta-2)" stroke-width="1.6"/></marker>
+            </defs>
+            <g id="planta-g"></g>
+          </svg>
+        </div>
+        <p class="nota" id="planta-nota"></p>
+      </section>
+
+      <section class="panel" aria-labelledby="t-ficha">
+        <h2 id="t-ficha">Ficha</h2>
+        <div class="datos" id="datos"></div>
+        <ul class="lista" id="ventajas"></ul>
+      </section>
+
+      <section class="panel resolver-box" aria-labelledby="t-resolver">
+        <h2 id="t-resolver">Para resolver con la administración</h2>
+        <ul class="lista resolver" id="resolver"></ul>
+      </section>
+    </aside>
+  </div>
+
+  <section class="comp wrap" aria-labelledby="t-comp">
+    <h2 id="t-comp">Comparativo de ubicaciones</h2>
+    <div class="tabla">
+      <table>
+        <thead><tr><th scope="col">Criterio</th><th scope="col">1 · Visitantes 2, esquina</th><th scope="col">2 · Parqueadero 33</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Paso de residentes</th><td><span class="chip ojo">Medio</span> los que parquean en ese extremo y los visitantes</td><td><span class="chip bien">Alto</span> todos los que salen o llegan al ascensor desde el sótano</td></tr>
+          <tr><th scope="row">Visibilidad</th><td><span class="chip bien">Alta</span> desde visitantes y desde el carril</td><td><span class="chip bien">Alta</span> de frente al salir del lobby</td></tr>
+          <tr><th scope="row">Parqueaderos que se pierden</th><td><span class="chip bien">0</span> usa la zona de no parqueo</td><td><span class="chip ojo">1</span> la celda 33</td></tr>
+          <tr><th scope="row">Cubierta</th><td>Bajo el voladizo, semiabierto</td><td>Bajo placa, totalmente cubierto</td></tr>
+          <tr><th scope="row">Área del punto</th><td>10,1 m²</td><td>9,8 m²</td></tr>
+          <tr><th scope="row">Pendientes</th><td>Señal de evacuación, franja peatonal, topes</td><td>Puerta del depósito 33, ventana del lobby, sifón</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel reco">
+      <h2>Nuestra recomendación</h2>
+      <p><b>Ubicación 1.</b> No quita parqueaderos, usa un espacio que hoy no tiene uso y queda protegida por el voladizo. Si el comité prefiere que el punto quede en el paso diario de los residentes, la <b>ubicación 2</b> queda junto al ascensor, a cambio de la celda 33.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p>MinuteMark instala, surte y mantiene el punto sin costo para la copropiedad. Los fotomontajes combinan las fotos reales del parqueadero con un modelo 3D del punto renderizado con la luz de cada sitio. Las medidas se confirman en obra antes de fabricar.</p>
+</footer>
+
+<script>
+(function(){
+'use strict';
+/* ---------- datos por ubicación ---------- */
+const U = [
+  {
+    id: 'u1', n: 1, nombre: 'Visitantes 2 · esquina', sub: 'Al fondo, bajo el voladizo',
+    vistas: [
+      {img: 'u1-1', w: 1050, h: 1400, nombre: 'General', pie: '<b>Vista 1.</b> Desde el parqueadero de visitantes. El punto ocupa la zona de no parqueo bajo el voladizo y llega justo hasta su borde.'},
+      {img: 'u1-2', w: 788, h: 1400, nombre: 'Desde el carril', pie: '<b>Vista 2.</b> Desde el carril, a la altura de una persona. A la derecha, la entrada al sótano 1.'},
+      {img: 'u1-3', w: 1050, h: 1400, nombre: 'Entrada', pie: '<b>Vista 3.</b> La entrada del punto, mirando hacia el sótano: estantería, frío, congeladores y pago con tarjeta.'}
+    ],
+    nota: 'Medidas tomadas de las fotos y el video del sitio, escaladas con el muro de la torre (4,99 m).',
+    datos: [['Área', '10,1 m²'], ['Frente × fondo', '3,96 × 2,56 m'], ['Alto', '2,65 m'], ['Parqueaderos que se pierden', '0'], ['Cubierta', 'Voladizo'], ['Energía', 'Por confirmar']],
+    ventajas: ['Usa la zona de no parqueo que hoy no tiene uso, más una esquina de 0,3 m² del visitante 1.', 'Queda bajo el voladizo de la torre: protegido de la lluvia y sin estructura de techo nueva.', 'La entrada mira hacia el parqueadero cubierto, por donde vienen los residentes desde el lobby.', 'Ya hay una cámara de seguridad en la esquina del voladizo.'],
+    resolver: ['La señal de ruta de evacuación del muro quedaría cubierta: se traslada a la fachada del punto.', 'La entrada da hacia la circulación del sótano: demarcar una franja peatonal y poner dos bolardos.', 'Los dos topes amarillos de la zona se retiran o se reubican.', 'Confirmar si la caja metálica del muro es un tomacorriente o hay que traer uno.'],
+    planta: plantaU1, cams: [[5.65, -6.49, -0.63, 0.77], [6.36, -7.11, -0.41, 0.91], [6.92, -3.33, -0.90, 0.44]]
+  },
+  {
+    id: 'u2', n: 2, nombre: 'Parqueadero 33', sub: 'Junto al lobby de los ascensores',
+    vistas: [
+      {img: 'u2-1', w: 1050, h: 1400, nombre: 'General', pie: '<b>Vista 1.</b> Desde el carril, en diagonal. El punto ocupa la celda 33, con el fondo contra el muro de los depósitos.'},
+      {img: 'u2-2', w: 788, h: 1400, nombre: 'De frente', pie: '<b>Vista 2.</b> De frente, desde el carril. A la izquierda queda la columna junto al paso al lobby de los ascensores.'}
+    ],
+    nota: 'Medidas del escaneo del sitio, ajustadas con la cinta sobre la línea amarilla (4,98 m).',
+    datos: [['Área', '9,8 m²'], ['Frente × fondo', '2,50 × 3,90 m'], ['Alto', '2,65 m'], ['Parqueaderos que se pierden', '1'], ['Altura libre', '≈ 3,1 m'], ['Energía', 'Por confirmar']],
+    ventajas: ['Todos los residentes que usan el ascensor desde el sótano pasan por el frente del punto.', 'Queda bajo placa: protegido del agua y del sol, con la luz del parqueadero.', 'La celda mide 2,71 m de ancho: el punto cabe con el lateral contra el muro del lobby.', 'Frente al punto queda una plazoleta de 1 m para las cajas de tapas y de pilas.'],
+    resolver: ['La puerta del depósito 33 queda dentro del punto: si el depósito va con el parqueadero, sirve de bodega de reposición; si no, hay que acordar el acceso.', 'El lateral del punto cubre la ventana del lobby por el lado del parqueadero.', 'Dejar libre la rejilla del sifón de piso junto al muro del lobby.', 'Definir si la celda 33 es comunal o se arrienda a su propietario.'],
+    planta: plantaU2, cams: [[3.43, -7.65, -0.44, 0.89], [0.16, -9.60, 0.27, 0.96]]
+  },
+];
+
+/* ---------- planta (metros → px) ---------- */
+const NS = 'http://www.w3.org/2000/svg';
+const g = document.getElementById('planta-g');
+let S = 56, OX = 2.6, OY = 1.6;
+const P = (x, y) => [(x + OX) * S, (OY - y) * S];
+function el(tag, attrs, txt, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (txt) e.textContent = txt; (parent || g).appendChild(e); return e; }
+function poly(pts, attrs){ return el('polygon', Object.assign({points: pts.map(p => P(...p).join(',')).join(' ')}, attrs)); }
+function rect(x0, y0, x1, y1, attrs){ return poly([[x0, y0], [x1, y0], [x1, y1], [x0, y1]], attrs); }
+function line(a, b, attrs){ const [x1, y1] = P(...a), [x2, y2] = P(...b); return el('line', Object.assign({x1, y1, x2, y2}, attrs)); }
+function text(p, s, attrs){ const [x, y] = P(...p); return el('text', Object.assign({x, y, 'font-size': 12, fill: 'var(--tinta-2)'}, attrs), s); }
+function cota(a, b, label, pos, anchor){ line(a, b, {stroke: 'var(--tinta-2)', 'stroke-width': 1, 'marker-start': 'url(#tope)', 'marker-end': 'url(#tope)'}); text(pos, label, {'text-anchor': anchor || 'middle', fill: 'var(--tinta)', 'font-size': 11}); }
+function modulos(list){ list.forEach(r => { rect(r[0], r[1], r[2], r[3], {fill: 'var(--hoja)', stroke: 'var(--azul)', 'stroke-width': 1}); text([(r[0] + r[2]) / 2, (r[1] + r[3]) / 2 - 0.08], r[4], {'text-anchor': 'middle', 'font-size': 10, fill: 'var(--azul)'}); }); }
+function camaras(list, label){
+  list.forEach((c, i) => {
+    const grp = el('g', {class: 'cam', 'data-v': i, style: 'cursor:pointer', opacity: i === 0 ? '1' : '0.45'});
+    const [x, y] = P(c[0], c[1]), a = Math.atan2(-c[3], c[2]), L = 46, hw = 0.42;
+    el('path', {d: `M${x} ${y} L${x + L * Math.cos(a - hw)} ${y + L * Math.sin(a - hw)} L${x + L * Math.cos(a + hw)} ${y + L * Math.sin(a + hw)} Z`, fill: 'var(--azul-b)', opacity: '0.28'}, null, grp);
+    el('circle', {cx: x, cy: y, r: 11, fill: 'var(--tinta)'}, null, grp);
+    el('text', {x, y: y + 4, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, fill: 'var(--fondo)'}, String(i + 1), grp);
+    grp.addEventListener('click', () => vista(i));
+  });
+  text(label[0], 'Vistas de las fotos (toque para cambiar)', {'font-size': 11});
+}
+function plantaU1(){
+  S = 56; OX = 2.6; OY = 1.6;
+  rect(-2.6, 0, 4.99, 1.6, {fill: 'var(--hielo)'}); text([-2.3, 0.7], 'Torre 1', {fill: 'var(--tinta)', 'font-weight': 600, 'font-size': 14});
+  rect(4.99, -2.2, 8.9, 1.6, {fill: 'url(#gris)'}); text([5.3, 0.55], 'Parqueadero cubierto', {fill: 'var(--tinta)', 'font-weight': 600}); text([5.3, 0.15], 'hacia el lobby y los ascensores');
+  line([4.99, 0], [4.99, -2.2], {stroke: 'var(--tinta-2)', 'stroke-width': 2, 'stroke-dasharray': '2 3'});
+  rect(-2.6, 0, 8.9, -2.56, {fill: 'none', stroke: 'var(--azul-b)', 'stroke-width': 1.5, 'stroke-dasharray': '7 5'});
+  text([-2.45, -2.42], 'Borde del voladizo · 2,83 m de altura', {fill: 'var(--azul)', 'font-size': 11});
+  [1.6, 2.75, 3.92].forEach(x => line([x, 0], [x, -2.56], {stroke: 'var(--azul-b)', 'stroke-width': 1, 'stroke-dasharray': '2 4', opacity: .7}));
+  line([-0.05, 0], [4.99, 0], {stroke: 'var(--ladrillo)', 'stroke-width': 6, 'stroke-linecap': 'square'});
+  line([0, 0], [-1.85, -5.4], {stroke: 'var(--ladrillo)', 'stroke-width': 5, 'stroke-linecap': 'square'}); text([-2.45, -5.9], 'Muro bajo');
+  const n = [-0.312, -0.949];
+  for (let k = 0; k < 3; k++) {
+    const s = [0.03 + n[0] * 2.13 * k, -1.82 + n[1] * 2.13 * k], t = [3.63 + n[0] * 2.13 * k, -3.01 + n[1] * 2.13 * k];
+    line(s, t, {stroke: 'var(--amarillo)', 'stroke-width': 4});
+    line([t[0] - 0.42 * n[0], t[1] - 0.42 * n[1]], [t[0] + 0.42 * n[0], t[1] + 0.42 * n[1]], {stroke: 'var(--amarillo)', 'stroke-width': 4});
+    if (k > 0) { const c = [(s[0] + t[0]) / 2 - n[0] * 1.06, (s[1] + t[1]) / 2 - n[1] * 1.06]; text(c, 'Visitante ' + k, {'text-anchor': 'middle', fill: 'var(--tinta)'}); }
+  }
+  text([0.5, -1.1], 'No parqueo hoy', {'font-size': 11});
+  poly([[0.84, -2.086], [0.84, -2.56], [2.28, -2.56]], {fill: 'url(#rayas)', stroke: 'var(--alerta)', 'stroke-width': 1});
+  rect(0.84, 0, 4.80, -2.56, {fill: 'var(--azul)', opacity: .14}); rect(0.84, 0, 4.80, -2.56, {fill: 'none', stroke: 'var(--azul)', 'stroke-width': 3});
+  modulos([[0.9, -2.02, 1.55, -0.68, 'Neveras'], [1.55, -2.44, 4.49, -2.08, 'Estantería'], [1.70, -0.71, 3.76, -0.02, 'Congeladores'], [3.84, -0.51, 4.64, -0.01, 'Pago']]);
+  text([2.82, -1.38], 'MinuteMark', {'text-anchor': 'middle', fill: 'var(--azul)', 'font-weight': 700, 'font-size': 15});
+  line([4.80, -0.38], [4.80, -2.14], {stroke: 'var(--hoja)', 'stroke-width': 5});
+  line([5.75, -1.26], [5.0, -1.26], {stroke: 'var(--azul)', 'stroke-width': 2.5, 'marker-end': 'url(#flecha)'}); text([5.85, -1.36], 'Entrada', {fill: 'var(--azul)', 'font-weight': 600});
+  cota([0.84, -2.95], [4.80, -2.95], '3,96 m', [2.6, -2.86]); cota([0.45, 0], [0.45, -2.56], '2,56', [0.38, -1.75], 'end'); cota([0, 0.32], [4.99, 0.32], 'Muro 4,99 m', [2.5, 0.4]);
+  camaras(U[0].cams, [[4.6, -8.25]]);
+}
+function plantaU2(){
+  S = 50; OX = 3.2; OY = 1.3;
+  rect(-3.2, -5.0, 0, 1.3, {fill: 'var(--hielo)'}); text([-2.95, -1.6], 'Lobby y', {fill: 'var(--tinta)', 'font-weight': 600, 'font-size': 14}); text([-2.95, -1.95], 'ascensores', {fill: 'var(--tinta)', 'font-weight': 600, 'font-size': 14});
+  rect(-3.2, -5.0, 0, -5.9, {fill: 'url(#gris)'}); text([-3.0, -5.6], 'Paso al lobby');
+  rect(-0.45, -5.0, 0, -5.45, {fill: 'var(--tinta-2)'}); text([-0.5, -5.3], 'Columna', {'text-anchor': 'end', 'font-size': 10});
+  rect(0, 0, 6.6, 1.3, {fill: 'var(--hielo)', opacity: .6}); text([3.2, 0.75], 'Depósitos', {'text-anchor': 'middle', fill: 'var(--tinta)', 'font-weight': 600});
+  line([0, 0], [6.6, 0], {stroke: 'var(--ladrillo)', 'stroke-width': 6, 'stroke-linecap': 'square'});
+  line([0, 0.05], [0, -5.0], {stroke: 'var(--tinta-2)', 'stroke-width': 6, 'stroke-linecap': 'square'});
+  line([0, -2.7], [0, -3.65], {stroke: 'var(--azul-b)', 'stroke-width': 6}); text([-0.12, -3.2], 'Ventana', {'text-anchor': 'end', 'font-size': 10, fill: 'var(--azul)'});
+  [[0.03, 0.67, '33'], [3.14, 3.88, '34']].forEach(d => { line([d[0], 0], [d[1], 0], {stroke: 'var(--hoja)', 'stroke-width': 6}); text([(d[0] + d[1]) / 2, 0.28], 'Depósito ' + d[2], {'text-anchor': 'middle', 'font-size': 10}); });
+  line([2.71, -0.25], [2.71, -4.96], {stroke: 'var(--amarillo)', 'stroke-width': 4}); line([2.31, -4.96], [3.11, -4.96], {stroke: 'var(--amarillo)', 'stroke-width': 4});
+  line([5.42, -0.25], [5.42, -4.96], {stroke: 'var(--amarillo)', 'stroke-width': 4, opacity: .6});
+  text([4.06, -2.6], 'Parqueadero 34', {'text-anchor': 'middle', fill: 'var(--tinta)'});
+  rect(0, -3.9, 2.71, -4.96, {fill: 'none', stroke: 'var(--linea)', 'stroke-width': 1, 'stroke-dasharray': '3 3'}); text([1.36, -4.62], 'Plazoleta', {'text-anchor': 'middle', 'font-size': 11});
+  rect(0.0, -3.96, 0.32, -4.75, {fill: 'var(--bien)', opacity: .35}); text([0.4, -4.4], 'Tapas y pilas', {'font-size': 9});
+  rect(0.02, 0, 2.52, -3.90, {fill: 'var(--azul)', opacity: .14}); rect(0.02, 0, 2.52, -3.90, {fill: 'none', stroke: 'var(--azul)', 'stroke-width': 3});
+  modulos([[0.70, -0.65, 2.04, -0.02, 'Neveras'], [2.10, -3.59, 2.48, -0.68, ''], [0.05, -2.86, 0.73, -0.80, ''], [0.05, -3.74, 0.55, -2.94, 'Pago']]);
+  text([2.29, -2.1], 'Estantería', {'text-anchor': 'middle', 'font-size': 10, fill: 'var(--azul)', transform: `rotate(-90 ${P(2.29, -2.1).join(' ')})`});
+  text([0.39, -1.83], 'Congeladores', {'text-anchor': 'middle', 'font-size': 10, fill: 'var(--azul)', transform: `rotate(-90 ${P(0.39, -1.83).join(' ')})`});
+  text([1.38, -2.2], 'MinuteMark', {'text-anchor': 'middle', fill: 'var(--azul)', 'font-weight': 700, 'font-size': 15});
+  line([0.40, -3.90], [2.16, -3.90], {stroke: 'var(--hoja)', 'stroke-width': 5});
+  line([1.28, -5.55], [1.28, -4.1], {stroke: 'var(--azul)', 'stroke-width': 2.5, 'marker-end': 'url(#flecha)'}); text([1.42, -5.5], 'Entrada', {fill: 'var(--azul)', 'font-weight': 600});
+  cota([0.02, -6.3], [2.52, -6.3], '2,50 m', [1.27, -6.2]); cota([3.3, 0], [3.3, -3.90], '3,90 m', [3.38, -1.4], 'start'); cota([0, -7.0], [2.71, -7.0], 'Celda 2,71 m', [1.36, -6.9]);
+  text([4.0, -6.15], 'Carril', {fill: 'var(--tinta)', 'font-weight': 600});
+  camaras(U[1].cams, [[-3.0, -9.75]]);
+}
+
+/* ---------- plano general (esquema del croquis) ---------- */
+(function mapa(){
+  const svg = document.getElementById('mapa');
+  const m = (tag, a, txt, parent) => el(tag, a, txt, parent || svg);
+  m('rect', {x: 20, y: 20, width: 860, height: 290, rx: 10, fill: 'var(--fondo)', stroke: 'var(--linea)'});
+  // visitantes 2 (izquierda) y 1 (derecha)
+  m('path', {d: 'M30 60 L120 30 L120 300 L30 270 Z', fill: 'var(--hielo)'});
+  m('text', {x: 70, y: 170, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600, fill: 'var(--tinta)'}, 'Visitantes 2');
+  m('rect', {x: 780, y: 30, width: 90, height: 270, fill: 'var(--hielo)'});
+  m('text', {x: 825, y: 160, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600, fill: 'var(--tinta)'}, 'Visitantes 1');
+  m('text', {x: 825, y: 180, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--tinta-2)'}, 'entrada a la torre');
+  // bloques de celdas (arriba y abajo) y carril central
+  [[130, 'izq'], [490, 'der']].forEach(([x0]) => {
+    [[30, 100], [230, 300]].forEach(([y0, y1]) => {
+      for (let k = 0; k < 4; k++) m('rect', {x: x0 + k * 70 + (k > 1 ? 14 : 0), y: y0, width: 70, height: y1 - y0, fill: 'var(--hoja)', stroke: 'var(--linea)'});
+      m('rect', {x: x0 + 140, y: y0 + (y0 < 100 ? 0 : 56), width: 14, height: 14, fill: 'var(--tinta-2)'});
+    });
+  });
+  m('text', {x: 450, y: 170, 'text-anchor': 'middle', 'font-size': 12, fill: 'var(--tinta-2)'}, 'Carril');
+  // lobby: ascensores arriba, escaleras abajo
+  m('rect', {x: 432, y: 30, width: 56, height: 70, fill: 'var(--hielo)', stroke: 'var(--azul-b)'});
+  m('text', {x: 460, y: 60, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 600, fill: 'var(--tinta)'}, 'Lobby');
+  m('text', {x: 460, y: 75, 'text-anchor': 'middle', 'font-size': 10, fill: 'var(--tinta-2)'}, 'ascensores');
+  m('rect', {x: 432, y: 230, width: 56, height: 70, fill: 'url(#gris)', stroke: 'var(--linea)'});
+  m('text', {x: 460, y: 270, 'text-anchor': 'middle', 'font-size': 10, fill: 'var(--tinta-2)'}, 'Escaleras');
+  m('text', {x: 525, y: 55, 'text-anchor': 'middle', 'font-size': 10, fill: 'var(--tinta-2)'}, '33');
+  // ubicaciones
+  [[78, 62, 0], [525, 75, 1]].forEach(([x, y, i]) => {
+    const grp = m('g', {class: 'mk', tabindex: 0, role: 'button', 'aria-label': 'Ver ubicación ' + (i + 1)});
+    m('circle', {cx: x, cy: y, r: 15, fill: 'var(--azul)'}, null, grp);
+    m('text', {x, y: y + 5, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 700, fill: '#fff'}, String(i + 1), grp);
+    grp.addEventListener('click', () => ubicacion(i));
+    grp.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ubicacion(i); } });
+  });
+})();
+
+/* ---------- interfaz ---------- */
+const ubicNav = document.getElementById('ubic'), vistasEl = document.getElementById('vistas');
+const ab = document.getElementById('ab'), rango = document.getElementById('corte');
+const imgA = document.getElementById('imgAntes'), imgD = document.getElementById('imgDespues');
+let u = U[0], actual = 0;
+U.forEach((x, i) => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'ub'; b.dataset.u = i; b.disabled = !!x.pendiente;
+  b.innerHTML = `<span class="n">${x.n}</span><span><b></b><small></small></span>`;
+  b.querySelector('b').textContent = x.nombre; b.querySelector('small').textContent = x.sub;
+  b.addEventListener('click', () => ubicacion(i)); ubicNav.appendChild(b);
+});
+function lista(id, items){ const ul = document.getElementById(id); ul.textContent = ''; items.forEach(t => { const li = document.createElement('li'); const s = document.createElement('span'); s.textContent = t; li.appendChild(s); ul.appendChild(li); }); }
+function ubicacion(i, inicial){
+  u = U[i];
+  document.querySelectorAll('.ub').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.u) === i)));
+  vistasEl.textContent = '';
+  u.vistas.forEach((v, k) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'vista'; b.dataset.v = k; b.textContent = `Vista ${k + 1} · ${v.nombre}`; b.addEventListener('click', () => vista(k)); vistasEl.appendChild(b); });
+  document.getElementById('t-planta').textContent = `Planta de la ubicación ${u.n}`;
+  document.getElementById('planta-nota').textContent = u.nota;
+  const datos = document.getElementById('datos'); datos.textContent = '';
+  u.datos.forEach(d => { const div = document.createElement('div'); div.className = 'dato'; const s = document.createElement('span'); s.textContent = d[0]; const b = document.createElement('b'); b.textContent = d[1]; div.append(s, b); datos.appendChild(div); });
+  lista('ventajas', u.ventajas); lista('resolver', u.resolver);
+  g.textContent = ''; u.planta();
+  vista(0);
+  if (!inicial) { try { history.replaceState(null, '', '#' + u.id); } catch (e) {} }
+}
+function vista(k){
+  actual = k; const v = u.vistas[k];
+  ab.style.maxWidth = v.w < v.h * 0.7 ? '520px' : '';
+  imgA.src = `img/${v.img}-antes.jpg`; imgD.src = `img/${v.img}-despues.jpg`;
+  [imgA, imgD].forEach(im => { im.width = v.w; im.height = v.h; });
+  imgA.alt = `Ubicación ${u.n}, vista ${k + 1}: foto actual`; imgD.alt = `Ubicación ${u.n}, vista ${k + 1}: fotomontaje con el punto MinuteMark`;
+  document.getElementById('pie').innerHTML = v.pie;
+  document.querySelectorAll('.vista').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.v) === k)));
+  document.querySelectorAll('.cam').forEach(c => c.setAttribute('opacity', Number(c.dataset.v) === k ? '1' : '0.45'));
+}
+function corte(val){ ab.style.setProperty('--corte', val + '%'); }
+rango.addEventListener('input', () => corte(rango.value)); corte(rango.value);
+const inicio = U.findIndex(x => '#' + x.id === location.hash && !x.pendiente);
+ubicacion(inicio > 0 ? inicio : 0, true);
+
+/* ---------- descarga en alta ---------- */
+let downloads = null;
+function aviso(m){ const d = document.createElement('div'); d.className = 'aviso'; d.textContent = m; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); }
+document.getElementById('bajar').addEventListener('click', async () => {
+  const v = u.vistas[actual];
+  if (!downloads) { const a = document.createElement('a'); a.href = `img/${v.img}-alta.jpg`; a.download = `MinuteMark-Bosques-ubicacion-${u.n}-vista-${actual + 1}.jpg`; document.body.appendChild(a); a.click(); a.remove(); return; }
+  try { const b = await (await fetch(`img/${v.img}-alta.jpg`)).blob(); await downloads.save({filename: `MinuteMark-Bosques-ubicacion-${u.n}-vista-${actual + 1}.jpg`, data: b}); }
+  catch (e) { if (e && e.code === 'declined') return; aviso('No se pudo descargar aquí. Abra la imagen y guárdela desde el visor.'); }
+});
+document.getElementById('bajar').hidden = false;
+})();
+</script>
+
+</body>
+</html>
