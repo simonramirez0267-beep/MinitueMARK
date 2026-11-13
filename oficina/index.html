@@ -260,6 +260,19 @@ svg{display:block}
 .es-hecha .fila-titulo,.es-hecha .mini-titulo,.es-hecha .tarea-titulo{color:var(--tinta-suave)}
 .resultado{font-size:13px;color:var(--tinta-suave);font-weight:300;line-height:1.45}
 .resultado b{font-weight:500;color:var(--tinta)}
+/* tareas en curso: se ve que avanzan */
+.fila.en-curso{background:linear-gradient(90deg,var(--azul-tenue),rgba(232,241,255,0) 75%);border-radius:var(--r-s);padding-left:12px;padding-right:6px;box-shadow:inset 3px 0 0 var(--azul-brillante)}
+.tarea.en-curso{border-color:#BFD9FF;background:linear-gradient(180deg,#F3F8FF,var(--superficie) 70%);box-shadow:inset 3px 0 0 var(--azul-brillante)}
+.en-curso .resultado{border-left:2px solid #BFD9FF;padding-left:9px}
+.chip-avanza{background:var(--azul-profundo);color:var(--blanco)}
+.chip-avanza::before{content:'';width:7px;height:7px;border-radius:50%;background:#7CC4FF;flex:none}
+@media(prefers-reduced-motion:no-preference){.chip-avanza::before{animation:pulso-curso 1.8s ease-out infinite}}
+@keyframes pulso-curso{0%{box-shadow:0 0 0 0 rgba(124,196,255,.75)}70%{box-shadow:0 0 0 7px rgba(124,196,255,0)}100%{box-shadow:0 0 0 0 rgba(124,196,255,0)}}
+.avance-barra{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:500;color:var(--azul-profundo)}
+.avance-barra .barra{flex:1;max-width:220px;height:6px;background:#D6E6FB}
+.avance-barra.casi span{font-weight:600}
+.mini.en-curso .mini-titulo{color:var(--azul-profundo)}
+.mini.en-curso .mini-titulo::after{content:' · en curso';font-weight:400;font-size:12px;color:var(--azul-brillante)}
 .check{width:26px;height:26px;flex:none;border-radius:50%;border:2px solid var(--linea);background:var(--superficie);cursor:pointer;display:grid;place-items:center;color:transparent;padding:0;margin-top:-1px}
 .check svg{width:15px;height:15px}
 .check:hover{border-color:var(--azul-brillante);color:var(--azul-brillante)}
@@ -1139,6 +1152,15 @@ function textoFoco(fo){ if (!fo) return ''; var e = etapa(fo.etapa); return fo.f
 function ordenTareas(a, b){ return (a.dia || '9999').localeCompare(b.dia || '9999') || (a.orden || 0) - (b.orden || 0); }
 function ultimoAvance(t){ var a = t.avances || []; return a.length ? a[a.length - 1] : null; }
 function textoAvance(a){ return '<p class="resultado"><b>Último avance · ' + (SOCIOS[a.por] ? SOCIOS[a.por].nombre + ', ' : '') + haceCuanto(a.fecha) + ':</b> ' + esc(a.texto) + (a.falta ? ' <b>Falta:</b> ' + esc(a.falta) : '') + '</p>'; }
+// una tarea está en marcha si alguien la empezó o ya tiene avances: se pinta distinta para que se note y motive a cerrarla
+function enMarcha(t){ return t.estado !== 'hecho' && (t.estado === 'en_curso' || (t.avances || []).length > 0); }
+function chipMarcha(t){ var n = (t.avances || []).length; return '<span class="chip chip-avanza">En curso' + (n ? ' · ' + n + (n === 1 ? ' avance' : ' avances') : '') + '</span>'; }
+function barraMarcha(t){
+  var p = t.pasos || []; if (!p.length) return '';
+  var ok = p.filter(function(x){ return x.ok; }).length, falta = p.length - ok, pct = Math.round(ok / p.length * 100);
+  var txt = !falta ? 'Pasos listos: márquenla como hecha' : falta === 1 ? 'Ya casi: falta 1 paso' : 'Van ' + ok + ' de ' + p.length + ' pasos';
+  return '<div class="avance-barra' + (falta <= 1 ? ' casi' : '') + '"><div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '" aria-label="Pasos cumplidos"><i style="width:' + pct + '%"></i></div><span>' + txt + '</span></div>';
+}
 function linkAvance(t){ return t.estado === 'hecho' ? '' : '<button class="enlace" data-accion="avance" data-id="' + esc(t.id) + '">Registrar avance</button>'; }
 // plazos: «dia» es cuándo se trabaja la tarea; «plazo» es la fecha límite y activa los avisos
 var AVISOS = [['3','3 días antes'],['7','7 días antes'],['14','14 días antes'],['30','30 días antes']];
@@ -1234,12 +1256,13 @@ function cabecera(etq, titulo, lead, derecha){
 function filaTarea(t, extra){
   var e = etapa(t.etapa), hecha = t.estado === 'hecho', venc = !hecha && t.dia && t.dia < hoy(), ua = !hecha && ultimoAvance(t);
   var pasos = t.pasos || [], ok = pasos.filter(function(p){ return p.ok; }).length;
-  return '<li class="fila' + (hecha ? ' es-hecha' : '') + '">' + botonCheck(t) +
+  var marcha = enMarcha(t);
+  return '<li class="fila' + (hecha ? ' es-hecha' : '') + (marcha ? ' en-curso' : '') + '">' + botonCheck(t) +
     '<div class="fila-txt"><button class="fila-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button>' +
-    '<div class="meta">' + (e ? chipEtapa(e) : '') +
+    '<div class="meta">' + (marcha ? chipMarcha(t) : '') + (e ? chipEtapa(e) : '') +
       (venc ? '<span class="chip chip-alerta">Atrasada · ' + fechaCorta(t.dia) + '</span>' : '') + chipPlazo(t) +
-      (t.estado === 'en_curso' ? '<span class="chip chip-curso">En curso</span>' : '') +
-      (pasos.length ? '<span class="chip chip-neutro">' + ok + '/' + pasos.length + ' pasos</span>' : '') + (extra || '') + '</div>' +
+      (pasos.length && !marcha ? '<span class="chip chip-neutro">' + ok + '/' + pasos.length + ' pasos</span>' : '') + (extra || '') + '</div>' +
+    (marcha ? barraMarcha(t) : '') +
     (ua ? textoAvance(ua) : '') +
     (hecha && t.resultado ? '<p class="resultado"><b>Cómo se cumplió:</b> ' + esc(t.resultado) + '</p>' : '') +
     '</div>' + avatar(t.responsable, true) + '</li>';
@@ -1551,11 +1574,13 @@ function tarjetaTarea(t){
   var pasos = t.pasos || [], ok = pasos.filter(function(p){ return p.ok; }).length;
   var mover = t.estado === 'pendiente' ? '<button class="enlace" data-accion="mover-tarea" data-estado="en_curso" data-id="' + esc(t.id) + '">Empezar</button>'
     : t.estado === 'en_curso' ? '<button class="enlace enlace-suave" data-accion="mover-tarea" data-estado="pendiente" data-id="' + esc(t.id) + '">Volver a por hacer</button>' : '';
-  return '<article class="tarea' + (hecha ? ' es-hecha' : '') + '" draggable="true" data-arrastre="t:' + esc(t.id) + '">' +
+  var marcha = enMarcha(t);
+  return '<article class="tarea' + (hecha ? ' es-hecha' : '') + (marcha ? ' en-curso' : '') + '" draggable="true" data-arrastre="t:' + esc(t.id) + '">' +
     '<div class="tarea-fila">' + botonCheck(t) + '<button class="tarea-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button></div>' +
-    '<div class="meta">' + (e ? chipEtapa(e) : '') +
+    '<div class="meta">' + (marcha ? chipMarcha(t) : '') + (e ? chipEtapa(e) : '') +
       (t.dia ? '<span class="chip ' + (venc ? 'chip-alerta' : 'chip-neutro') + '">' + (venc ? 'Atrasada · ' : '') + fechaCorta(t.dia) + '</span>' : '') + chipPlazo(t) +
-      (pasos.length ? '<span class="chip chip-neutro">' + ok + '/' + pasos.length + ' pasos</span>' : '') + '</div>' +
+      (pasos.length && !marcha ? '<span class="chip chip-neutro">' + ok + '/' + pasos.length + ' pasos</span>' : '') + '</div>' +
+    (marcha ? barraMarcha(t) : '') +
     (ua ? textoAvance(ua) : '') +
     (hecha && t.resultado ? '<p class="resultado"><b>Cómo se cumplió:</b> ' + esc(t.resultado) + '</p>' : '') +
     '<div class="tarea-pie">' + (hecha ? (t.hechaEn ? '<span class="resultado">' + (SOCIOS[t.hechaPor] ? SOCIOS[t.hechaPor].nombre + ' · ' : '') + haceCuanto(t.hechaEn) + '</span>' : '<span></span>') : '<span class="tarea-acc">' + mover + '<button class="enlace" data-accion="avance" data-id="' + esc(t.id) + '">Avance</button></span>') + avatar(t.responsable) + '</div>' +
@@ -1585,7 +1610,7 @@ function diaHTML(f){
   return '<section class="dia' + (esHoy ? ' es-hoy' : '') + (f < hoy() ? ' es-pasado' : '') + '" aria-label="' + fechaLarga(f) + '">' +
     '<header class="dia-cab"><span class="dia-nombre">' + DIAS[d.getDay()] + '</span><span class="dia-num">' + d.getDate() + '</span>' + (esHoy ? '<span class="chip chip-hoy">Hoy</span>' : '') + '</header>' +
     '<button class="foco' + (tf ? '' : ' foco-vacio') + '" data-accion="editar-foco" data-fecha="' + f + '"><span class="foco-et">Foco' + (e && e.titulo !== tf ? ' · ' + esc(e.titulo) : '') + '</span><b>' + (tf ? esc(tf) : 'Sin definir') + '</b></button>' +
-    '<ul class="dia-tareas">' + ts.map(function(t){ return '<li class="mini' + (t.estado === 'hecho' ? ' es-hecha' : '') + '">' + botonCheck(t) + '<button class="mini-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button>' + avatar(t.responsable, true) + '</li>'; }).join('') + '</ul>' +
+    '<ul class="dia-tareas">' + ts.map(function(t){ return '<li class="mini' + (t.estado === 'hecho' ? ' es-hecha' : '') + (enMarcha(t) ? ' en-curso' : '') + '">' + botonCheck(t) + '<button class="mini-titulo" data-accion="editar-tarea" data-id="' + esc(t.id) + '">' + esc(t.titulo) + '</button>' + avatar(t.responsable, true) + '</li>'; }).join('') + '</ul>' +
     '<footer class="dia-pie"><button class="enlace" data-accion="nueva-tarea" data-dia="' + f + '">' + ICON.mas + 'Tarea</button>' + (r && r.fin ? '<button class="enlace enlace-suave" data-accion="ver-reunion" data-fecha="' + f + '">Acta</button>' : '') + '</footer></section>';
 }
 
