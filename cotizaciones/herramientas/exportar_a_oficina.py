@@ -120,6 +120,24 @@ for n, nombre in enumerate(ITEMS):
         opciones.append(o)
         fotos_fila[(nombre, k)] = o
 
+# Precios especiales verificados en la página de la tienda el 22 nov 2026 (cotizaciones/VERIFICACION-2026-11-22.md).
+# El precio que cuenta sigue siendo el del Excel (el de promoción); aquí va el normal y hasta cuándo dura.
+PROMOS = {
+    "estanterias-01": (479900, "2026-11-23", "Promoción Homecenter"),
+    "meson-de-pago-01": (479900, "2026-11-23", "Promoción Homecenter"),
+    "estanterias-02": (449950, "2026-12-03", "Promoción Homecenter"),   # combo de 2: normal $899.900
+    "estanterias-03": (563300, "2026-12-03", "Promoción Homecenter"),   # combo de 3: normal $1.689.900
+    "estanterias-07": (619900, "2026-12-03", "Promoción Homecenter"),
+}
+# Precio confirmado igual en la página ese día: la fecha de cotización pasa al 22 nov.
+VERIFICADOS_22NOV = {"estanterias-01", "estanterias-02", "estanterias-03", "estanterias-07", "estanterias-08",
+                     "estanterias-09", "meson-de-pago-01"}
+for o in opciones:
+    if o["id"] in VERIFICADOS_22NOV:
+        o["fecha"] = "2026-11-22"
+    if o["id"] in PROMOS:
+        o["precioNormal"], o["promoHasta"], o["promoTipo"] = PROMOS[o["id"]]
+
 # hoja Fotos: más fotos de algunas opciones («Neveras · opción 1», «Neveras · opciones 2 a 4»)
 FS = wb["Fotos"]
 por_fila = {}

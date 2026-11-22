@@ -53,6 +53,8 @@ Si se abre este `index.html` sin configuración de Firebase, funciona como copia
 
 ## Montaje del punto
 
+- **Regla principal** (a la vista arriba de la sala): antes de marcar algo «Elegido» o «Comprado», abrir el link o escribirle al proveedor ese mismo día y actualizar el precio y la fecha. Si la cotización no es de hoy, la oficina lo pregunta antes de cambiar el estado; al confirmar, la fecha pasa a hoy.
+- **Promociones:** cada opción puede llevar precio normal, hasta cuándo dura la promoción y el tipo (Black Friday, temporada…). El total usa el precio de hoy; la tarjeta muestra el normal y el total con él, el resumen dice cuánto costaría el punto si se acaban las promociones, y la sala avisa una semana antes de que se acabe una (en la barra lateral, desde 3 días antes).
 - Las cuentas son las mismas del Excel de cotizaciones: costo total = precio (más 19% si no incluye IVA) × cantidad (o la del ítem) + envío. Cada ítem entra al presupuesto con la opción «Elegido» o «Comprado»; si no hay, con la más barata. Las descartadas no cuentan.
 - Fotos: se suben desde el celular en el formulario de la opción y se achican solas (máximo unos 450 KB) antes de guardarse en `montajeFotos`, aparte de la opción, para no pasar el límite de 1 MB por documento. Una foto que nadie usa se borra sola a los 30 días.
 - Carga inicial: `cotizaciones/herramientas/exportar_a_oficina.py` pasa el Excel a `cotizaciones/montaje-oficina.json`; en la sala, «Cargar las cotizaciones del Excel» lo toma de la página. Volver a cargar actualiza las mismas opciones, no las duplica.

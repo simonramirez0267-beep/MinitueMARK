@@ -693,7 +693,7 @@ tr.m-total td{background:var(--fondo)}
 .prov p.m-producto{color:var(--tinta);font-weight:500}
 .m-precio{background:var(--azul-tenue);border-radius:var(--r-s);padding:12px 14px;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
 .m-precio > div{display:flex;flex-direction:column}
-.m-precio span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--azul-profundo)}
+.m-precio > div > span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--azul-profundo)}
 .m-precio b{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15}
 .prov .m-precio p{font-size:13px;color:var(--tinta-suave)}
 .m-precio .chip{margin-top:4px}
@@ -718,6 +718,14 @@ b.m-mini-etq{background:var(--azul-profundo);cursor:default}
 .m-total-vivo{background:var(--azul-tenue);border-radius:var(--r-s);padding:10px 14px;font-size:14px;color:var(--tinta)}
 .m-visor .modal-cuerpo{display:flex;flex-direction:column;gap:14px}
 .m-visor .modal-cuerpo img{width:100%;height:auto;border-radius:var(--r-s);background:var(--carril)}
+.m-regla{display:flex;gap:14px;align-items:flex-start;background:var(--azul-profundo);color:var(--blanco);border-radius:var(--r-m);padding:16px 20px}
+.m-regla > svg{width:24px;height:24px;flex:none;margin-top:2px;color:var(--sobre-azul-acento)}
+.m-regla .etiqueta{color:var(--sobre-azul-etiqueta);margin-bottom:4px}
+.m-regla p{font-size:16px;font-weight:500;line-height:1.45;max-width:80ch}
+.m-regla small{display:block;margin-top:4px;font-size:13px;color:var(--sobre-azul-suave)}
+.m-sin-promo{font-size:14px;color:var(--tinta-suave);background:var(--fondo);border-radius:var(--r-s);padding:10px 14px}
+.m-sin-promo b{color:var(--tinta);font-weight:600}
+.prov .m-precio p.m-normal{color:var(--tinta);font-weight:500}
 .info-modal:has(#m-fotos-caja),.info-modal:has(.m-total-vivo){background:none;padding:0}
 </style>
 
@@ -1422,7 +1430,7 @@ function renderLado(){
     var extra = '';
     if (s[0] === 'tablero' && abiertas) extra = '<b class="cuenta">' + abiertas + '</b>';
     if (s[0] === 'recepcion' && listo()) { var nr = recordatoriosVencidos().filter(esParaMi).length + plazosUrgentes().filter(esMia).length; if (nr) extra = '<b class="cuenta" title="Recordatorios y plazos urgentes">' + nr + '</b>'; }
-    if (s[0] === 'montaje' && listo()) { var ng = mGarantiasPorVencer().length; if (ng) extra = '<b class="cuenta" title="Garantías que vencen en 30 días o menos">' + ng + '</b>'; }
+    if (s[0] === 'montaje' && listo()) { var ng = mGarantiasPorVencer().length + S.d.montajeOpciones.filter(function(o){ var pr = mPromo(o); return pr && pr.pronto && o.estado !== 'descartado' && o.estado !== 'comprado'; }).length; if (ng) extra = '<b class="cuenta" title="Garantías que vencen en 30 días o menos y promociones que se acaban en 3 días o menos">' + ng + '</b>'; }
     if (s[0] === 'reunion' && (er === 'curso' || er === 'hora')) extra = '<i class="punto vivo-dot" title="Es hora de la reunión"></i>';
     return '<a href="#' + s[0] + '" class="sala-link' + (S.sala === s[0] ? ' on' : '') + '" data-accion="ir" data-sala="' + s[0] + '"' + (S.sala === s[0] ? ' aria-current="page"' : '') + '>' + ICON[s[0]] + '<span>' + s[1] + '</span>' + extra + '</a>';
   }).join('');
@@ -2008,7 +2016,7 @@ function resultados(q){
   mirar('cotizaciones', 'Cotización', function(x){ return x.proveedor; }, function(x){ return [x.proveedor, x.contacto, x.incluye, x.notas]; }, 'editar-cotizacion');
   mirar('productos', 'Producto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.categoria, x.proveedor, x.notas]; }, 'editar-producto');
   mirar('prospectos', 'Prospecto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.contacto, x.telefono, x.zona, x.proximo, x.notas].concat((x.contactos || []).map(function(c){ return c.nota; })); }, 'editar-prospecto');
-  mirar('montajeOpciones', 'Cotización · Montaje', function(x){ return tituloDe('montajeOpciones', x); }, function(x){ return [x.proveedor, x.producto, x.contacto, x.zona, x.medidas, x.color, x.s1, x.s2, x.s3, x.garantia, x.entrega, x.pago, x.notas, mEstado(x.estado)]; }, 'm-editar-opcion');
+  mirar('montajeOpciones', 'Cotización · Montaje', function(x){ return tituloDe('montajeOpciones', x); }, function(x){ return [x.proveedor, x.producto, x.contacto, x.zona, x.medidas, x.color, x.s1, x.s2, x.s3, x.garantia, x.entrega, x.pago, x.notas, x.promoTipo, mEstado(x.estado)]; }, 'm-editar-opcion');
   mirar('montajeItems', 'Ítem · Montaje', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.necesitamos]; }, 'm-item');
   mirar('montajePuntos', 'Punto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.ubicacion, x.notas]; }, 'm-abrir-punto');
   mirar('montajeEquipos', 'Equipo · Punto', function(x){ return x.producto || x.tipo; }, function(x){ return [x.producto, x.tipo, x.proveedor, x.contacto, x.serial, x.factura, x.servicio, x.notas]; }, 'm-editar-equipo');
@@ -2047,8 +2055,10 @@ function mEstado(k){ var e = M_ESTADOS.find(function(x){ return x[0] === k; }); 
 function mNum(v){ return v === null || v === undefined || v === '' || isNaN(Number(v)) ? null : Number(v); }
 // la misma cuenta del Excel: precio (con el 19% si dice que no lo incluye) × cantidad (o la del ítem) + envío
 function mCant(o, it){ var q = mNum(o.cantidad); return q === null ? (mNum(it && it.cantidad) || 0) : q; }
+var M_NORMAL = false; // true: cuenta con el precio normal (sin promociones)
 function mTotal(o, it){
   var p = mNum(o.precio); if (p === null) return null;
+  if (M_NORMAL && mNum(o.precioNormal) !== null) p = mNum(o.precioNormal);
   return (o.iva === 'no' ? p * (1 + M_IVA) : p) * mCant(o, it) + (mNum(o.envio) || 0);
 }
 function mElegida(o){ return o.estado === 'elegido' || o.estado === 'comprado'; }
@@ -2077,7 +2087,8 @@ function mEstructura(it){
   lista.forEach(function(x){ tot.bs += x.bs || 0; tot.ba += x.ba || 0; tot.es += x.es; tot.ea += x.ea; });
   return {lista:lista, tot:tot, sotano:tot.es || tot.bs, aire:tot.ea || tot.ba, opciones:os.length};
 }
-function mEscenarios(){
+function mEscenarios(normal){
+  if (normal) { M_NORMAL = true; try { return mEscenarios(); } finally { M_NORMAL = false; } }
   var eq = 0, est = null, filas = [];
   mItems().forEach(function(it){
     if (it.tipo === 'estructura') { est = est || {it:it, r:mEstructura(it)}; return; }
@@ -2109,6 +2120,26 @@ function mEstadoGarantia(e){
   if (d <= 30) return {txt:(d === 0 ? 'Vence hoy' : d === 1 ? 'Vence mañana' : 'Vence en ' + d + ' días') + ' · ' + fechaCorta(v), cls:'chip-alerta', alerta:true, dias:d};
   return {txt:'Vigente hasta ' + fechaCorta(v), cls:'chip-etapa', alerta:false, dias:d};
 }
+// promociones: precio de hoy (el que cuenta), precio normal y hasta cuándo dura
+function mPromo(o){
+  if (!o.promoHasta && mNum(o.precioNormal) === null) return null;
+  var d = o.promoHasta ? diasHasta(o.promoHasta) : null;
+  return {dias:d, vencida:d !== null && d < 0, pronto:d !== null && d >= 0 && d <= 3, tipo:o.promoTipo || 'Promoción', normal:mNum(o.precioNormal), hasta:o.promoHasta || ''};
+}
+function textoPromo(pr){
+  if (!pr.hasta) return pr.tipo + ' · sin fecha de fin';
+  if (pr.vencida) return pr.tipo + ' vencida el ' + fechaCorta(pr.hasta) + ': confirmar precio';
+  return pr.tipo + ' · ' + (pr.dias === 0 ? 'vence hoy' : pr.dias === 1 ? 'vence mañana' : 'vence en ' + pr.dias + ' días') + ' (' + fechaCorta(pr.hasta) + ')';
+}
+function mPromosPorVencer(){ return S.d.montajeOpciones.filter(function(o){ var pr = mPromo(o); return pr && o.estado !== 'descartado' && o.estado !== 'comprado' && pr.hasta && (pr.vencida || pr.dias <= 7); }); }
+// regla principal: antes de Elegido o Comprado, confirmar el precio ese mismo día
+var M_REGLA = 'Antes de marcar algo «Elegido» o «Comprado», abran el link o escríbanle al proveedor ese mismo día, y actualicen el precio y la fecha de cotización.';
+function confirmarRegla(o, estado){
+  if (!mElegida({estado:estado}) || mElegida(o) || o.fecha === hoy()) return true;
+  var pr = mPromo(o);
+  return confirm('Regla del montaje: ' + M_REGLA + '\n\nEsta cotización es del ' + (o.fecha ? fechaLarga(o.fecha) + ' de ' + o.fecha.slice(0, 4) : 'día sin anotar') + '.' +
+    (pr && pr.vencida ? '\nOjo: su promoción ya venció.' : '') + '\n\n¿Ya confirmaron hoy el precio con el proveedor? Si aceptan, la fecha de cotización pasa a hoy.');
+}
 function mGarantiasPorVencer(){ return S.d.montajeEquipos.filter(function(e){ var g = mEstadoGarantia(e); return g && g.alerta; }); }
 
 function vistaMontaje(){
@@ -2118,6 +2149,7 @@ function vistaMontaje(){
     ? ['Puntos', 'La hoja de vida de cada punto: qué equipo y mueble quedó, de dónde salió y hasta cuándo tiene garantía. Si algo se daña, aquí está a quién llamar.', '<button class="btn btn-primario" data-accion="m-nuevo-punto">' + ICON.mas + 'Punto</button>']
     : ['Cotizaciones', 'Todo lo que necesita un punto, con cada opción que encontremos para comparar y tener plan B. Los precios se comparan siempre con IVA.', vacio ? '' : '<button class="btn btn-primario" data-accion="m-nueva-opcion">' + ICON.mas + 'Opción</button>'];
   return cabecera('Montaje del punto', t[0], t[1], t[2]) +
+    '<section class="m-regla" aria-label="Regla principal del montaje">' + ICON.bandera + '<div><span class="etiqueta">Regla principal del montaje</span><p>' + esc(M_REGLA) + '</p><small>Los precios cambian y las promociones se acaban: un precio vale con su fecha.</small></div></section>' +
     '<div class="seg pestanas" role="group">' +
       '<button type="button" data-accion="seg" data-grupo="m-tab" data-valor="cotizaciones" aria-pressed="' + (tab === 'cotizaciones') + '">Cotizaciones</button>' +
       '<button type="button" data-accion="seg" data-grupo="m-tab" data-valor="puntos" aria-pressed="' + (tab === 'puntos') + '">Puntos' + (nv ? ' <b class="m-cuenta" title="Garantías por vencer">' + nv + '</b>' : '') + '</button></div>' +
@@ -2132,8 +2164,11 @@ function montajeVacio(){
       '<button class="enlace" data-accion="m-nuevo-item">O empezar en blanco con un ítem</button></div></div></section>';
 }
 function vistaMontajeCotizaciones(){
-  var its = mItems(), it = mItemSel(), E = mEscenarios();
-  return panelMontajeResumen(E) +
+  var its = mItems(), it = mItemSel(), E = mEscenarios(), pv = mPromosPorVencer();
+  var aviso = pv.length ? '<div class="franja alerta" role="alert"><span><b>' + (pv.length === 1 ? 'Una promoción se acaba' : pv.length + ' promociones se acaban') + ' o ya se acabó:</b> ' + pv.map(function(o){
+      var it2 = buscar('montajeItems', o.item); return '<button class="enlace" data-accion="m-ir-opcion" data-id="' + esc(o.id) + '">' + esc((it2 ? it2.nombre + ' · ' : '') + o.proveedor) + '</button> (' + esc(textoPromo(mPromo(o))) + ')';
+    }).join('; ') + '. Después, el precio sube al normal.</span></div>' : '';
+  return aviso + panelMontajeResumen(E) +
     '<nav class="m-items" id="m-items" data-scroll aria-label="Ítems del punto">' + its.map(function(x){
       var n = mOpcionesDe(x.id).length, el = mOpcionesDe(x.id).some(mElegida);
       return '<button type="button" class="m-item-btn" data-accion="m-item" data-id="' + esc(x.id) + '" aria-pressed="' + (it && x.id === it.id) + '">' + esc(x.nombre) + ' <small>' + n + '</small>' + (el ? '<i class="m-punto-el" title="Ya hay una elegida"></i>' : '') + '</button>';
@@ -2152,7 +2187,7 @@ function panelMontajeResumen(E){
       '<div class="dato"><b>' + pesos(E.cerrado) + '</b><span>En un espacio ya cerrado</span></div>' +
       '<div class="dato"><b>' + pesos(E.sotano) + '</b><span>En parqueadero de sótano</span></div>' +
       '<div class="dato"><b>' + pesos(E.aire) + '</b><span>En parqueadero al aire libre</span></div>' +
-    '</div>' +
+    '</div>' + (function(){ var N = mEscenarios(true); return N.cerrado !== E.cerrado ? '<p class="m-sin-promo"><b>Si se acaban las promociones:</b> ' + pesos(N.cerrado) + ' en espacio cerrado, ' + pesos(N.sotano) + ' en sótano y ' + pesos(N.aire) + ' al aire libre (' + (N.cerrado > E.cerrado ? '+' : '') + pesos(N.cerrado - E.cerrado) + ').</p>' : ''; })() +
     '<div class="tabla-caja"><table><thead><tr><th>Ítem</th><th class="num">Cantidad</th><th class="num">Opciones</th><th class="num">Con precio</th><th class="num">Más barata</th><th class="num">Más cara</th><th class="num">Elegida</th><th class="num">Para presupuesto</th></tr></thead><tbody>' +
       E.filas.map(fila).join('') +
       '<tr class="m-total"><td colspan="7"><b>Equipos y mobiliario</b></td><td class="num"><b>' + pesos(E.equipos) + '</b></td></tr>' +
@@ -2203,6 +2238,10 @@ function tarjetaOpcion(o, it, barataId, os){
     (o.producto ? '<p class="m-producto">' + esc(o.producto) + '</p>' : '') +
     '<div class="m-precio"><div><span>' + esc(mCampo(it, 'total')) + '</span><b>' + (t === null ? 'Sin precio' : pesos(t)) + '</b></div>' +
       '<p>' + (mNum(o.precio) !== null ? pesos(o.precio) + ' ' + (mCampo(it, 'precio') === 'Precio unitario' ? 'c/u' : '· ' + esc(mCampo(it, 'precio').toLowerCase())) + ' × ' + q + (mNum(o.envio) ? ' + ' + pesos(o.envio) + ' de ' + esc(mCampo(it, 'envio').toLowerCase()) : '') + ' · ' : '') + iva + '</p>' +
+      (function(){ var pr = mPromo(o); if (!pr) return '';
+        M_NORMAL = true; var tn = mTotal(o, it); M_NORMAL = false;
+        return '<span class="chip ' + (pr.vencida || pr.pronto ? 'chip-alerta' : 'chip-vivo') + '">' + esc(textoPromo(pr)) + '</span>' +
+          (pr.normal !== null ? '<p class="m-normal">Precio normal ' + pesos(pr.normal) + (mCampo(it, 'precio') === 'Precio unitario' ? ' c/u' : '') + (tn !== null && tn !== t ? ' → total ' + pesos(tn) : '') + '</p>' : ''); })() +
       (o.id === barataId ? '<span class="chip chip-curso">La más barata</span>' : '') + '</div>' +
     (datos.length ? '<dl class="prov-datos">' + datos.map(function(x){ return '<dt>' + esc(x[0]) + '</dt><dd>' + esc(x[1]) + '</dd>'; }).join('') + '</dl>' : '') +
     (o.link ? (esLink(o.link) ? '<a class="enlace m-link" href="' + esc(o.link.trim()) + '" target="_blank" rel="noopener">Abrir el link de la cotización</a>' : '<p>' + esc(o.link) + '</p>') : '') +
@@ -2292,6 +2331,9 @@ function modalOpcion(o, itemId){
     {id:'producto', label:'Producto o referencia', valor:o.producto || '', max:200},
     {id:'precio', label:mCampo(it, 'precio') + ' (COP)', tipo:'pesos', ancho:'medio', valor:o.precio == null ? '' : o.precio},
     {id:'cantidad', label:mCampo(it, 'cantidad'), tipo:'number', ancho:'medio', valor:o.cantidad == null ? '' : o.cantidad, placeholder:String(it.cantidad == null ? '' : it.cantidad), ayuda:'Vacío = ' + (it.cantidad == null ? '—' : it.cantidad) + ', lo que necesita el punto.'},
+    {id:'precioNormal', label:'Precio normal, sin promoción (COP)', tipo:'pesos', ancho:'medio', valor:o.precioNormal == null ? '' : o.precioNormal, ayuda:'Solo si el precio de arriba es de promoción o temporada.'},
+    {id:'promoHasta', label:'La promoción dura hasta', tipo:'date', ancho:'medio', valor:o.promoHasta || '', ayuda:'La oficina avisa una semana antes.'},
+    {id:'promoTipo', label:'Tipo de precio especial', ancho:'medio', valor:o.promoTipo || '', max:60, placeholder:'Ej.: Black Friday, Temporada, Liquidación'},
     {id:'iva', label:'¿El precio incluye IVA?', tipo:'segment', valor:o.iva || '', opciones:M_IVAS, ayuda:'Si no lo incluye, el costo total le suma el 19% para comparar parejo.'},
     {id:'envio', label:mCampo(it, 'envio') + ' (COP)', tipo:'pesos', ancho:'medio', valor:o.envio == null ? '' : o.envio},
     {id:'estado', label:'Estado', tipo:'select', ancho:'medio', valor:o.estado || 'por_contactar', opciones:M_ESTADOS},
@@ -2320,6 +2362,8 @@ function modalOpcion(o, itemId){
     alAbrir: function(dlg){ totalVivo(it); dlg.querySelector('form').addEventListener('input', function(){ totalVivo(it); }); dlg.querySelector('form').addEventListener('change', function(){ totalVivo(it); }); },
     onGuardar: function(v){
       if (M_FOTOS.some(function(f){ return f.cargando; })) { avisar('Espera a que termine de cargar la foto.', 'alerta'); return false; }
+      if (!confirmarRegla(nueva ? {fecha:v.fecha} : Object.assign({}, o, {fecha:v.fecha}), v.estado)) return false;
+      if (mElegida(v) && !(nueva ? false : mElegida(o))) v.fecha = hoy();
       var ids = M_FOTOS.map(function(f){ return f.id || crear('montajeFotos', {data:f.data, ancho:f.ancho, alto:f.alto, creada:ahora(), por:S.yo || ''}); });
       var d = Object.assign({}, v, {fotos:ids, actualizada:ahora(), por:S.yo || ''});
       if (nueva) {
@@ -2534,7 +2578,10 @@ var ACC_M = {
 var CAMBIO_M = {
   'm-estado': function(el){
     var o = buscar('montajeOpciones', el.dataset.id); if (!o || o.estado === el.value) return;
-    cambiar('montajeOpciones', o.id, {estado:el.value, actualizada:ahora(), por:S.yo || ''});
+    if (!confirmarRegla(o, el.value)) { el.value = o.estado || 'por_contactar'; avisar('No se cambió. Primero confirmen el precio con el proveedor y actualícenlo en «Editar».', 'alerta'); return; }
+    var cambio = {estado:el.value, actualizada:ahora(), por:S.yo || ''};
+    if (mElegida({estado:el.value}) && !mElegida(o)) cambio.fecha = hoy();
+    cambiar('montajeOpciones', o.id, cambio);
     desc('«' + cortar(o.proveedor, 40) + '» pasó a ' + mEstado(el.value).toLowerCase());
     if (mElegida({estado:el.value})) registrar('marcó como ' + mEstado(el.value).toLowerCase() + ' la opción de ' + o.proveedor + ' (' + ((buscar('montajeItems', o.item) || {}).nombre || '').toLowerCase() + ')');
   },
