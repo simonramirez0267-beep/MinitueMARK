@@ -31,7 +31,7 @@ Reglas que no se cambian sin decidirlo:
 
 ## Plan: pasarlo a la Oficina
 
-**Estado (22 nov 2026):** la sala «Montaje» está construida en la rama `claude/exciting-keller-rbo96a`, esperando el visto bueno de Simón para pasar a `main`. Para cargar el Excel: `python3 cotizaciones/herramientas/exportar_a_oficina.py` arma `montaje-oficina.json` y en la Oficina › Montaje se toca «Cargar las cotizaciones del Excel». Una vez cargado, las cotizaciones nuevas se escriben en la Oficina, no en el Excel.
+**Estado (22 nov 2026):** la sala «Montaje» quedó publicada en la Oficina (aprobada por Simón y pasada a `main` el 22 nov 2026). Para cargar el Excel: `python3 cotizaciones/herramientas/exportar_a_oficina.py` arma `montaje-oficina.json` y en la Oficina › Montaje se toca «Cargar las cotizaciones del Excel». Una vez cargado, las cotizaciones nuevas se escriben en la Oficina, no en el Excel.
 
 Cuando estén cerradas las primeras cotizaciones (internet, estanterías, neveras y congeladores), esto pasa a la Oficina con estas condiciones, acordadas con Simón el 21 de noviembre de 2026:
 
