@@ -659,6 +659,66 @@ body.con-entrada .app{display:none}
 .modo-pantalla .con-activo .bloque:not(.activo) > :not(.bloque-cab){display:none}
 .modo-pantalla .con-activo .bloque:not(.activo){padding-block:14px}
 .salir-pantalla{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:max(14px,env(safe-area-inset-right,0px));z-index:40;box-shadow:var(--sombra)}
+
+/* ---------- montaje del punto ---------- */
+.m-cuenta{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--alerta);color:var(--blanco);font-size:11px;font-weight:700;margin-left:4px}
+.m-vacio{flex-direction:row;align-items:center;gap:22px}
+.m-vacio > div{display:flex;flex-direction:column;gap:12px}
+.m-vacio-mark{width:120px;height:auto;flex:none}
+@media(max-width:620px){.m-vacio{flex-direction:column;align-items:flex-start}.m-vacio-mark{width:90px}}
+.m-escenarios .dato b{color:var(--azul-profundo)}
+tr.m-total td{background:var(--fondo)}
+.m-items{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;scroll-snap-type:x proximity;scroll-margin-top:12px}
+.m-item-btn{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--linea);background:var(--superficie);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:500;color:var(--tinta);cursor:pointer;white-space:nowrap;scroll-snap-align:start}
+.m-item-btn small{font-size:12px;color:var(--tinta-suave);font-weight:500}
+.m-item-btn:hover{border-color:var(--azul-brillante)}
+.m-item-btn[aria-pressed="true"]{background:var(--azul-profundo);border-color:var(--azul-profundo);color:var(--blanco)}
+.m-item-btn[aria-pressed="true"] small{color:var(--sobre-azul-acento)}
+.m-item-nuevo{color:var(--azul-profundo);border-style:dashed}
+.m-punto-el{width:7px;height:7px;border-radius:50%;background:var(--verde-abierto)}
+.m-necesitamos{font-size:15px;max-width:80ch}
+.m-tarjetas{grid-template-columns:repeat(auto-fill,minmax(290px,1fr));align-items:start}
+.m-op{padding:0;overflow:hidden;gap:12px}
+.m-op > :not(.m-foto){margin-inline:16px}
+.m-op > :last-child{margin-bottom:16px}
+.m-foto{display:block;width:100%;aspect-ratio:4/3;border:0;border-bottom:1px solid var(--linea);background:var(--carril);padding:0;cursor:zoom-in;position:relative;overflow:hidden}
+.m-foto img{width:100%;height:100%;object-fit:contain;display:block}
+.m-foto-vacia{cursor:pointer;color:var(--tinta-suave);font-size:14px;display:grid;place-items:center;aspect-ratio:16/7;background:repeating-linear-gradient(135deg,var(--carril),var(--carril) 10px,var(--fondo) 10px,var(--fondo) 20px)}
+.m-foto-n{position:absolute;right:10px;bottom:10px;background:rgba(10,27,51,.72);color:#fff;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:500}
+.m-elegida{border-color:var(--azul-profundo);box-shadow:0 0 0 2px var(--azul-profundo)}
+.m-descartada{opacity:.62}
+.m-descartada h3{text-decoration:line-through}
+.m-resalta{animation:m-resalta 1.6s ease-out 1}
+@keyframes m-resalta{0%{box-shadow:0 0 0 6px rgba(0,140,255,.45)}100%{box-shadow:0 0 0 0 rgba(0,140,255,0)}}
+.prov p.m-producto{color:var(--tinta);font-weight:500}
+.m-precio{background:var(--azul-tenue);border-radius:var(--r-s);padding:12px 14px;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.m-precio > div{display:flex;flex-direction:column}
+.m-precio span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--azul-profundo)}
+.m-precio b{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15}
+.prov .m-precio p{font-size:13px;color:var(--tinta-suave)}
+.m-precio .chip{margin-top:4px}
+.m-link{font-size:14px;align-self:flex-start}
+.prov p.m-notas{font-size:13.5px;line-height:1.5;border-left:2px solid var(--linea);padding-left:10px}
+.m-op-pie{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--linea);padding-top:12px}
+.m-op-pie .espacio{flex:1}
+.m-op-pie .icono-btn{width:36px;height:36px}
+.m-op-pie .icono-btn:disabled{opacity:.35;cursor:default}
+.m-op-pie .icono-btn svg{transform:rotate(90deg)}
+.m-est{width:auto;max-width:190px;padding:8px 10px;font-size:14px}
+.m-item-cab .icono-btn:disabled{opacity:.35;cursor:default}
+.m-alerta{border-color:var(--alerta);box-shadow:0 0 0 1px var(--alerta)}
+.m-fotos-modal{display:flex;flex-wrap:wrap;gap:10px}
+.m-mini{position:relative;width:118px;height:118px;border-radius:var(--r-s);border:1px solid var(--linea);background:var(--carril);overflow:hidden;display:grid;place-items:center;font-size:12px;color:var(--tinta-suave)}
+.m-mini img{width:100%;height:100%;object-fit:cover}
+.m-mini-etq{position:absolute;left:6px;bottom:6px;border:0;border-radius:999px;background:rgba(10,27,51,.72);color:#fff;font-size:11px;font-weight:600;padding:3px 8px;cursor:pointer}
+b.m-mini-etq{background:var(--azul-profundo);cursor:default}
+.m-mini-x{position:absolute;top:6px;right:6px;width:28px!important;height:28px!important}
+.m-mini-mas{cursor:pointer;border-style:dashed;color:var(--azul-profundo);font-weight:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:var(--superficie)}
+.m-mini-mas svg{width:22px;height:22px}
+.m-total-vivo{background:var(--azul-tenue);border-radius:var(--r-s);padding:10px 14px;font-size:14px;color:var(--tinta)}
+.m-visor .modal-cuerpo{display:flex;flex-direction:column;gap:14px}
+.m-visor .modal-cuerpo img{width:100%;height:auto;border-radius:var(--r-s);background:var(--carril)}
+.info-modal:has(#m-fotos-caja),.info-modal:has(.m-total-vivo){background:none;padding:0}
 </style>
 
 </head>
@@ -710,7 +770,8 @@ var SALAS = [
   ['comercial','Comercial'],
   ['libreta','Libreta'],
   ['caja','Caja fuerte'],
-  ['historial','Historial']
+  ['historial','Historial'],
+  ['montaje','Montaje']
 ];
 var SALA_IDS = SALAS.map(function(s){ return s[0]; });
 var ESTADOS = [['pendiente','Por hacer'],['en_curso','En curso'],['hecho','Hecho']];
@@ -736,8 +797,8 @@ var REGLAS = [
   ['Lo cumplido se causa.','Una línea sobre cómo se cumplió, con datos.'],
   ['Lo decidido no se reabre','sin un dato nuevo.']
 ];
-var COLS = ['config','etapas','tareas','semana','reuniones','decisiones','parqueadero','objetivos','recordatorios','proveedores','cotizaciones','productos','prospectos','libreta','papelera','caja'];
-var TIPOS = {tareas:'Tarea', decisiones:'Decisión', parqueadero:'Idea', recordatorios:'Recordatorio', proveedores:'Proveedor', cotizaciones:'Cotización', productos:'Producto', prospectos:'Prospecto', libreta:'Nota', objetivos:'Meta', etapas:'Área', semana:'Foco del día', reuniones:'Reunión'};
+var COLS = ['config','etapas','tareas','semana','reuniones','decisiones','parqueadero','objetivos','recordatorios','proveedores','cotizaciones','productos','prospectos','libreta','papelera','caja','montajeItems','montajeOpciones','montajeFotos','montajePuntos','montajeEquipos'];
+var TIPOS = {tareas:'Tarea', decisiones:'Decisión', parqueadero:'Idea', recordatorios:'Recordatorio', proveedores:'Proveedor', cotizaciones:'Cotización', productos:'Producto', prospectos:'Prospecto', libreta:'Nota', objetivos:'Meta', etapas:'Área', semana:'Foco del día', reuniones:'Reunión', montajeItems:'Ítem del montaje', montajeOpciones:'Cotización del montaje', montajePuntos:'Punto', montajeEquipos:'Equipo de un punto', montajeFotos:'Foto'};
 
 function svg(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
 var ICON = {
@@ -761,6 +822,7 @@ var ICON = {
   deshacer: svg('<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>'),
   buscar: svg('<circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>'),
   abajo: svg('<path d="m6 9 6 6 6-6"/>'),
+  montaje: svg('<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M4 9h16M4 15h16M9 6h2M13 12h3M8 18h3"/>'),
   campana: svg('<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>')
 };
 
@@ -825,12 +887,13 @@ var S = {
   verHechas:false, verHechasHoy:false, verPerdidos:false,
   presentes: [], tickClave:'',
   atras: [], plegados: LS.get('mm-oficina-plegados', {reglas:true}), pantalla:false,
-  verRecHechos:false, verDescartadas:false
+  verRecHechos:false, verDescartadas:false,
+  mTab: LS.get('mm-oficina-montaje', 'cotizaciones'), mItem:null, mVerDesc:false
 };
 COLS.forEach(function(c){ S.d[c] = []; });
 if (S.yo && !SOCIOS[S.yo]) S.yo = null;
 function salaInicial(){ var h = (location.hash || '').slice(1); return SALA_IDS.indexOf(h) >= 0 ? h : 'recepcion'; }
-function listo(){ return S.modo === 'local' || ((S.modo === 'vivo' || S.modo === 'nube') && COLS.every(function(c){ return S.recibidas[c]; })); }
+function listo(){ return S.modo === 'local' || ((S.modo === 'vivo' || S.modo === 'nube') && COLS.every(function(c){ return S.recibidas[c] || c === 'montajeFotos'; })); }
 function enClaude(){ return !!(window.claude && typeof window.claude.use === 'function'); }
 
 // ---------- datos: base compartida (claude.ai) o copia local ----------
@@ -874,7 +937,10 @@ function deshacer(){
   render();
 }
 // lo que se borra pasa 30 días por la papelera antes de irse
-function tituloDe(c, d){ return c === 'semana' ? 'Foco del ' + fechaCorta(d.id) + ': ' + (d.foco || '') : (d.titulo || d.texto || d.nombre || d.proveedor || 'Sin título'); }
+function tituloDe(c, d){
+  if (c === 'montajeOpciones') return ((buscar('montajeItems', d.item) || {}).nombre || 'Montaje') + ' · ' + (d.proveedor || 'Opción');
+  if (c === 'montajeEquipos') return d.producto || d.tipo || 'Equipo';
+  return c === 'semana' ? 'Foco del ' + fechaCorta(d.id) + ': ' + (d.foco || '') : (d.titulo || d.texto || d.nombre || d.proveedor || 'Sin título'); }
 function aPapelera(c, id){
   var d = buscar(c, id); if (!d) return;
   var t = tituloDe(c, d);
@@ -1089,7 +1155,7 @@ function refrescarLocal(){
 }
 
 function escribir(op, c, id, data){
-  if (U.grupo && !U.deshaciendo && c !== 'actividad' && c !== 'caja' && c !== 'acceso') anotarPrevio(c, id);
+  if (U.grupo && !U.deshaciendo && c !== 'actividad' && c !== 'caja' && c !== 'acceso' && c !== 'montajeFotos') anotarPrevio(c, id);
   if (B.db) {
     var ref = B.db.collection(c).doc(id);
     var p = op === 'set' ? ref.set(data) : op === 'update' ? ref.update(data) : ref.delete();
@@ -1302,6 +1368,7 @@ function render(){
   restaurar(sala, g);
   revisarRecordatorios();
   limpiarPapelera();
+  if (S.sala === 'montaje') limpiarFotosMontaje();
 }
 function franjas(){
   var h = '';
@@ -1325,6 +1392,7 @@ function vistaSala(){
     case 'libreta': return vistaLibreta();
     case 'historial': return vistaHistorial();
     case 'caja': return vistaCaja();
+    case 'montaje': return vistaMontaje();
     default: return vistaRecepcion();
   }
 }
@@ -1354,6 +1422,7 @@ function renderLado(){
     var extra = '';
     if (s[0] === 'tablero' && abiertas) extra = '<b class="cuenta">' + abiertas + '</b>';
     if (s[0] === 'recepcion' && listo()) { var nr = recordatoriosVencidos().filter(esParaMi).length + plazosUrgentes().filter(esMia).length; if (nr) extra = '<b class="cuenta" title="Recordatorios y plazos urgentes">' + nr + '</b>'; }
+    if (s[0] === 'montaje' && listo()) { var ng = mGarantiasPorVencer().length; if (ng) extra = '<b class="cuenta" title="Garantías que vencen en 30 días o menos">' + ng + '</b>'; }
     if (s[0] === 'reunion' && (er === 'curso' || er === 'hora')) extra = '<i class="punto vivo-dot" title="Es hora de la reunión"></i>';
     return '<a href="#' + s[0] + '" class="sala-link' + (S.sala === s[0] ? ' on' : '') + '" data-accion="ir" data-sala="' + s[0] + '"' + (S.sala === s[0] ? ' aria-current="page"' : '') + '>' + ICON[s[0]] + '<span>' + s[1] + '</span>' + extra + '</a>';
   }).join('');
@@ -1921,7 +1990,7 @@ function fragmento(txt, k, n){
 }
 function resultados(q){
   var n = normal(q.trim());
-  if (n.length < 2) return '<p class="vacio">Escribe al menos dos letras. Busca en tareas, avances, notas, decisiones, ideas, recordatorios, proveedores, precios, prospectos y reuniones.</p>';
+  if (n.length < 2) return '<p class="vacio">Escribe al menos dos letras. Busca en tareas, avances, notas, decisiones, ideas, recordatorios, proveedores, precios, prospectos, reuniones y cotizaciones del montaje.</p>';
   var res = [];
   function mirar(c, tipo, titulo, campos, accion, porFecha){
     S.d[c].forEach(function(d){
@@ -1939,6 +2008,10 @@ function resultados(q){
   mirar('cotizaciones', 'Cotización', function(x){ return x.proveedor; }, function(x){ return [x.proveedor, x.contacto, x.incluye, x.notas]; }, 'editar-cotizacion');
   mirar('productos', 'Producto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.categoria, x.proveedor, x.notas]; }, 'editar-producto');
   mirar('prospectos', 'Prospecto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.contacto, x.telefono, x.zona, x.proximo, x.notas].concat((x.contactos || []).map(function(c){ return c.nota; })); }, 'editar-prospecto');
+  mirar('montajeOpciones', 'Cotización · Montaje', function(x){ return tituloDe('montajeOpciones', x); }, function(x){ return [x.proveedor, x.producto, x.contacto, x.zona, x.medidas, x.color, x.s1, x.s2, x.s3, x.garantia, x.entrega, x.pago, x.notas, mEstado(x.estado)]; }, 'm-editar-opcion');
+  mirar('montajeItems', 'Ítem · Montaje', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.necesitamos]; }, 'm-item');
+  mirar('montajePuntos', 'Punto', function(x){ return x.nombre; }, function(x){ return [x.nombre, x.ubicacion, x.notas]; }, 'm-abrir-punto');
+  mirar('montajeEquipos', 'Equipo · Punto', function(x){ return x.producto || x.tipo; }, function(x){ return [x.producto, x.tipo, x.proveedor, x.contacto, x.serial, x.factura, x.servicio, x.notas]; }, 'm-editar-equipo');
   mirar('reuniones', 'Reunión', function(x){ return 'Reunión del ' + fechaLarga(x.id); }, function(x){ return [x.notas, x.resumen].concat(((x.proceso || {}).items || []).map(function(i){ return i.texto; })); }, 'ver-reunion', true);
   mirar('semana', 'Foco', function(x){ return 'Foco del ' + fechaLarga(x.id) + ': ' + (x.foco || ''); }, function(x){ return [x.foco, x.nota]; }, 'editar-foco', true);
   if (!res.length) return '<p class="vacio">Nada con «' + esc(q.trim()) + '».</p>';
@@ -1952,6 +2025,534 @@ function abrirBuscar(){
   try { if (!dlg.open) dlg.showModal(); } catch(e){ dlg.setAttribute('open', ''); }
   $('#buscar-q').focus();
 }
+
+// ---------- sala: montaje del punto ----------
+// Cotizaciones de todo lo que necesita un punto (mismo orden y mismas cuentas del Excel de cotizaciones)
+// y la hoja de vida de cada punto montado. Las fotos van aparte (montajeFotos) para que cada documento
+// quede liviano y una foto que usan dos opciones se guarde una sola vez.
+var M_IVA = 0.19;
+var M_ESTADOS = [['por_contactar','Por contactar'],['esperando','Esperando respuesta'],['cotizado','Cotizado'],['negociando','Negociando'],['elegido','Elegido'],['comprado','Comprado'],['descartado','Descartado']];
+var M_IVAS = [['si','Sí, lo incluye'],['no','No: se le suma el 19%'],['na','No aplica (sin factura)']];
+var M_CANALES = ['Marketplace','Fabricante','Tienda','Distribuidor','Comodato','Carpintería','Contratista','Operador','Otro'];
+var M_COMPS = ['Cerramiento (muros)','Techo / cubierta','Piso','Fachada y puerta','Eléctrico y acometida','Iluminación general','Ventilación','Impermeabilización y desagüe','Gráfica exterior','Montaje llave en mano','Permisos y pólizas'];
+var M_APLICA = ['Ambos','Sótano','Aire libre'];
+var M_TIPOS_EQ = ['Nevera','Congelador','Estantería','Repisa','Torre','Mesón','Cámara','Datáfono','Internet','LED y gráfica','Estructura','Otro'];
+var M_CAMPOS = {precio:'Precio unitario', cantidad:'Cantidad', envio:'Envío e instalación', total:'Costo total con IVA'};
+
+function mItems(){ return S.d.montajeItems.slice().sort(function(a, b){ return (a.orden || 0) - (b.orden || 0) || (a.nombre || '').localeCompare(b.nombre || '', 'es'); }); }
+function mOpcionesDe(id){ return S.d.montajeOpciones.filter(function(o){ return o.item === id; }).sort(function(a, b){ return (a.orden || 0) - (b.orden || 0); }); }
+function mItemSel(){ var its = mItems(); return its.find(function(i){ return i.id === S.mItem; }) || its[0] || null; }
+function mCampo(it, k){ var c = (it && it.campos) || {}; return (c[k] || M_CAMPOS[k] || '').replace(/\s*\(COP\)\s*$/, ''); }
+function mEstado(k){ var e = M_ESTADOS.find(function(x){ return x[0] === k; }); return e ? e[1] : 'Por contactar'; }
+function mNum(v){ return v === null || v === undefined || v === '' || isNaN(Number(v)) ? null : Number(v); }
+// la misma cuenta del Excel: precio (con el 19% si dice que no lo incluye) × cantidad (o la del ítem) + envío
+function mCant(o, it){ var q = mNum(o.cantidad); return q === null ? (mNum(it && it.cantidad) || 0) : q; }
+function mTotal(o, it){
+  var p = mNum(o.precio); if (p === null) return null;
+  return (o.iva === 'no' ? p * (1 + M_IVA) : p) * mCant(o, it) + (mNum(o.envio) || 0);
+}
+function mElegida(o){ return o.estado === 'elegido' || o.estado === 'comprado'; }
+// resumen de un ítem, como la hoja Resumen (las descartadas no cuentan para «la más barata»)
+function mResumenItem(it){
+  var os = mOpcionesDe(it.id), conP = [], el = [], suma = 0;
+  os.forEach(function(o){ var t = mTotal(o, it); if (t !== null && o.estado !== 'descartado') conP.push([o, t]); if (mElegida(o)) { el.push(o); suma += t || 0; } });
+  conP.sort(function(a, b){ return a[1] - b[1]; });
+  var barata = conP[0] || null, cara = conP[conP.length - 1] || null;
+  return {opciones:os, conPrecio:conP.length, barata:barata, cara:cara, elegidas:el, elegida:el.length ? suma : null,
+    presupuesto:el.length ? suma : (barata ? barata[1] : 0)};
+}
+// estructura del parqueadero: por componente, la más barata y la elegida en sótano y al aire libre
+function mEstructura(it){
+  var os = mOpcionesDe(it.id), comps = {}, orden = [];
+  os.forEach(function(o){
+    var c = o.s1; if (!c) return;
+    if (!comps[c]) { comps[c] = {nombre:c, bs:null, ba:null, es:0, ea:0}; orden.push(c); }
+    var t = mTotal(o, it), x = comps[c], ap = o.s2 || 'Ambos';
+    if (t === null || o.estado === 'descartado') return;
+    if (ap !== 'Aire libre') { x.bs = x.bs === null ? t : Math.min(x.bs, t); if (mElegida(o)) x.es += t; }
+    if (ap !== 'Sótano') { x.ba = x.ba === null ? t : Math.min(x.ba, t); if (mElegida(o)) x.ea += t; }
+  });
+  orden.sort(function(a, b){ var i = M_COMPS.indexOf(a), j = M_COMPS.indexOf(b); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j); });
+  var lista = orden.map(function(c){ return comps[c]; }), tot = {bs:0, ba:0, es:0, ea:0};
+  lista.forEach(function(x){ tot.bs += x.bs || 0; tot.ba += x.ba || 0; tot.es += x.es; tot.ea += x.ea; });
+  return {lista:lista, tot:tot, sotano:tot.es || tot.bs, aire:tot.ea || tot.ba, opciones:os.length};
+}
+function mEscenarios(){
+  var eq = 0, est = null, filas = [];
+  mItems().forEach(function(it){
+    if (it.tipo === 'estructura') { est = est || {it:it, r:mEstructura(it)}; return; }
+    var r = mResumenItem(it); eq += r.presupuesto; filas.push({it:it, r:r});
+  });
+  var s = est ? est.r.sotano : 0, a = est ? est.r.aire : 0;
+  return {filas:filas, est:est, equipos:eq, cerrado:eq, sotano:eq + s, aire:eq + a};
+}
+function chipEstadoM(k){
+  var cls = {elegido:'chip-curso', comprado:'chip-curso', cotizado:'chip-etapa', negociando:'chip-etapa', esperando:'chip-vivo', descartado:'chip-alerta'}[k] || 'chip-neutro';
+  return '<span class="chip ' + cls + '">' + (mElegida({estado:k}) ? ICON.check.replace('<svg', '<svg style="width:13px;height:13px"') : '') + esc(mEstado(k)) + '</span>';
+}
+function mFoto(id){ return buscar('montajeFotos', id); }
+function mFotosDe(o){ return (o.fotos || []).map(mFoto).filter(Boolean); }
+function esLink(s){ return /^https?:\/\//i.test(String(s || '').trim()); }
+function linkWa(t){ var d = String(t || '').replace(/[^\d]/g, ''); if (d.length === 10 && d.charAt(0) === '3') d = '57' + d; return d.length >= 12 ? 'https://wa.me/' + d : ''; }
+
+// garantías de los puntos: vence = fecha + meses (como EDATE del Excel)
+function mVence(e){
+  var m = mNum(e.garantia); if (!e.fecha || m === null) return '';
+  var d = desdeISO(e.fecha), dia = d.getDate(); d.setMonth(d.getMonth() + m);
+  if (d.getDate() !== dia) d.setDate(0);
+  return fechaISO(d);
+}
+function mEstadoGarantia(e){
+  var v = mVence(e); if (!v) return null;
+  var d = diasHasta(v);
+  if (d < 0) return {txt:'Vencida · ' + fechaCorta(v), cls:'chip-neutro', alerta:false, dias:d};
+  if (d <= 30) return {txt:(d === 0 ? 'Vence hoy' : d === 1 ? 'Vence mañana' : 'Vence en ' + d + ' días') + ' · ' + fechaCorta(v), cls:'chip-alerta', alerta:true, dias:d};
+  return {txt:'Vigente hasta ' + fechaCorta(v), cls:'chip-etapa', alerta:false, dias:d};
+}
+function mGarantiasPorVencer(){ return S.d.montajeEquipos.filter(function(e){ var g = mEstadoGarantia(e); return g && g.alerta; }); }
+
+function vistaMontaje(){
+  var tab = S.mTab === 'puntos' ? 'puntos' : 'cotizaciones', nv = mGarantiasPorVencer().length;
+  var vacio = !S.d.montajeItems.length;
+  var t = tab === 'puntos'
+    ? ['Puntos', 'La hoja de vida de cada punto: qué equipo y mueble quedó, de dónde salió y hasta cuándo tiene garantía. Si algo se daña, aquí está a quién llamar.', '<button class="btn btn-primario" data-accion="m-nuevo-punto">' + ICON.mas + 'Punto</button>']
+    : ['Cotizaciones', 'Todo lo que necesita un punto, con cada opción que encontremos para comparar y tener plan B. Los precios se comparan siempre con IVA.', vacio ? '' : '<button class="btn btn-primario" data-accion="m-nueva-opcion">' + ICON.mas + 'Opción</button>'];
+  return cabecera('Montaje del punto', t[0], t[1], t[2]) +
+    '<div class="seg pestanas" role="group">' +
+      '<button type="button" data-accion="seg" data-grupo="m-tab" data-valor="cotizaciones" aria-pressed="' + (tab === 'cotizaciones') + '">Cotizaciones</button>' +
+      '<button type="button" data-accion="seg" data-grupo="m-tab" data-valor="puntos" aria-pressed="' + (tab === 'puntos') + '">Puntos' + (nv ? ' <b class="m-cuenta" title="Garantías por vencer">' + nv + '</b>' : '') + '</button></div>' +
+    (tab === 'puntos' ? vistaMontajePuntos() : vacio ? montajeVacio() : vistaMontajeCotizaciones());
+}
+function montajeVacio(){
+  return '<section class="panel m-vacio"><img class="m-vacio-mark" src="img/mark-08-senalando.webp" alt="" width="200" height="200"><div>' +
+    '<span class="etiqueta">Para empezar</span><h2>Traer las cotizaciones del Excel</h2>' +
+    '<p class="panel-ayuda">Carga de una vez los 10 ítems, las opciones y las fotos del Excel de cotizaciones (cotizaciones/MinuteMark-Cotizaciones-Punto.xlsx). Así no se escribe nada dos veces. Desde ahí se siguen cargando cotizaciones aquí.</p>' +
+    '<div class="panel-herr"><button class="btn btn-primario btn-sm" data-accion="m-cargar-excel">Cargar las cotizaciones del Excel</button>' +
+      '<label class="btn btn-linea btn-sm" for="m-importar">Elegir el archivo (.json)</label><input type="file" id="m-importar" accept="application/json,.json" data-cambio="m-importar" hidden>' +
+      '<button class="enlace" data-accion="m-nuevo-item">O empezar en blanco con un ítem</button></div></div></section>';
+}
+function vistaMontajeCotizaciones(){
+  var its = mItems(), it = mItemSel(), E = mEscenarios();
+  return panelMontajeResumen(E) +
+    '<nav class="m-items" id="m-items" data-scroll aria-label="Ítems del punto">' + its.map(function(x){
+      var n = mOpcionesDe(x.id).length, el = mOpcionesDe(x.id).some(mElegida);
+      return '<button type="button" class="m-item-btn" data-accion="m-item" data-id="' + esc(x.id) + '" aria-pressed="' + (it && x.id === it.id) + '">' + esc(x.nombre) + ' <small>' + n + '</small>' + (el ? '<i class="m-punto-el" title="Ya hay una elegida"></i>' : '') + '</button>';
+    }).join('') + '<button type="button" class="m-item-btn m-item-nuevo" data-accion="m-nuevo-item">' + ICON.mas.replace('<svg', '<svg style="width:15px;height:15px"') + 'Ítem</button></nav>' +
+    (it ? vistaMontajeItem(it) : '');
+}
+function panelMontajeResumen(E){
+  var fila = function(f){
+    var r = f.r;
+    return '<tr' + (S.mItem === f.it.id ? ' class="destacada"' : '') + '><td><button class="enlace" data-accion="m-item" data-id="' + esc(f.it.id) + '">' + esc(f.it.nombre) + '</button></td><td class="num">' + esc(f.it.cantidad == null ? '—' : f.it.cantidad) + '</td><td class="num">' + r.opciones.length + '</td><td class="num">' + r.conPrecio + '</td>' +
+      '<td class="num">' + (r.barata ? pesos(r.barata[1]) : '—') + '</td><td class="num">' + (r.cara ? pesos(r.cara[1]) : '—') + '</td><td class="num">' + (r.elegida !== null ? pesos(r.elegida) : '—') + '</td><td class="num"><b>' + pesos(r.presupuesto) + '</b></td></tr>';
+  };
+  var est = E.est;
+  return '<section class="panel" data-panel="m-resumen"><header class="panel-cab"><div><span class="etiqueta">Resumen · presupuesto del punto</span><h2>Cuánto cuesta montar un punto</h2></div></header>' +
+    '<div class="resumen m-escenarios">' +
+      '<div class="dato"><b>' + pesos(E.cerrado) + '</b><span>En un espacio ya cerrado</span></div>' +
+      '<div class="dato"><b>' + pesos(E.sotano) + '</b><span>En parqueadero de sótano</span></div>' +
+      '<div class="dato"><b>' + pesos(E.aire) + '</b><span>En parqueadero al aire libre</span></div>' +
+    '</div>' +
+    '<div class="tabla-caja"><table><thead><tr><th>Ítem</th><th class="num">Cantidad</th><th class="num">Opciones</th><th class="num">Con precio</th><th class="num">Más barata</th><th class="num">Más cara</th><th class="num">Elegida</th><th class="num">Para presupuesto</th></tr></thead><tbody>' +
+      E.filas.map(fila).join('') +
+      '<tr class="m-total"><td colspan="7"><b>Equipos y mobiliario</b></td><td class="num"><b>' + pesos(E.equipos) + '</b></td></tr>' +
+      (est ? '<tr><td><button class="enlace" data-accion="m-item" data-id="' + esc(est.it.id) + '">' + esc(est.it.nombre) + ' · sótano</button></td><td></td><td class="num">' + est.r.opciones + '</td><td></td><td class="num">' + pesos(est.r.tot.bs) + '</td><td></td><td class="num">' + (est.r.tot.es ? pesos(est.r.tot.es) : '—') + '</td><td class="num"><b>' + pesos(est.r.sotano) + '</b></td></tr>' +
+        '<tr><td><button class="enlace" data-accion="m-item" data-id="' + esc(est.it.id) + '">' + esc(est.it.nombre) + ' · aire libre</button></td><td></td><td class="num">' + est.r.opciones + '</td><td></td><td class="num">' + pesos(est.r.tot.ba) + '</td><td></td><td class="num">' + (est.r.tot.ea ? pesos(est.r.tot.ea) : '—') + '</td><td class="num"><b>' + pesos(est.r.aire) + '</b></td></tr>' : '') +
+    '</tbody></table></div>' +
+    '<p class="nota-tabla">Cada ítem cuenta con la opción elegida (o comprada); si todavía no hay ninguna, con la más barata. Las descartadas no cuentan. Espacio cerrado = equipos y mobiliario; los parqueaderos suman la estructura de sótano o de aire libre. Internet entra como costo del primer año (12 mensualidades + instalación).</p></section>';
+}
+function vistaMontajeItem(it){
+  var r = mResumenItem(it), os = r.opciones, idx = mItems().indexOf(it), n = mItems().length;
+  var activas = os.filter(function(o){ return o.estado !== 'descartado'; }), descartadas = os.filter(function(o){ return o.estado === 'descartado'; });
+  var el = r.elegidas;
+  var cab = '<section class="panel m-item-cab"><header class="panel-cab"><div><span class="etiqueta">Lo que necesitamos</span><h2>' + esc(it.nombre) + '</h2></div>' +
+      '<div class="panel-herr"><button class="icono-btn" data-accion="m-mover-item" data-id="' + esc(it.id) + '" data-n="-1" title="Mover a la izquierda" aria-label="Mover el ítem antes"' + (idx <= 0 ? ' disabled' : '') + '>' + ICON.izq + '</button>' +
+        '<button class="icono-btn" data-accion="m-mover-item" data-id="' + esc(it.id) + '" data-n="1" title="Mover a la derecha" aria-label="Mover el ítem después"' + (idx >= n - 1 ? ' disabled' : '') + '>' + ICON.der + '</button>' +
+        '<button class="btn btn-linea btn-sm" data-accion="m-editar-item" data-id="' + esc(it.id) + '">' + ICON.lapiz + 'Editar ítem</button>' +
+        '<button class="btn btn-primario btn-sm" data-accion="m-nueva-opcion" data-item="' + esc(it.id) + '">' + ICON.mas + 'Opción</button></div></header>' +
+    (it.necesitamos ? '<p class="m-necesitamos">' + esc(it.necesitamos) + '</p>' : '<p class="vacio">Falta escribir qué necesitamos: medidas y cantidad. Toca «Editar ítem».</p>') +
+    '<div class="resumen">' +
+      '<div class="dato"><b>' + esc(it.cantidad == null ? '—' : it.cantidad) + '</b><span>' + (it.tipo === 'estructura' ? 'Cantidad por defecto' : mCampo(it, 'cantidad') === 'Cantidad' ? 'Cantidad que necesita el punto' : mCampo(it, 'cantidad')) + '</span></div>' +
+      (it.tipo === 'estructura' ? '' :
+      '<div class="dato"><b>' + (r.barata ? pesos(r.barata[1]) : '—') + '</b><span>Más barata' + (r.barata ? ' · ' + esc(r.barata[0].proveedor) : '') + '</span></div>' +
+      '<div class="dato"><b>' + (r.elegida !== null ? pesos(r.elegida) : '—') + '</b><span>' + (el.length ? 'Elegida · ' + esc(el.map(function(o){ return o.proveedor; }).join(', ')) : 'Elegida: todavía ninguna') + '</span></div>') +
+      '<div class="dato"><b>' + os.length + '</b><span>' + (os.length === 1 ? 'Opción' : 'Opciones') + (descartadas.length ? ' · ' + descartadas.length + ' descartada' + (descartadas.length === 1 ? '' : 's') : '') + '</span></div>' +
+    '</div>' + (it.tipo === 'estructura' ? tablaEstructura(it) : '') + '</section>';
+  var barataId = r.barata ? r.barata[0].id : '';
+  return cab + (os.length ? '<div class="tarjetas m-tarjetas">' + activas.concat(S.mVerDesc ? descartadas : []).map(function(o){ return tarjetaOpcion(o, it, barataId, os); }).join('') + '</div>' +
+      (descartadas.length ? '<button class="enlace mostrar-mas enlace-suave" data-accion="m-ver-descartadas">' + (S.mVerDesc ? 'Ocultar las descartadas' : 'Ver las descartadas (' + descartadas.length + ')') + '</button>' : '')
+    : '<p class="vacio">Todavía no hay opciones para ' + esc(it.nombre.toLowerCase()) + '. Agreguen la primera con «Opción»: proveedor, precio y un pantallazo.</p>');
+}
+function tablaEstructura(it){
+  var e = mEstructura(it);
+  if (!e.lista.length) return '<p class="panel-ayuda">Cada opción lleva su componente (muros, techo, piso…) y si aplica a sótano, aire libre o ambos. Aquí se arma la cuenta de los dos escenarios.</p>';
+  return '<div class="tabla-caja"><table><thead><tr><th>Componente</th><th class="num">Más barata · sótano</th><th class="num">Más barata · aire libre</th><th class="num">Elegida · sótano</th><th class="num">Elegida · aire libre</th></tr></thead><tbody>' +
+    e.lista.map(function(x){ return '<tr><td>' + esc(x.nombre) + '</td><td class="num">' + pesos(x.bs) + '</td><td class="num">' + pesos(x.ba) + '</td><td class="num">' + (x.es ? pesos(x.es) : '—') + '</td><td class="num">' + (x.ea ? pesos(x.ea) : '—') + '</td></tr>'; }).join('') +
+    '<tr class="m-total"><td><b>Total</b></td><td class="num"><b>' + pesos(e.tot.bs) + '</b></td><td class="num"><b>' + pesos(e.tot.ba) + '</b></td><td class="num"><b>' + pesos(e.tot.es) + '</b></td><td class="num"><b>' + pesos(e.tot.ea) + '</b></td></tr></tbody></table></div>';
+}
+function tarjetaOpcion(o, it, barataId, os){
+  var fs = mFotosDe(o), t = mTotal(o, it), q = mCant(o, it), i = os.indexOf(o), pend = (o.fotos || []).length && !fs.length;
+  var iva = o.iva === 'si' ? 'IVA incluido' : o.iva === 'no' ? 'sin IVA: se le suma el 19%' : o.iva === 'na' ? 'IVA: no aplica' : 'IVA sin aclarar';
+  var specs = [['s1', o.s1], ['s2', o.s2], ['s3', o.s3]].filter(function(x){ return x[1] !== undefined && x[1] !== null && x[1] !== ''; }).map(function(x){ return [mCampo(it, x[0]), x[1]]; });
+  var datos = [['Medidas', o.medidas], ['Color', o.color]].concat(specs, [['Garantía', o.garantia], ['Entrega', o.entrega], ['Forma de pago', o.pago], ['Contacto', o.contacto], ['Zona', o.zona], ['Cotizado el', o.fecha ? fechaCorta(o.fecha) + ' ' + o.fecha.slice(0, 4) : '']]).filter(function(x){ return x[1] !== undefined && x[1] !== null && x[1] !== ''; });
+  var wa = linkWa(o.contacto);
+  return '<article class="prov m-op' + (mElegida(o) ? ' m-elegida' : '') + (o.estado === 'descartado' ? ' m-descartada' : '') + '" id="op-' + esc(o.id) + '">' +
+    (fs.length ? '<button class="m-foto" data-accion="m-ver-fotos" data-id="' + esc(o.id) + '" aria-label="Ver la foto en grande"><img src="' + fs[0].data + '" alt="Foto de ' + esc(o.proveedor) + '" loading="lazy">' + (fs.length > 1 ? '<span class="m-foto-n">' + fs.length + ' fotos</span>' : '') + '</button>'
+      : '<button class="m-foto m-foto-vacia" data-accion="m-editar-opcion" data-id="' + esc(o.id) + '">' + (pend ? 'Cargando la foto…' : 'Sin foto · toca para subir un pantallazo') + '</button>') +
+    '<header class="prov-cab"><div><h3>' + esc(o.proveedor) + '</h3><span>' + esc([o.canal, o.zona].filter(Boolean).join(' · ')) + '</span></div>' + chipEstadoM(o.estado) + '</header>' +
+    (o.producto ? '<p class="m-producto">' + esc(o.producto) + '</p>' : '') +
+    '<div class="m-precio"><div><span>' + esc(mCampo(it, 'total')) + '</span><b>' + (t === null ? 'Sin precio' : pesos(t)) + '</b></div>' +
+      '<p>' + (mNum(o.precio) !== null ? pesos(o.precio) + ' ' + (mCampo(it, 'precio') === 'Precio unitario' ? 'c/u' : '· ' + esc(mCampo(it, 'precio').toLowerCase())) + ' × ' + q + (mNum(o.envio) ? ' + ' + pesos(o.envio) + ' de ' + esc(mCampo(it, 'envio').toLowerCase()) : '') + ' · ' : '') + iva + '</p>' +
+      (o.id === barataId ? '<span class="chip chip-curso">La más barata</span>' : '') + '</div>' +
+    (datos.length ? '<dl class="prov-datos">' + datos.map(function(x){ return '<dt>' + esc(x[0]) + '</dt><dd>' + esc(x[1]) + '</dd>'; }).join('') + '</dl>' : '') +
+    (o.link ? (esLink(o.link) ? '<a class="enlace m-link" href="' + esc(o.link.trim()) + '" target="_blank" rel="noopener">Abrir el link de la cotización</a>' : '<p>' + esc(o.link) + '</p>') : '') +
+    (wa ? '<a class="enlace m-link" href="' + wa + '" target="_blank" rel="noopener">Escribir por WhatsApp</a>' : '') +
+    (o.notas ? '<p class="m-notas">' + esc(o.notas) + '</p>' : '') +
+    '<div class="m-op-pie"><label class="sr" for="m-est-' + esc(o.id) + '">Estado</label><select class="select-suelto m-est" data-vivo id="m-est-' + esc(o.id) + '" data-cambio="m-estado" data-id="' + esc(o.id) + '">' + opciones(M_ESTADOS, o.estado || 'por_contactar') + '</select>' +
+      '<span class="espacio"></span><button class="icono-btn" data-accion="m-mover-opcion" data-id="' + esc(o.id) + '" data-n="-1" title="Subir" aria-label="Subir esta opción"' + (i <= 0 ? ' disabled' : '') + '>' + ICON.izq + '</button>' +
+      '<button class="icono-btn" data-accion="m-mover-opcion" data-id="' + esc(o.id) + '" data-n="1" title="Bajar" aria-label="Bajar esta opción"' + (i >= os.length - 1 ? ' disabled' : '') + '>' + ICON.der + '</button>' +
+      '<button class="btn btn-linea btn-sm" data-accion="m-editar-opcion" data-id="' + esc(o.id) + '">Editar</button></div>' +
+  '</article>';
+}
+
+// ---------- puntos ----------
+function vistaMontajePuntos(){
+  var ps = S.d.montajePuntos.slice().sort(function(a, b){ return (a.apertura || '9999').localeCompare(b.apertura || '9999') || (a.nombre || '').localeCompare(b.nombre || '', 'es'); });
+  var nv = mGarantiasPorVencer();
+  var aviso = nv.length ? '<div class="franja alerta" role="alert"><span><b>' + (nv.length === 1 ? 'Una garantía vence' : nv.length + ' garantías vencen') + ' en 30 días o menos:</b> ' + nv.map(function(e){ var p = buscar('montajePuntos', e.punto); return esc((e.producto || e.tipo || 'Equipo') + (p ? ' (' + p.nombre + ')' : '') + ' · ' + mEstadoGarantia(e).txt); }).join('; ') + '. Si algo falla, reclámenla antes.</span></div>' : '';
+  if (!ps.length) return aviso + '<section class="panel"><header class="panel-cab"><div><span class="etiqueta">Todavía no hay puntos montados</span><h2>Lista para el primer punto</h2></div></header>' +
+    '<p class="panel-ayuda">Cuando se monte el primer punto, créenlo con «Punto» y anoten cada equipo y mueble que quedó: proveedor, contacto, fecha, valor, meses de garantía, serial, dónde está la factura y quién hace el servicio técnico. Se puede traer de una cotización elegida para no escribir dos veces. La oficina avisa cuando una garantía vence en 30 días o menos.</p>' +
+    '<div class="panel-herr"><button class="btn btn-primario btn-sm" data-accion="m-nuevo-punto">' + ICON.mas + 'Crear el primer punto</button></div></section>';
+  return aviso + ps.map(function(p){
+    var es = S.d.montajeEquipos.filter(function(e){ return e.punto === p.id; }).sort(function(a, b){ return M_TIPOS_EQ.indexOf(a.tipo) - M_TIPOS_EQ.indexOf(b.tipo) || (a.orden || 0) - (b.orden || 0); });
+    var total = es.reduce(function(s, e){ return s + (mNum(e.valor) || 0); }, 0);
+    return '<section class="panel" data-panel="m-punto-' + esc(p.id) + '"><header class="panel-cab"><div><span class="etiqueta">' + esc(p.ubicacion || 'Punto') + '</span><h2>' + esc(p.nombre) + '</h2>' +
+      '<p class="panel-ayuda">' + [p.apertura ? 'Montado el ' + fechaLarga(p.apertura) + ' de ' + p.apertura.slice(0, 4) : '', es.length + (es.length === 1 ? ' equipo' : ' equipos'), total ? pesos(total) + ' invertidos' : ''].filter(Boolean).join(' · ') + '</p></div>' +
+      '<div class="panel-herr"><button class="btn btn-linea btn-sm" data-accion="m-editar-punto" data-id="' + esc(p.id) + '">' + ICON.lapiz + 'Editar</button><button class="btn btn-primario btn-sm" data-accion="m-nuevo-equipo" data-punto="' + esc(p.id) + '">' + ICON.mas + 'Equipo</button></div></header>' +
+      (p.notas ? '<p class="m-notas">' + esc(p.notas) + '</p>' : '') +
+      (es.length ? '<div class="tarjetas">' + es.map(tarjetaEquipo).join('') + '</div>' : '<p class="vacio">Sin equipos todavía. Anoten cada nevera, estantería, cámara… con su garantía.</p>') + '</section>';
+  }).join('');
+}
+function tarjetaEquipo(e){
+  var g = mEstadoGarantia(e), wa = linkWa(e.contacto);
+  var prov = e.proveedor && S.d.proveedores.find(function(p){ return normal(p.nombre) === normal(e.proveedor); });
+  var datos = [['Cantidad', e.cantidad], ['Proveedor', e.proveedor], ['Contacto', e.contacto], ['Fecha', e.fecha ? fechaCorta(e.fecha) + ' ' + e.fecha.slice(0, 4) : ''], ['Valor', mNum(e.valor) !== null ? pesos(e.valor) : ''],
+    ['Garantía', mNum(e.garantia) !== null ? e.garantia + (Number(e.garantia) === 1 ? ' mes' : ' meses') : ''], ['Serial', e.serial], ['Factura', e.factura], ['Servicio técnico', e.servicio]].filter(function(x){ return x[1] !== undefined && x[1] !== null && x[1] !== ''; });
+  return '<article class="prov' + (g && g.alerta ? ' m-alerta' : '') + '"><header class="prov-cab"><div><h3>' + esc(e.producto || e.tipo || 'Equipo') + '</h3><span>' + esc(e.tipo || '') + '</span></div>' + (g ? '<span class="chip ' + g.cls + '">' + esc(g.txt) + '</span>' : '<span class="chip chip-neutro">Garantía sin datos</span>') + '</header>' +
+    (datos.length ? '<dl class="prov-datos">' + datos.map(function(x){ return '<dt>' + esc(x[0]) + '</dt><dd>' + esc(x[1]) + '</dd>'; }).join('') + '</dl>' : '') +
+    (e.notas ? '<p class="m-notas">' + esc(e.notas) + '</p>' : '') +
+    '<div class="prov-pie"><div>' + (wa ? '<a class="enlace" href="' + wa + '" target="_blank" rel="noopener">WhatsApp del proveedor</a>' : '') + (prov ? '<button class="enlace" data-accion="editar-proveedor" data-id="' + esc(prov.id) + '">Ficha del proveedor</button>' : '') +
+      (e.opcion && buscar('montajeOpciones', e.opcion) ? '<button class="enlace" data-accion="m-ir-opcion" data-id="' + esc(e.opcion) + '">Ver la cotización</button>' : '') + '</div>' +
+      '<button class="btn btn-linea btn-sm" data-accion="m-editar-equipo" data-id="' + esc(e.id) + '">Editar</button></div></article>';
+}
+
+// ---------- formularios ----------
+function modalItemM(it){
+  var nuevo = !it; it = it || {}; var c = it.campos || {};
+  abrirForm({
+    etiqueta: nuevo ? 'Nuevo ítem del punto' : 'Ítem del punto', titulo: nuevo ? 'Ítem' : it.nombre,
+    campos:[
+      {id:'nombre', label:'Nombre', valor:it.nombre || '', requerido:true, max:60, placeholder:'Ej.: Neveras, Avisos, Seguro'},
+      {id:'necesitamos', label:'Lo que necesitamos', tipo:'textarea', valor:it.necesitamos || '', placeholder:'Medidas, cantidad, color y lo que no puede faltar.'},
+      {id:'cantidad', label:'Cantidad que necesita el punto', tipo:'number', ancho:'medio', valor:it.cantidad == null ? 1 : it.cantidad, ayuda:'Se usa en cada opción que no diga otra cantidad.'},
+      {id:'tipo', label:'Cómo entra en el resumen', tipo:'segment', valor:it.tipo === 'estructura' ? 'estructura' : '', opciones:[['', 'Equipo o mueble'], ['estructura', 'Estructura del parqueadero']], ayuda:'«Estructura» solo suma en los escenarios de parqueadero (sótano o aire libre).'},
+      {id:'s1', label:'Dato propio 1 (ej.: Capacidad en litros)', ancho:'medio', valor:c.s1 || '', max:50},
+      {id:'s2', label:'Dato propio 2', ancho:'medio', valor:c.s2 || '', max:50},
+      {id:'s3', label:'Dato propio 3', ancho:'medio', valor:c.s3 || '', max:50},
+      {id:'lprecio', label:'Nombre del precio (opcional)', ancho:'medio', valor:c.precio || '', placeholder:'Precio unitario', max:50, ayuda:'Ej.: «Precio mensual» en Internet.'},
+      {id:'lcantidad', label:'Nombre de la cantidad (opcional)', ancho:'medio', valor:c.cantidad || '', placeholder:'Cantidad', max:50, ayuda:'Ej.: «Meses».'},
+      {id:'lenvio', label:'Nombre del envío (opcional)', ancho:'medio', valor:c.envio || '', placeholder:'Envío e instalación', max:50},
+      {id:'ltotal', label:'Nombre del total (opcional)', ancho:'medio', valor:c.total || '', placeholder:'Costo total con IVA', max:50, ayuda:'Ej.: «Costo primer año».'}
+    ],
+    onGuardar: function(v){
+      var d = {nombre:v.nombre, necesitamos:v.necesitamos, cantidad:v.cantidad === null ? 1 : v.cantidad, tipo:v.tipo || '',
+        campos:{s1:v.s1, s2:v.s2, s3:v.s3, precio:v.lprecio, cantidad:v.lcantidad, envio:v.lenvio, total:v.ltotal}};
+      if (nuevo) {
+        var max = mItems().reduce(function(m, x){ return Math.max(m, x.orden || 0); }, 0);
+        S.mItem = crear('montajeItems', Object.assign(d, {orden:max + 10, creado:ahora()}));
+        registrar('agregó el ítem «' + v.nombre + '» al montaje');
+      } else cambiar('montajeItems', it.id, d);
+    },
+    textoBorrar:'Borrar el ítem',
+    onBorrar: nuevo ? null : function(){
+      var n = mOpcionesDe(it.id).length;
+      if (n) { avisar('«' + it.nombre + '» tiene ' + n + (n === 1 ? ' opción' : ' opciones') + '. Bórrenlas o pásenlas a otro ítem antes de borrarlo.', 'alerta'); return; }
+      aPapelera('montajeItems', it.id); S.mItem = null;
+    }
+  });
+}
+function modalOpcion(o, itemId){
+  var nueva = !o; o = o || {};
+  var it = buscar('montajeItems', o.item || itemId) || mItemSel(); if (!it) return;
+  var est = it.tipo === 'estructura';
+  M_FOTOS = (o.fotos || []).map(function(id){ return {id:id}; });
+  var campos = [
+    {id:'proveedor', label:'Proveedor', valor:o.proveedor || '', requerido:true, max:80, placeholder:'Ej.: Frozentech'},
+    {tipo:'info', html:'<div id="m-fotos-caja">' + fotosModalHTML() + '</div>'},
+    {id:'producto', label:'Producto o referencia', valor:o.producto || '', max:200},
+    {id:'precio', label:mCampo(it, 'precio') + ' (COP)', tipo:'pesos', ancho:'medio', valor:o.precio == null ? '' : o.precio},
+    {id:'cantidad', label:mCampo(it, 'cantidad'), tipo:'number', ancho:'medio', valor:o.cantidad == null ? '' : o.cantidad, placeholder:String(it.cantidad == null ? '' : it.cantidad), ayuda:'Vacío = ' + (it.cantidad == null ? '—' : it.cantidad) + ', lo que necesita el punto.'},
+    {id:'iva', label:'¿El precio incluye IVA?', tipo:'segment', valor:o.iva || '', opciones:M_IVAS, ayuda:'Si no lo incluye, el costo total le suma el 19% para comparar parejo.'},
+    {id:'envio', label:mCampo(it, 'envio') + ' (COP)', tipo:'pesos', ancho:'medio', valor:o.envio == null ? '' : o.envio},
+    {id:'estado', label:'Estado', tipo:'select', ancho:'medio', valor:o.estado || 'por_contactar', opciones:M_ESTADOS},
+    {tipo:'info', html:'<p class="m-total-vivo" id="m-total-vivo"></p>'},
+    {id:'canal', label:'Canal', tipo:'select', ancho:'medio', valor:o.canal || '', opciones:[['', 'Sin definir']].concat(M_CANALES.map(function(c){ return [c, c]; }))},
+    {id:'zona', label:'Zona o ciudad', ancho:'medio', valor:o.zona || '', max:60},
+    {id:'contacto', label:'Contacto (nombre y WhatsApp)', valor:o.contacto || '', max:120},
+    {id:'medidas', label:'Medidas (frente × fondo × alto)', ancho:'medio', valor:o.medidas || '', max:80},
+    {id:'color', label:'Color / ¿se puede brandear?', ancho:'medio', valor:o.color || '', max:120},
+    est ? {id:'s1', label:mCampo(it, 's1') || 'Componente', tipo:'select', ancho:'medio', valor:o.s1 || '', opciones:[['', 'Elegir']].concat(M_COMPS.concat(o.s1 && M_COMPS.indexOf(o.s1) < 0 ? [o.s1] : []).map(function(c){ return [c, c]; }))}
+        : {id:'s1', label:mCampo(it, 's1') || 'Dato 1', ancho:'medio', valor:o.s1 == null ? '' : o.s1, max:80},
+    est ? {id:'s2', label:mCampo(it, 's2') || 'Aplica a', tipo:'select', ancho:'medio', valor:o.s2 || 'Ambos', opciones:M_APLICA.map(function(c){ return [c, c]; })}
+        : {id:'s2', label:mCampo(it, 's2') || 'Dato 2', ancho:'medio', valor:o.s2 == null ? '' : o.s2, max:80},
+    {id:'s3', label:mCampo(it, 's3') || 'Dato 3', ancho:'medio', valor:o.s3 == null ? '' : o.s3, max:80},
+    {id:'garantia', label:'Garantía', ancho:'medio', valor:o.garantia || '', max:80, placeholder:'Ej.: 6 meses'},
+    {id:'entrega', label:'Tiempo de entrega', ancho:'medio', valor:o.entrega || '', max:80},
+    {id:'pago', label:'Forma de pago', ancho:'medio', valor:o.pago || '', max:80},
+    {id:'link', label:'Link', valor:o.link || '', max:400, placeholder:'https://…'},
+    {id:'fecha', label:'Fecha de cotización', tipo:'date', ancho:'medio', valor:o.fecha || (nueva ? hoy() : '')},
+    {id:'item', label:'Ítem', tipo:'select', ancho:'medio', valor:it.id, opciones:mItems().map(function(x){ return [x.id, x.nombre]; }), ayuda:'Para pasarla a otro ítem.'},
+    {id:'notas', label:'Notas', tipo:'textarea', valor:o.notas || '', placeholder:'Lo que hay que preguntar, lo que no cumple, lo que la hace mejor.'}
+  ];
+  abrirForm({
+    etiqueta: nueva ? 'Nueva opción · ' + it.nombre : it.nombre, titulo: nueva ? 'Opción para ' + it.nombre.toLowerCase() : o.proveedor,
+    campos:campos,
+    alAbrir: function(dlg){ totalVivo(it); dlg.querySelector('form').addEventListener('input', function(){ totalVivo(it); }); dlg.querySelector('form').addEventListener('change', function(){ totalVivo(it); }); },
+    onGuardar: function(v){
+      if (M_FOTOS.some(function(f){ return f.cargando; })) { avisar('Espera a que termine de cargar la foto.', 'alerta'); return false; }
+      var ids = M_FOTOS.map(function(f){ return f.id || crear('montajeFotos', {data:f.data, ancho:f.ancho, alto:f.alto, creada:ahora(), por:S.yo || ''}); });
+      var d = Object.assign({}, v, {fotos:ids, actualizada:ahora(), por:S.yo || ''});
+      if (nueva) {
+        var max = mOpcionesDe(v.item).reduce(function(m, x){ return Math.max(m, x.orden || 0); }, 0);
+        crear('montajeOpciones', Object.assign(d, {orden:max + 10, creada:ahora()}));
+        registrar('agregó una opción de ' + (buscar('montajeItems', v.item) || it).nombre.toLowerCase() + ': ' + v.proveedor + (v.precio ? ' · ' + pesos(v.precio) : ''));
+      } else {
+        if (v.item !== o.item) d.orden = mOpcionesDe(v.item).reduce(function(m, x){ return Math.max(m, x.orden || 0); }, 0) + 10;
+        cambiar('montajeOpciones', o.id, d);
+        if (mElegida(v) && !mElegida(o)) registrar('marcó como ' + mEstado(v.estado).toLowerCase() + ' la opción de ' + v.proveedor + ' (' + it.nombre.toLowerCase() + ')');
+      }
+      S.mItem = v.item;
+    },
+    textoBorrar:'Borrar la opción',
+    onBorrar: nueva ? null : function(){ aPapelera('montajeOpciones', o.id); }
+  });
+}
+function totalVivo(it){
+  var el = $('#m-total-vivo'), f = $('#modal-form'); if (!el || !f) return;
+  var r = f.querySelector('input[name="m-iva"]:checked');
+  var o = {precio:leerPesos(($('#m-precio') || {}).value), cantidad:($('#m-cantidad') || {}).value, envio:leerPesos(($('#m-envio') || {}).value), iva:r ? r.value : ''};
+  var t = mTotal(o, it);
+  el.innerHTML = t === null ? 'Con el precio, aquí sale el ' + esc(mCampo(it, 'total').toLowerCase()) + '.' : esc(mCampo(it, 'total')) + ': <b>' + pesos(t) + '</b>';
+}
+// fotos del formulario: las que ya están (id) y las nuevas (data), comprimidas en el equipo antes de guardar
+var M_FOTOS = [];
+var M_FOTO_MAX = 600000; // caracteres por foto: deja holgura bajo el límite de 1 MB por documento de Firestore
+function fotosModalHTML(){
+  return '<span class="campo-label">Fotos</span><div class="m-fotos-modal">' + M_FOTOS.map(function(f, i){
+    var x = f.id ? mFoto(f.id) : f, src = x && x.data;
+    return '<div class="m-mini">' + (src ? '<img src="' + src + '" alt="Foto ' + (i + 1) + '">' : '<span>' + (f.cargando ? 'Comprimiendo…' : 'Cargando…') + '</span>') +
+      (i === 0 ? '<b class="m-mini-etq">Principal</b>' : '<button type="button" class="m-mini-etq" data-accion="m-foto-principal" data-i="' + i + '">Poner primero</button>') +
+      '<button type="button" class="icono-btn m-mini-x" data-accion="m-foto-quitar" data-i="' + i + '" aria-label="Quitar esta foto">' + ICON.x + '</button></div>';
+  }).join('') +
+  '<label class="m-mini m-mini-mas" for="m-foto-subir">' + ICON.mas + '<span>Subir foto</span></label><input type="file" id="m-foto-subir" accept="image/*" multiple data-cambio="m-foto-subir" hidden></div>' +
+  '<span class="ayuda">Un pantallazo de Marketplace o WhatsApp, o una foto del producto. Se achica sola antes de guardarse.</span>';
+}
+function refrescarFotosModal(){ var c = $('#m-fotos-caja'); if (c) c.innerHTML = fotosModalHTML(); }
+function comprimirFoto(file){
+  return new Promise(function(ok, mal){
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function(){
+      URL.revokeObjectURL(url);
+      var lado = 1280, q = 0.8, c = document.createElement('canvas'), data, w, h;
+      for (var n = 0; n < 8; n++) {
+        var e = Math.min(1, lado / Math.max(img.naturalWidth, img.naturalHeight));
+        w = Math.max(1, Math.round(img.naturalWidth * e)); h = Math.max(1, Math.round(img.naturalHeight * e));
+        c.width = w; c.height = h;
+        var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); g.drawImage(img, 0, 0, w, h);
+        data = c.toDataURL('image/jpeg', q);
+        if (data.length <= M_FOTO_MAX) return ok({data:data, ancho:w, alto:h});
+        if (q > 0.55) q -= 0.12; else lado = Math.round(lado * 0.8);
+      }
+      mal(new Error('grande'));
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); mal(new Error('formato')); };
+    img.src = url;
+  });
+}
+function modalVerFotos(o){
+  var fs = mFotosDe(o); if (!fs.length) return;
+  M = null;
+  var dlg = $('#modal');
+  dlg.innerHTML = '<div class="modal-caja m-visor"><header class="modal-cab"><div><span class="etiqueta">' + esc((buscar('montajeItems', o.item) || {}).nombre || 'Montaje') + '</span><h2>' + esc(o.proveedor) + '</h2></div><button type="button" class="icono-btn" data-accion="cerrar-modal" aria-label="Cerrar">' + ICON.x + '</button></header>' +
+    '<div class="modal-cuerpo">' + fs.map(function(f, i){ return '<img src="' + f.data + '" alt="Foto ' + (i + 1) + ' de ' + esc(o.proveedor) + '">'; }).join('') + '</div></div>';
+  try { if (!dlg.open) dlg.showModal(); } catch(e){ dlg.setAttribute('open', ''); }
+}
+function modalPunto(p){
+  var nuevo = !p; p = p || {};
+  abrirForm({
+    etiqueta: nuevo ? 'Nuevo punto' : 'Punto', titulo: nuevo ? 'Punto' : p.nombre,
+    campos:[
+      {id:'nombre', label:'Nombre del punto', valor:p.nombre || '', requerido:true, max:80, placeholder:'Ej.: Punto 1 · Bosques de la Cascada'},
+      {id:'ubicacion', label:'Ubicación', valor:p.ubicacion || '', max:160, placeholder:'Unidad, dirección y dónde queda dentro (sótano, lobby…)'},
+      {id:'apertura', label:'Fecha de montaje', tipo:'date', ancho:'medio', valor:p.apertura || ''},
+      {id:'notas', label:'Notas', tipo:'textarea', valor:p.notas || '', placeholder:'Contacto de la administración, horarios, lo que hay que saber del punto.'}
+    ],
+    onGuardar: function(v){
+      if (nuevo) { crear('montajePuntos', Object.assign({}, v, {creado:ahora(), por:S.yo || ''})); registrar('creó el punto «' + v.nombre + '» en Montaje'); }
+      else cambiar('montajePuntos', p.id, v);
+    },
+    textoBorrar:'Borrar el punto',
+    onBorrar: nuevo ? null : function(){
+      var n = S.d.montajeEquipos.filter(function(e){ return e.punto === p.id; }).length;
+      if (n) { avisar('«' + p.nombre + '» tiene ' + n + (n === 1 ? ' equipo' : ' equipos') + '. Bórrenlos antes de borrar el punto.', 'alerta'); return; }
+      aPapelera('montajePuntos', p.id);
+    }
+  });
+}
+function modalEquipo(e, puntoId){
+  var nuevo = !e; e = e || {};
+  var ops = S.d.montajeOpciones.slice().sort(function(a, b){ return (mElegida(b) ? 1 : 0) - (mElegida(a) ? 1 : 0); });
+  abrirForm({
+    deshacer: nuevo ? 'Se anotó un equipo en el punto' : 'Se guardaron los cambios del equipo',
+    etiqueta: nuevo ? 'Nuevo equipo' : 'Equipo', titulo: nuevo ? 'Equipo o mueble instalado' : (e.producto || e.tipo || 'Equipo'),
+    campos:[
+      {id:'opcion', label:'Traer los datos de una cotización (opcional)', tipo:'select', valor:e.opcion || '', opciones:[['', 'Ninguna: lo escribo yo']].concat(ops.map(function(o){ var it = buscar('montajeItems', o.item); return [o.id, (mElegida(o) ? '★ ' : '') + (it ? it.nombre + ' · ' : '') + o.proveedor + (o.producto ? ' · ' + cortar(o.producto, 40) : '')]; })), ayuda:'Llena proveedor, producto, contacto y valor; después se corrige lo que haga falta.'},
+      {id:'tipo', label:'Ítem', tipo:'select', ancho:'medio', valor:e.tipo || '', opciones:[['', 'Elegir']].concat(M_TIPOS_EQ.map(function(x){ return [x, x]; }))},
+      {id:'cantidad', label:'Cantidad', tipo:'number', ancho:'medio', valor:e.cantidad == null ? 1 : e.cantidad},
+      {id:'producto', label:'Producto o referencia', valor:e.producto || '', requerido:true, max:200},
+      {id:'proveedor', label:'Proveedor', ancho:'medio', valor:e.proveedor || '', max:80},
+      {id:'contacto', label:'Contacto (nombre y WhatsApp)', ancho:'medio', valor:e.contacto || '', max:120},
+      {id:'fecha', label:'Fecha de compra o instalación', tipo:'date', ancho:'medio', valor:e.fecha || ''},
+      {id:'valor', label:'Valor pagado (COP)', tipo:'pesos', ancho:'medio', valor:e.valor == null ? '' : e.valor},
+      {id:'garantia', label:'Garantía (meses)', tipo:'number', ancho:'medio', valor:e.garantia == null ? '' : e.garantia, ayuda:'Con la fecha, la oficina calcula cuándo vence y avisa 30 días antes.'},
+      {id:'serial', label:'Serial o placa', ancho:'medio', valor:e.serial || '', max:80},
+      {id:'factura', label:'Factura (dónde está)', valor:e.factura || '', max:200, placeholder:'Ej.: Drive › 04 Finanzas › Facturas'},
+      {id:'servicio', label:'Servicio técnico / mantenimiento', valor:e.servicio || '', max:200},
+      {id:'notas', label:'Notas', tipo:'textarea', valor:e.notas || ''}
+    ],
+    alAbrir: function(dlg){
+      var s = dlg.querySelector('#m-opcion'); if (!s) return;
+      s.addEventListener('change', function(){
+        var o = buscar('montajeOpciones', s.value); if (!o) return;
+        var it = buscar('montajeItems', o.item), t = mTotal(o, it);
+        var tipo = it ? M_TIPOS_EQ.find(function(x){ return normal(it.nombre).indexOf(normal(x).slice(0, 5)) === 0; }) : '';
+        var poner = {producto:o.producto || '', proveedor:o.proveedor || '', contacto:o.contacto || '', cantidad:mCant(o, it), tipo:tipo || ''};
+        Object.keys(poner).forEach(function(k){ var el = dlg.querySelector('#m-' + k); if (el && poner[k] !== '' && poner[k] !== undefined) el.value = poner[k]; });
+        if (t !== null) dlg.querySelector('#m-valor').value = pesos(t);
+        var gm = String(o.garantia || '').match(/(\d+)\s*mes/i), ga = String(o.garantia || '').match(/(\d+)\s*año/i);
+        if (gm || ga) dlg.querySelector('#m-garantia').value = gm ? gm[1] : Number(ga[1]) * 12;
+      });
+    },
+    onGuardar: function(v){
+      if (nuevo) { crear('montajeEquipos', Object.assign({}, v, {punto:puntoId, creado:ahora(), por:S.yo || ''})); var p = buscar('montajePuntos', puntoId); registrar('anotó ' + v.producto + ' en ' + (p ? p.nombre : 'un punto')); }
+      else cambiar('montajeEquipos', e.id, v);
+    },
+    textoBorrar:'Borrar el equipo',
+    onBorrar: nuevo ? null : function(){ aPapelera('montajeEquipos', e.id); }
+  });
+}
+
+// ---------- carga inicial desde el Excel ----------
+// El archivo lo arma cotizaciones/herramientas/exportar_a_oficina.py desde el Excel, con el formato de la copia de seguridad.
+var M_COLS = ['montajeItems', 'montajeOpciones', 'montajeFotos', 'montajePuntos', 'montajeEquipos'];
+function cargarMontaje(data){
+  var cols = data && data.colecciones, docs = [];
+  if (!cols) return avisar('Ese archivo no trae cotizaciones para Montaje.', 'alerta');
+  M_COLS.forEach(function(c){ (cols[c] || []).forEach(function(d){ if (d && d.id) docs.push([c, d]); }); });
+  if (!docs.length) return avisar('El archivo no trae cotizaciones para Montaje.', 'alerta');
+  var ya = docs.filter(function(x){ return x[0] !== 'montajeFotos' && buscar(x[0], x[1].id); }).length;
+  if (ya && !confirm('Ya hay ' + ya + ' cotizaciones que vinieron del Excel. ¿Cargarlas otra vez? Esas se reemplazan por las del Excel (lo que les hayan cambiado aquí se pierde). Las opciones que agregaron en la oficina se quedan.')) return;
+  avisar('Cargando ' + docs.length + ' datos…');
+  enGrupo('Se cargaron las cotizaciones del Excel', function(){
+    Promise.all(docs.map(function(x){ var d = Object.assign({}, x[1]); delete d.id; return escribir('set', x[0], x[1].id, d); })).then(function(r){
+      var ok = r.filter(Boolean).length, nOp = (cols.montajeOpciones || []).length;
+      registrar('cargó en Montaje las cotizaciones del Excel: ' + (cols.montajeItems || []).length + ' ítems, ' + nOp + ' opciones y ' + (cols.montajeFotos || []).length + ' fotos');
+      avisar(ok === docs.length ? 'Listo: ' + nOp + ' opciones con sus fotos.' : 'Se cargaron ' + ok + ' de ' + docs.length + ' datos. Intenten otra vez.', ok === docs.length ? '' : 'alerta');
+    });
+  });
+}
+function cargarMontajeDeLaPagina(){
+  avisar('Buscando el archivo del Excel…');
+  fetch('../cotizaciones/montaje-oficina.json', {cache:'no-store'}).then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(cargarMontaje)
+    .catch(function(){ avisar('Desde aquí no se pudo traer el archivo. Usen «Elegir el archivo (.json)» con cotizaciones/montaje-oficina.json.', 'alerta'); });
+}
+// fotos que ya no usa ninguna opción (ni nada en la papelera): se marcan y a los 30 días se borran
+function limpiarFotosMontaje(){
+  if (S.fotosRevisadas || !listo() || !S.recibidas.montajeFotos || S.soloLectura) return;
+  S.fotosRevisadas = true;
+  var usadas = {};
+  S.d.montajeOpciones.forEach(function(o){ (o.fotos || []).forEach(function(id){ usadas[id] = 1; }); });
+  S.d.papelera.forEach(function(p){ ((p.datos && p.datos.fotos) || []).forEach(function(id){ usadas[id] = 1; }); });
+  var lim = Date.now() - 30 * 864e5;
+  S.d.montajeFotos.forEach(function(f){
+    if (usadas[f.id]) { if (f.suelta) cambiar('montajeFotos', f.id, {suelta:''}); return; }
+    if (!f.suelta) cambiar('montajeFotos', f.id, {suelta:ahora()});
+    else if (Date.parse(f.suelta) < lim) borrar('montajeFotos', f.id);
+  });
+}
+function irMontaje(tab, item){
+  S.mTab = tab; if (item) S.mItem = item;
+  if (S.sala !== 'montaje') irA('montaje'); else render();
+}
+var ACC_M = {
+  'm-item': function(el){ S.mItem = el.dataset.id; S.mTab = 'cotizaciones'; render(); var n = $('#m-items'); if (n && window.innerWidth < 900) n.scrollIntoView({block:'start', behavior:'smooth'}); },
+  'm-nuevo-item': function(){ modalItemM(null); },
+  'm-editar-item': function(el){ var it = buscar('montajeItems', el.dataset.id); if (it) modalItemM(it); },
+  'm-mover-item': function(el){
+    var its = mItems(), i = its.findIndex(function(x){ return x.id === el.dataset.id; }), j = i + Number(el.dataset.n);
+    if (i < 0 || j < 0 || j >= its.length) return;
+    its.forEach(function(x, k){ var n = (k === i ? j : k === j ? i : k) * 10 + 10; if (x.orden !== n) cambiar('montajeItems', x.id, {orden:n}); });
+    desc('Se movió «' + its[i].nombre + '»');
+  },
+  'm-nueva-opcion': function(el){ modalOpcion(null, el.dataset.item || (mItemSel() || {}).id); },
+  'm-editar-opcion': function(el){ var o = buscar('montajeOpciones', el.dataset.id); if (!o) return; if (S.sala !== 'montaje' || S.mItem !== o.item) { cerrarModal(); irMontaje('cotizaciones', o.item); } modalOpcion(o); },
+  'm-ir-opcion': function(el){
+    var o = buscar('montajeOpciones', el.dataset.id); if (!o) return;
+    if (o.estado === 'descartado') S.mVerDesc = true;
+    cerrarModal(); irMontaje('cotizaciones', o.item);
+    setTimeout(function(){ var c = document.getElementById('op-' + o.id); if (c) { c.scrollIntoView({block:'center'}); c.classList.add('m-resalta'); } }, 60);
+  },
+  'm-mover-opcion': function(el){
+    var o = buscar('montajeOpciones', el.dataset.id); if (!o) return;
+    var os = mOpcionesDe(o.item), i = os.indexOf(o), j = i + Number(el.dataset.n);
+    if (j < 0 || j >= os.length) return;
+    os.forEach(function(x, k){ var n = (k === i ? j : k === j ? i : k) * 10 + 10; if (x.orden !== n) cambiar('montajeOpciones', x.id, {orden:n}); });
+    desc('Se movió la opción de ' + o.proveedor);
+  },
+  'm-ver-descartadas': function(){ S.mVerDesc = !S.mVerDesc; render(); },
+  'm-ver-fotos': function(el){ var o = buscar('montajeOpciones', el.dataset.id); if (o) modalVerFotos(o); },
+  'm-foto-quitar': function(el){ M_FOTOS.splice(Number(el.dataset.i), 1); refrescarFotosModal(); },
+  'm-foto-principal': function(el){ var f = M_FOTOS.splice(Number(el.dataset.i), 1)[0]; if (f) M_FOTOS.unshift(f); refrescarFotosModal(); },
+  'm-cargar-excel': cargarMontajeDeLaPagina,
+  'm-nuevo-punto': function(){ modalPunto(null); },
+  'm-editar-punto': function(el){ var p = buscar('montajePuntos', el.dataset.id); if (p) modalPunto(p); },
+  'm-nuevo-equipo': function(el){ modalEquipo(null, el.dataset.punto); },
+  'm-editar-equipo': function(el){ var e = buscar('montajeEquipos', el.dataset.id); if (!e) return; if (S.sala !== 'montaje' || S.mTab !== 'puntos') { cerrarModal(); irMontaje('puntos'); } modalEquipo(e, e.punto); },
+  'm-abrir-punto': function(){ cerrarModal(); irMontaje('puntos'); }
+};
+var CAMBIO_M = {
+  'm-estado': function(el){
+    var o = buscar('montajeOpciones', el.dataset.id); if (!o || o.estado === el.value) return;
+    cambiar('montajeOpciones', o.id, {estado:el.value, actualizada:ahora(), por:S.yo || ''});
+    desc('«' + cortar(o.proveedor, 40) + '» pasó a ' + mEstado(el.value).toLowerCase());
+    if (mElegida({estado:el.value})) registrar('marcó como ' + mEstado(el.value).toLowerCase() + ' la opción de ' + o.proveedor + ' (' + ((buscar('montajeItems', o.item) || {}).nombre || '').toLowerCase() + ')');
+  },
+  'm-importar': function(el){
+    var f = el.files && el.files[0]; el.value = ''; if (!f) return;
+    var lector = new FileReader();
+    lector.onload = function(){ var d = null; try { d = JSON.parse(lector.result); } catch(e){} cargarMontaje(d); };
+    lector.readAsText(f);
+  },
+  'm-foto-subir': function(el){
+    var files = Array.prototype.slice.call(el.files || []); el.value = '';
+    files.forEach(function(file){
+      var f = {cargando:true}; M_FOTOS.push(f); refrescarFotosModal();
+      comprimirFoto(file).then(function(r){ f.cargando = false; f.data = r.data; f.ancho = r.ancho; f.alto = r.alto; refrescarFotosModal(); },
+        function(){ var i = M_FOTOS.indexOf(f); if (i >= 0) M_FOTOS.splice(i, 1); refrescarFotosModal(); avisar('No se pudo leer esa imagen. Prueben con un pantallazo en JPG o PNG.', 'alerta'); });
+    });
+  }
+};
 
 // ---------- copia de seguridad ----------
 function respaldo(){
@@ -2862,7 +3463,7 @@ var ACC = {
   'editar-decision': function(el){ var d = buscar('decisiones', el.dataset.id); if (d) modalDecision(d); },
   'editar-idea': function(el){ var i = buscar('parqueadero', el.dataset.id); if (i) modalIdea(i); },
   'marcar-calendario': function(el){ var d = buscar(el.dataset.col, el.dataset.id); if (d) cambiar(el.dataset.col, d.id, {calendario:ahora(), calendarioPor:S.yo || ''}); },
-  'respaldo-json': function(){ descargar('oficina-minutemark-' + hoy() + '.json', respaldo()); },
+  'respaldo-json': function(){ if (S.modo !== 'local' && !S.recibidas.montajeFotos) return avisar('Las fotos de Montaje todavía están llegando. Intenten en unos segundos para que la copia salga completa.', 'alerta'); descargar('oficina-minutemark-' + hoy() + '.json', respaldo()); },
   'respaldo-csv': function(){ descargar('tareas-minutemark-' + hoy() + '.csv', csvTareas()); },
   'idea-recuperar': function(el){ cambiar('parqueadero', el.dataset.id, {estado:'parqueada'}); },
   'ver-descartadas': function(){ S.verDescartadas = !S.verDescartadas; render(); },
@@ -2939,6 +3540,7 @@ var ACC = {
     else if (g === 'filtro-resp') { S.filtro.resp = v; LS.set('mm-oficina-filtro', S.filtro); }
     else if (g === 'prov-tab') { S.provTab = v; LS.set('mm-oficina-prov', v); }
     else if (g === 'com-resp') { S.comResp = v; }
+    else if (g === 'm-tab') { S.mTab = v; LS.set('mm-oficina-montaje', v); }
     else if (g.indexOf('prov-lista:') === 0) {
       var p = buscar('proveedores', g.slice(11)); if (!p || (p.lista || 'por_pedir') === v) return;
       cambiar('proveedores', p.id, {lista:v, listaFecha:ahora(), actualizado:ahora()});
@@ -3022,6 +3624,9 @@ var FORM = {
     el.titulo.focus();
   }
 };
+
+Object.assign(ACC, ACC_M); Object.assign(CAMBIO, CAMBIO_M);
+Object.assign(DESC, {'m-cargar-excel':'Se cargaron las cotizaciones del Excel', 'm-mover-item':'Se movió el ítem', 'm-mover-opcion':'Se movió la opción', 'm-item':'Cambio de ítem'});
 
 document.addEventListener('click', function(e){
   var el = e.target.closest('[data-accion]');

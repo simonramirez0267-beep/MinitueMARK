@@ -20,6 +20,7 @@ Aquí está el banco de cotizaciones para montar los puntos de MinuteMark: todas
 Otras carpetas:
 
 - `fotos/`: todas las fotos de las opciones (pantallazos de proveedores y fotos de las tiendas), con nombre por ítem y proveedor.
+- `herramientas/exportar_a_oficina.py`: pasa el Excel (datos y fotos) a `montaje-oficina.json`, el archivo que carga la sala Montaje de la Oficina.
 - `herramientas/construir_excel.py`: arma el Excel desde cero con los datos y las fotos. Se corre con `python3 cotizaciones/herramientas/construir_excel.py cotizaciones/MinuteMark-Cotizaciones-Punto.xlsx`. Cuando se agrega una cotización, se agrega en este archivo y se vuelve a armar el Excel, así el Excel nunca queda desordenado.
 
 Reglas que no se cambian sin decidirlo:
@@ -29,6 +30,8 @@ Reglas que no se cambian sin decidirlo:
 - Una opción pasa a «Elegido» o «Comprado» y el Resumen la toma; si no hay ninguna elegida, presupuesta con la más barata.
 
 ## Plan: pasarlo a la Oficina
+
+**Estado (22 nov 2026):** la sala «Montaje» está construida en la rama `claude/exciting-keller-rbo96a`, esperando el visto bueno de Simón para pasar a `main`. Para cargar el Excel: `python3 cotizaciones/herramientas/exportar_a_oficina.py` arma `montaje-oficina.json` y en la Oficina › Montaje se toca «Cargar las cotizaciones del Excel». Una vez cargado, las cotizaciones nuevas se escriben en la Oficina, no en el Excel.
 
 Cuando estén cerradas las primeras cotizaciones (internet, estanterías, neveras y congeladores), esto pasa a la Oficina con estas condiciones, acordadas con Simón el 21 de noviembre de 2026:
 

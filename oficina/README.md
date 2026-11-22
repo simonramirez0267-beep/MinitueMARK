@@ -49,6 +49,14 @@ Si se abre este `index.html` sin configuración de Firebase, funciona como copia
 | Libreta | Notas compartidas que se guardan solas: modelo de negocio, objeciones, guion de llamada, preguntas para financieros y proveedores. |
 | Caja fuerte | NIT, bancos, códigos y accesos de proveedores, contraseñas y contactos, cifrados con una clave que solo tienen los dos socios. |
 | Historial | La papelera (lo borrado se guarda 30 días y se puede restaurar), los cambios del día que se pueden deshacer y todos los movimientos. |
+| Montaje | Lo que se necesita para montar un punto. **Cotizaciones:** una pestaña por ítem (neveras, estanterías, cámaras, internet…), cada opción con su foto, precio, IVA, costo total con IVA, garantía, entrega, pago y estado; arriba, el presupuesto del punto en tres escenarios (espacio cerrado, sótano, aire libre). **Puntos:** la hoja de vida de cada punto montado, con aviso cuando una garantía vence en 30 días o menos. |
+
+## Montaje del punto
+
+- Las cuentas son las mismas del Excel de cotizaciones: costo total = precio (más 19% si no incluye IVA) × cantidad (o la del ítem) + envío. Cada ítem entra al presupuesto con la opción «Elegido» o «Comprado»; si no hay, con la más barata. Las descartadas no cuentan.
+- Fotos: se suben desde el celular en el formulario de la opción y se achican solas (máximo unos 450 KB) antes de guardarse en `montajeFotos`, aparte de la opción, para no pasar el límite de 1 MB por documento. Una foto que nadie usa se borra sola a los 30 días.
+- Carga inicial: `cotizaciones/herramientas/exportar_a_oficina.py` pasa el Excel a `cotizaciones/montaje-oficina.json`; en la sala, «Cargar las cotizaciones del Excel» lo toma de la página. Volver a cargar actualiza las mismas opciones, no las duplica.
+- Colecciones: `montajeItems`, `montajeOpciones`, `montajeFotos`, `montajePuntos`, `montajeEquipos`. Entran en la papelera, el deshacer, el buscador y la copia de seguridad como todo lo demás.
 
 ## Áreas
 
