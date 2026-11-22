@@ -4,7 +4,9 @@ Aquí está el banco de cotizaciones para montar los puntos de MinuteMark: todas
 
 ## El archivo
 
-`MinuteMark-Cotizaciones-Punto.xlsx`
+**Versión viva, la que se edita:** [MinuteMark · Cotizaciones del punto](https://docs.google.com/spreadsheets/d/1P48TY4e64aG82Fdq-Y9YP509qPtEpTX2Zn1f2hIgOXg/edit), en el Drive compartido de MinuteMark › 04 Finanzas y precios › Montaje del punto (subida el 22 nov 2026). Simón y Sebastián la editan ahí.
+
+`MinuteMark-Cotizaciones-Punto.xlsx` (en esta carpeta) es la copia de respaldo con la que se armó, y la base para pasar todo a la Oficina.
 
 | Hoja | Para qué |
 | --- | --- |
