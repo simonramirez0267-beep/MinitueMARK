@@ -15,6 +15,11 @@ Aquí está el banco de cotizaciones para montar los puntos de MinuteMark: todas
 | Puntos | Lo que quedó instalado en cada punto: proveedor, contacto, fecha, valor, garantía, serial, factura y servicio técnico. Calcula cuándo vence la garantía y avisa. |
 | Fotos | Las fotos adicionales de cada opción. |
 
+Otras carpetas:
+
+- `fotos/`: todas las fotos de las opciones (pantallazos de proveedores y fotos de las tiendas), con nombre por ítem y proveedor.
+- `herramientas/construir_excel.py`: arma el Excel desde cero con los datos y las fotos. Se corre con `python3 cotizaciones/herramientas/construir_excel.py cotizaciones/MinuteMark-Cotizaciones-Punto.xlsx`. Cuando se agrega una cotización, se agrega en este archivo y se vuelve a armar el Excel, así el Excel nunca queda desordenado.
+
 Reglas que no se cambian sin decidirlo:
 
 - **Módulo de estantería universal:** 1,80 m de alto (mínimo) × 63 cm de ancho × 30 cm de fondo, entrepaños graduables, madera o melamina (nada industrial). Se acepta ancho 60–66, fondo 28–32 y alto 180–185 cm; lo demás no entra.
