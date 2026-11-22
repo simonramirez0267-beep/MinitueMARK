@@ -116,7 +116,8 @@ for n, nombre in enumerate(ITEMS):
             o[campo] = v
         o["fotos"] = [foto_de(i) for i in por_fila.get(r, [])]
         oid = "%s-%02d" % (iid, k)
-        opciones.append({"id": oid, **o})
+        o = {"id": oid, **o}
+        opciones.append(o)
         fotos_fila[(nombre, k)] = o
 
 # hoja Fotos: más fotos de algunas opciones («Neveras · opción 1», «Neveras · opciones 2 a 4»)
